@@ -2,7 +2,7 @@ package io.github.codeutilities.commands.misc;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import io.github.codeutilities.Codeutilities;
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -25,7 +25,7 @@ public class NodeCommand implements Command {
 
         for (Entry<String, String> node : nodes.entrySet()) {
             cmd.then(literal(node.getKey()).executes(ctx -> {
-                Codeutilities.MC.player.chat("/server " + node.getValue());
+                CodeUtilities.MC.player.chat("/server " + node.getValue());
                 return 1;
             }));
         }

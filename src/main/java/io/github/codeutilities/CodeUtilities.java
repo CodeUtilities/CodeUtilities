@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Codeutilities implements ModInitializer {
+public class CodeUtilities implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger();
     public static final Minecraft MC = Minecraft.getInstance();

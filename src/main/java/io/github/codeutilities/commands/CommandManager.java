@@ -2,6 +2,7 @@ package io.github.codeutilities.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import io.github.codeutilities.commands.item.DfGiveCommand;
+import io.github.codeutilities.commands.item.EditNbtCommand;
 import io.github.codeutilities.commands.misc.NodeCommand;
 import io.github.codeutilities.commands.text.UUIDCommand;
 import io.github.codeutilities.loader.Loadable;
@@ -28,6 +29,7 @@ public class CommandManager implements Loadable {
         commands.add(new DfGiveCommand());
         commands.add(new UUIDCommand());
         commands.add(new NodeCommand());
+        commands.add(new EditNbtCommand());
 
         attachTo(ClientCommandManager.DISPATCHER);
     }

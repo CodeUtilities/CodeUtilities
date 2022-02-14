@@ -11,7 +11,7 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "io.github.codeutilities.Codeutilities"
+      "io.github.codeutilities.CodeUtilities"
     ]
   },
   "mixins": [

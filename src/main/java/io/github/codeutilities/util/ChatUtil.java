@@ -1,6 +1,6 @@
 package io.github.codeutilities.util;
 
-import io.github.codeutilities.Codeutilities;
+import io.github.codeutilities.CodeUtilities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -8,8 +8,8 @@ import net.minecraft.network.chat.TextComponent;
 public class ChatUtil {
 
     public static void send(Component msg) {
-        if (Codeutilities.MC.player == null) return;
-        Codeutilities.MC.player.displayClientMessage(msg,false);
+        if (CodeUtilities.MC.player == null) return;
+        CodeUtilities.MC.player.displayClientMessage(msg,false);
     }
 
     public static void error(String s) {

@@ -1,13 +1,13 @@
 package io.github.codeutilities.util;
 
-import io.github.codeutilities.Codeutilities;
+import io.github.codeutilities.CodeUtilities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemUtil {
 
     public static void giveItem(ItemStack stack) {
-        Minecraft mc = Codeutilities.MC;
+        Minecraft mc = CodeUtilities.MC;
 
         if (!mc.player.isCreative()) {
             return;
@@ -45,7 +45,7 @@ public class ItemUtil {
     }
 
     public static void setHandItem(ItemStack stack) {
-        Minecraft mc = Codeutilities.MC;
+        Minecraft mc = CodeUtilities.MC;
         if (!mc.player.isCreative()) {
             return;
         }

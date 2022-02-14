@@ -3,7 +3,7 @@ package io.github.codeutilities.commands.item;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.codeutilities.Codeutilities;
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.util.ChatUtil;
 import io.github.codeutilities.util.ItemUtil;
@@ -46,7 +46,7 @@ public class DfGiveCommand implements Command {
         if (amount < 1) {
             ChatUtil.error("The minimum amount of items to give is 1");
         }
-        if (!Codeutilities.MC.player.isCreative()) {
+        if (!CodeUtilities.MC.player.isCreative()) {
             ChatUtil.error("You must be in creative mode to use this command");
             return;
         }

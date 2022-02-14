@@ -2,10 +2,9 @@ package io.github.codeutilities.commands.text;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import io.github.codeutilities.Codeutilities;
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.util.ChatUtil;
 import io.github.codeutilities.util.WebUtil;
@@ -16,13 +15,12 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.entity.vehicle.Minecart;
 
 public class UUIDCommand implements Command {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
-        Minecraft mc = Codeutilities.MC;
+        Minecraft mc = CodeUtilities.MC;
         cd.register(literal("uuid")
                 .executes(ctx -> {
                     showUUID(mc.player.getStringUUID());
