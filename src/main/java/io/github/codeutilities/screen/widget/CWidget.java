@@ -17,4 +17,8 @@ public interface CWidget {
 
     default void mouseScrolled(double mouseX, double mouseY, double amount) {
     }
+
+    default void renderOverlay(PoseStack stack, int mouseX, int mouseY, float tickDelta) {
+
+    }
 }

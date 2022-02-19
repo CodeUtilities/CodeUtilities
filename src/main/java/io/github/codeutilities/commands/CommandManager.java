@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import io.github.codeutilities.commands.item.DfGiveCommand;
 import io.github.codeutilities.commands.item.EditNbtCommand;
 import io.github.codeutilities.commands.misc.NodeCommand;
+import io.github.codeutilities.commands.misc.ScriptsCommand;
 import io.github.codeutilities.commands.text.UUIDCommand;
 import io.github.codeutilities.loader.Loadable;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class CommandManager implements Loadable {
         commands.add(new UUIDCommand());
         commands.add(new NodeCommand());
         commands.add(new EditNbtCommand());
+        commands.add(new ScriptsCommand());
 
         attachTo(ClientCommandManager.DISPATCHER);
     }

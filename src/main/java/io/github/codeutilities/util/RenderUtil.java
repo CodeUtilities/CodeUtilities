@@ -6,9 +6,12 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Vector4f;
 import io.github.codeutilities.CodeUtilities;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.opengl.GL11;
 
 public class RenderUtil {
@@ -108,11 +111,24 @@ public class RenderUtil {
     }
 
     public static void setScissor(int x, int y, int width, int height) {
-        GL11.glScissor(x, CodeUtilities.MC.getWindow().getHeight()-y-height, width, height);
+        GL11.glScissor(x, CodeUtilities.MC.getWindow().getHeight() - y - height, width, height);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
     }
 
     public static void clearScissor() {
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
+    }
+
+    public static void renderGuiItem(PoseStack stack, ItemStack item) {
+        RenderSystem.enableDepthTest();
+        stack.pushPose();
+        ItemRenderer renderer = CodeUtilities.MC.getItemRenderer();
+        renderer.blitOffset = 200f;
+        Vector4f pos = new Vector4f(0, 0, 0, 1);
+        pos.transform(stack.last().pose());
+        renderer.renderGuiItem(item, (int) pos.x(), (int) pos.y());
+        renderer.blitOffset = 0f;
+        stack.popPose();
+        RenderSystem.disableDepthTest();
     }
 }

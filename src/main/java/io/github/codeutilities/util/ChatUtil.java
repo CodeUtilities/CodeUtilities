@@ -3,6 +3,7 @@ package io.github.codeutilities.util;
 import io.github.codeutilities.CodeUtilities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 
 public class ChatUtil {
@@ -25,5 +26,10 @@ public class ChatUtil {
     public static void info(String s) {
         send(new TextComponent(s)
             .withStyle(ChatFormatting.AQUA));
+    }
+
+    public static void sendActionBar(MutableComponent msg) {
+        if (CodeUtilities.MC.player == null) return;
+        CodeUtilities.MC.player.displayClientMessage(msg,true);
     }
 }

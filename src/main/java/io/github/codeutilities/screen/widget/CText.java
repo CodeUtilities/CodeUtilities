@@ -25,6 +25,10 @@ public class CText implements CWidget {
         this.shadow = shadow;
     }
 
+    public CText(int x, int y, Component text) {
+        this(x, y, text, 0x333333, 1, false, false);
+    }
+
     @Override
     public void render(PoseStack stack, int mouseX, int mouseY, float tickDelta) {
         stack.pushPose();

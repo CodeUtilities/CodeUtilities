@@ -50,6 +50,9 @@ public class CScreen extends Screen {
         for (CWidget cWidget : widgets) {
             cWidget.render(stack, mouseX, mouseY, tickDelta);
         }
+        for (CWidget cWidget : widgets) {
+            cWidget.renderOverlay(stack, mouseX, mouseY, tickDelta);
+        }
         stack.popPose();
         super.render(stack, mouseX, mouseY, tickDelta);
     }
