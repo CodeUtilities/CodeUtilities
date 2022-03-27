@@ -7,11 +7,11 @@ import io.github.codeutilities.screen.widget.CScrollPanel;
 import io.github.codeutilities.screen.widget.CText;
 import io.github.codeutilities.script.Script;
 import io.github.codeutilities.script.ScriptManager;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
 
 public class ScriptListScreen extends CScreen {
 
@@ -22,24 +22,24 @@ public class ScriptListScreen extends CScreen {
 
 
         ItemStack deleteIcon = new ItemStack(Items.RED_DYE);
-        deleteIcon.setHoverName(new TextComponent("Delete")
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.RED)
+        deleteIcon.setCustomName(new LiteralText("Delete")
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.RED)
                 .withItalic(false)));
 
         ItemStack addIcon = new ItemStack(Items.LIME_DYE);
-        addIcon.setHoverName(new TextComponent("Add")
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.GREEN)
+        addIcon.setCustomName(new LiteralText("Add")
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.GREEN)
                 .withItalic(false)));
 
         ItemStack editIcon = new ItemStack(Items.IRON_INGOT);
-        editIcon.setHoverName(new TextComponent("Edit")
-            .withStyle(Style.EMPTY.withItalic(false)));
+        editIcon.setCustomName(new LiteralText("Edit")
+            .fillStyle(Style.EMPTY.withItalic(false)));
 
         int y = 5;
         for (Script s : ScriptManager.getInstance().getScripts()) {
-            panel.add(new CText(5, y + 5, new TextComponent(s.getName())));
+            panel.add(new CText(5, y + 5, new LiteralText(s.getName())));
 
             CItem editButton = new CItem(70, y + 3, editIcon);
             panel.add(editButton);

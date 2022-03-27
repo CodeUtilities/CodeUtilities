@@ -1,10 +1,10 @@
 package io.github.codeutilities.screen.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector4f;
 import io.github.codeutilities.util.RenderUtil;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Vector4f;
 
 public class CScrollPanel implements CWidget {
 
@@ -20,20 +20,20 @@ public class CScrollPanel implements CWidget {
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float tickDelta) {
-        stack.pushPose();
+    public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
+        stack.push();
         stack.translate(x, y, 0);
 
         Vector4f begin = new Vector4f(0, 0, 1, 1);
         Vector4f end = new Vector4f(width, height, 1, 1);
-        begin.transform(stack.last().pose());
-        end.transform(stack.last().pose());
+        begin.transform(stack.peek().getPositionMatrix());
+        end.transform(stack.peek().getPositionMatrix());
 
         RenderUtil.setScissor(
-            (int) begin.x()*2,
-            (int) begin.y()*2,
-            (int) (end.x() - begin.x())*2,
-            (int) (end.y() - begin.y())*2
+            (int) begin.getX()*2,
+            (int) begin.getY()*2,
+            (int) (end.getX() - begin.getX())*2,
+            (int) (end.getY() - begin.getY())*2
         );
 
         stack.translate(0, scroll, 0);
@@ -44,7 +44,7 @@ public class CScrollPanel implements CWidget {
         }
 
         RenderUtil.clearScissor();
-        stack.popPose();
+        stack.pop();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class CScrollPanel implements CWidget {
     }
 
     @Override
-    public void renderOverlay(PoseStack stack, int mouseX, int mouseY, float tickDelta) {
+    public void renderOverlay(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
         mouseY -= scroll;
 
         for (CWidget child : children) {

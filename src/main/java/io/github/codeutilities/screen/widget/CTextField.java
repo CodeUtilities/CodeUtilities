@@ -1,12 +1,12 @@
 package io.github.codeutilities.screen.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.util.RenderUtil;
 import java.nio.FloatBuffer;
 import java.util.List;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.util.math.MatrixStack;
 
 public class CTextField implements CWidget {
 
@@ -31,16 +31,16 @@ public class CTextField implements CWidget {
 
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float tickDelta) {
-        stack.pushPose();
+    public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
+        stack.push();
         stack.translate(x, y, 0);
 
-        GuiComponent.fill(stack, 0, 0, width, height, 0xFF888888);
-        GuiComponent.fill(stack, 1, 1, width - 1, height - 1, 0xFF000000);
+        DrawableHelper.fill(stack, 0, 0, width, height, 0xFF888888);
+        DrawableHelper.fill(stack, 1, 1, width - 1, height - 1, 0xFF000000);
 
         FloatBuffer buff = FloatBuffer.allocate(16);
 
-        stack.last().pose().store(buff);
+        stack.peek().getPositionMatrix().writeColumnMajor(buff);
 
         RenderUtil.setScissor(
             (int) ((x + buff.get(12)) * buff.get(0)),
@@ -52,10 +52,10 @@ public class CTextField implements CWidget {
         stack.translate(2, 2 + scroll, 0);
         stack.scale(0.5f, 0.5f, 0);
 
-        Font f = CodeUtilities.MC.font;
+        TextRenderer f = CodeUtilities.MC.textRenderer;
         String[] lines = text.split("\n");
 
-        stack.pushPose();
+        stack.push();
         int selectionStart = Math.min(selectionPos, cursorPos);
         int selectionEnd = Math.max(selectionPos, cursorPos);
 
@@ -64,33 +64,33 @@ public class CTextField implements CWidget {
                 int lineSelectionStart = Math.max(0, Math.min(selectionStart, line.length()));
                 int lineSelectionEnd = Math.max(0, Math.min(selectionEnd, line.length()));
 
-                stack.pushPose();
+                stack.push();
 
-                stack.translate(f.width(line.substring(0, lineSelectionStart)), 0, 0);
-                GuiComponent.fill(stack, 0, 0, f.width(line.substring(lineSelectionStart, lineSelectionEnd)), f.lineHeight, 0xFF5555FF);
+                stack.translate(f.getWidth(line.substring(0, lineSelectionStart)), 0, 0);
+                DrawableHelper.fill(stack, 0, 0, f.getWidth(line.substring(lineSelectionStart, lineSelectionEnd)), f.fontHeight, 0xFF5555FF);
 
-                stack.popPose();
+                stack.pop();
             }
             f.draw(stack, line, 0, 0, textColor);
 
             selectionStart -= line.length() + 1;
             selectionEnd -= line.length() + 1;
 
-            stack.translate(0, f.lineHeight, 0);
+            stack.translate(0, f.fontHeight, 0);
         }
-        stack.popPose();
+        stack.pop();
 
         if (editable) {
             int cursorLine = getCursorLineIndex();
             int cursorLinePos = getIndexInCursorLine();
 
-            int cursorX = f.width(getCursorLine().substring(0, cursorLinePos));
-            int cursorY = f.lineHeight * cursorLine;
+            int cursorX = f.getWidth(getCursorLine().substring(0, cursorLinePos));
+            int cursorY = f.fontHeight * cursorLine;
 
             f.draw(stack, "|", cursorX, cursorY, 0x99FFFFFF);
         }
 
-        stack.popPose();
+        stack.pop();
         RenderUtil.clearScissor();
     }
 
@@ -119,7 +119,7 @@ public class CTextField implements CWidget {
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (editable) {
             String lastText = text;
-            Font f = CodeUtilities.MC.font;
+            TextRenderer f = CodeUtilities.MC.textRenderer;
             boolean createSelection = modifiers != 0;
             if (createSelection && !hasSelection) {
                 hasSelection = true;
@@ -156,8 +156,8 @@ public class CTextField implements CWidget {
                     break;
                 case 265: //up
                     if (getCursorLineIndex() > 0) {
-                        int x = f.width(getCursorLine().substring(0, getIndexInCursorLine()));
-                        int charPos = f.plainSubstrByWidth(getLine(getCursorLineIndex() - 1), x, true).length();
+                        int x = f.getWidth(getCursorLine().substring(0, getIndexInCursorLine()));
+                        int charPos = f.trimToWidth(getLine(getCursorLineIndex() - 1), x, true).length();
                         setCursor(getCursorLineIndex() - 1, charPos);
                     } else {
                         cursorPos = 0;
@@ -165,8 +165,8 @@ public class CTextField implements CWidget {
                     break;
                 case 264: //down
                     if (getCursorLineIndex() < getLines().length - 1) {
-                        int x = f.width(getCursorLine().substring(0, getIndexInCursorLine()));
-                        int charPos = f.plainSubstrByWidth(getLine(getCursorLineIndex() + 1), x, true).length();
+                        int x = f.getWidth(getCursorLine().substring(0, getIndexInCursorLine()));
+                        int charPos = f.trimToWidth(getLine(getCursorLineIndex() + 1), x, true).length();
                         setCursor(getCursorLineIndex() + 1, charPos);
                     } else {
                         cursorPos = text.length();
@@ -189,7 +189,7 @@ public class CTextField implements CWidget {
                 case 67: //c
                     if (modifiers == 2) {
                         if (hasSelection) {
-                            CodeUtilities.MC.keyboardHandler.setClipboard(text.substring(selectionStart, selectionEnd));
+                            CodeUtilities.MC.keyboard.setClipboard(text.substring(selectionStart, selectionEnd));
                         }
                     }
                     break;
@@ -198,7 +198,7 @@ public class CTextField implements CWidget {
                         if (hasSelection) {
                             deleteSelection(selectionStart, selectionEnd);
                         }
-                        String clipboard = CodeUtilities.MC.keyboardHandler.getClipboard();
+                        String clipboard = CodeUtilities.MC.keyboard.getClipboard();
                         text = text.substring(0, cursorPos) + clipboard + text.substring(cursorPos);
                         cursorPos += clipboard.length();
                     }
@@ -206,7 +206,7 @@ public class CTextField implements CWidget {
                 case 88: //x
                     if (modifiers == 2) {
                         if (hasSelection) {
-                            CodeUtilities.MC.keyboardHandler.setClipboard(text.substring(selectionStart, selectionEnd));
+                            CodeUtilities.MC.keyboard.setClipboard(text.substring(selectionStart, selectionEnd));
                             deleteSelection(selectionStart, selectionEnd);
                         }
                     }
@@ -246,7 +246,7 @@ public class CTextField implements CWidget {
     public void mouseClicked(double x, double y, int button) {
         if (editable) {
             if (button == 0) {
-                Font f = CodeUtilities.MC.font;
+                TextRenderer f = CodeUtilities.MC.textRenderer;
 
                 x -= 1 + this.x;
                 y -= 1 + this.y + scroll;
@@ -254,10 +254,10 @@ public class CTextField implements CWidget {
                 x *= 2;
                 y *= 2;
 
-                int line = (int) (y / f.lineHeight);
+                int line = (int) (y / f.fontHeight);
                 int pixelX = (int) (x);
                 line = Math.max(0, Math.min(line, getLines().length - 1));
-                int lineIndex = f.plainSubstrByWidth(getLine(line), pixelX, true).length();
+                int lineIndex = f.trimToWidth(getLine(line), pixelX, true).length();
                 setCursor(line, lineIndex);
 
                 if (hasSelection) {
@@ -271,8 +271,8 @@ public class CTextField implements CWidget {
     public void mouseScrolled(double mouseX, double mouseY, double amount) {
         if (editable) {
             scroll += amount * 5;
-            Font f = CodeUtilities.MC.font;
-            scroll = Math.min(0, Math.max(scroll, -(getLines().length + 1) * f.lineHeight / 2 + height - 2));
+            TextRenderer f = CodeUtilities.MC.textRenderer;
+            scroll = Math.min(0, Math.max(scroll, -(getLines().length + 1) * f.fontHeight / 2 + height - 2));
         }
     }
 

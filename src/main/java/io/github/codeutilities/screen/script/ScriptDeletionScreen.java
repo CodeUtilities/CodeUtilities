@@ -22,7 +22,7 @@ public class ScriptDeletionScreen extends CScreen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         CodeUtilities.MC.setScreen(new ScriptListScreen());
     }
 }

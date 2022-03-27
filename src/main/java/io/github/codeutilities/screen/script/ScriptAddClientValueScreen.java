@@ -38,7 +38,7 @@ public class ScriptAddClientValueScreen extends CScreen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         CodeUtilities.MC.setScreen(new ScriptAddArgumentScreen(script, action, insertIndex));
     }
 }

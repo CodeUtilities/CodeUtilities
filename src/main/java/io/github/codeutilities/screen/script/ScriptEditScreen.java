@@ -11,11 +11,11 @@ import io.github.codeutilities.script.ScriptPart;
 import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
 import io.github.codeutilities.script.event.ScriptEvent;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
 
 public class ScriptEditScreen extends CScreen {
 
@@ -28,19 +28,19 @@ public class ScriptEditScreen extends CScreen {
         widgets.add(panel);
 
         ItemStack deleteIcon = new ItemStack(Items.RED_DYE);
-        deleteIcon.setHoverName(new TextComponent("Delete")
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.RED)
+        deleteIcon.setCustomName(new LiteralText("Delete")
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.RED)
                 .withItalic(false)));
 
         ItemStack addIcon = new ItemStack(Items.LIME_DYE);
-        addIcon.setHoverName(new TextComponent("Add")
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.GREEN)
+        addIcon.setCustomName(new LiteralText("Add")
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.GREEN)
                 .withItalic(false)));
 
         ItemStack argumentsIcon = new ItemStack(Items.CHEST);
-        argumentsIcon.setHoverName(new TextComponent("Arguments"));
+        argumentsIcon.setCustomName(new LiteralText("Arguments"));
 
         int y = 5;
         int index = 0;
@@ -48,7 +48,7 @@ public class ScriptEditScreen extends CScreen {
         for (ScriptPart part : script.getParts()) {
             if (part instanceof ScriptEvent se) {
                 panel.add(new CItem(5, y, se.getType().getIcon()));
-                panel.add(new CText(15, y + 3, new TextComponent(se.getType().getName())));
+                panel.add(new CText(15, y + 3, new LiteralText(se.getType().getName())));
                 indent = 5;
             } else if (part instanceof ScriptAction sa) {
                 if (sa.getType() == ScriptActionType.CLOSE_BRACKET) {
@@ -56,7 +56,7 @@ public class ScriptEditScreen extends CScreen {
                 }
 
                 panel.add(new CItem(5 + indent, y, sa.getType().getIcon()));
-                panel.add(new CText(15 + indent, y + 3, new TextComponent(sa.getType().getName())));
+                panel.add(new CText(15 + indent, y + 3, new LiteralText(sa.getType().getName())));
 
                 if (sa.getType().hasChildren()) {
                     indent += 5;
@@ -98,7 +98,7 @@ public class ScriptEditScreen extends CScreen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         ScriptManager.getInstance().saveScript(script);
         CodeUtilities.MC.setScreen(new ScriptListScreen());
     }

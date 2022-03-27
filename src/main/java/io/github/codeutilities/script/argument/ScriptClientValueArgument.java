@@ -15,13 +15,21 @@ import io.github.codeutilities.script.values.ScriptValue;
 import io.github.codeutilities.util.ComponentUtil;
 import java.lang.reflect.Type;
 import java.util.function.BiFunction;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public enum ScriptClientValueArgument implements ScriptArgument {
 
     EVENT_KEY("KeyPressed","The key code of the key pressed. (KeyPressEvent)", Items.STONE_BUTTON, (event, context) -> {
         if (event instanceof KeyPressEvent e) {
-            return new ScriptNumberValue(e.getKey().geValue());
+            return new ScriptNumberValue(e.getKey().getCode());
         } else {
             throw new IllegalStateException("Event is not a KeyPressEvent");
         }
@@ -58,15 +66,15 @@ public enum ScriptClientValueArgument implements ScriptArgument {
     ScriptClientValueArgument(String name, String description, Item type, BiFunction<Event, ScriptContext, ScriptValue> consumer) {
         this.name = name;
         this.icon = new ItemStack(type);
-        icon.setHoverName(new TextComponent(name)
-            .withStyle(Style.EMPTY
+        icon.setCustomName(new LiteralText(name)
+            .fillStyle(Style.EMPTY
                 .withItalic(false)));
-        ListTag lore = new ListTag();
-        lore.add(StringTag.valueOf(Component.Serializer.toJson(new TextComponent(description)
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.GRAY)
+        NbtList lore = new NbtList();
+        lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(description)
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.GRAY)
                 .withItalic(false)))));
-        icon.getTagElement("display")
+        icon.getSubNbt("display")
             .put("Lore", lore);
         this.consumer = consumer;
     }

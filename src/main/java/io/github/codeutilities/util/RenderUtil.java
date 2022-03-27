@@ -1,40 +1,40 @@
 package io.github.codeutilities.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Vector4f;
 import io.github.codeutilities.CodeUtilities;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vector4f;
 import org.lwjgl.opengl.GL11;
 
 public class RenderUtil {
 
-    public static void renderImage(PoseStack stack, int x, int y, int width, int height, float ux, float uy, float uw, float uh, String image) {
+    public static void renderImage(MatrixStack stack, int x, int y, int width, int height, float ux, float uy, float uw, float uh, String image) {
         RenderSystem.enableBlend();
-        RenderSystem.setShaderTexture(0, new ResourceLocation(image));
+        RenderSystem.setShaderTexture(0, new Identifier(image));
         RenderSystem.setShaderColor(1, 1, 1, 1);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.disableCull();
 
-        Tesselator tessellator = Tesselator.getInstance();
+        Tessellator tessellator = Tessellator.getInstance();
 
-        BufferBuilder bb = tessellator.getBuilder();
-        bb.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bb.vertex(stack.last().pose(), x, y, 0).uv(ux, uy).endVertex();
-        bb.vertex(stack.last().pose(), x + width, y, 0).uv(ux+uw, uy).endVertex();
-        bb.vertex(stack.last().pose(), x + width, y + height, 0).uv(ux+uw, uy+uh).endVertex();
-        bb.vertex(stack.last().pose(), x, y + height, 0).uv(ux, uy+uh).endVertex();
-        tessellator.end();
+        BufferBuilder bb = tessellator.getBuffer();
+        bb.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        bb.vertex(stack.peek().getPositionMatrix(), x, y, 0).texture(ux, uy).next();
+        bb.vertex(stack.peek().getPositionMatrix(), x + width, y, 0).texture(ux+uw, uy).next();
+        bb.vertex(stack.peek().getPositionMatrix(), x + width, y + height, 0).texture(ux+uw, uy+uh).next();
+        bb.vertex(stack.peek().getPositionMatrix(), x, y + height, 0).texture(ux, uy+uh).next();
+        tessellator.draw();
     }
 
-    public static void renderButton(PoseStack stack, int x, int y, int width, int height, boolean hovered, boolean disabled) {
+    public static void renderButton(MatrixStack stack, int x, int y, int width, int height, boolean hovered, boolean disabled) {
         final String image = "textures/gui/widgets.png";
         final int textureWidth = 256;
         final int textureHeight = 256;
@@ -51,7 +51,7 @@ public class RenderUtil {
         renderContinuousTexture(stack, x, y, width, height, image, x1, y1, x2, y2, textureWidth, textureHeight, padding,1);
     }
 
-    public static void renderContinuousTexture(PoseStack stack, int x, int y, int width, int height, String image, int tx1, int ty1, int tx2, int ty2, int textureWidth, int textureHeight, int padding,double scale) {
+    public static void renderContinuousTexture(MatrixStack stack, int x, int y, int width, int height, String image, int tx1, int ty1, int tx2, int ty2, int textureWidth, int textureHeight, int padding,double scale) {
         int scaledPadding = (int) (padding*scale);
         //top left corner
         renderContinuousTexture(stack, x, y, scaledPadding, scaledPadding, image, tx1, ty1, tx1 + padding, ty1 + padding, textureWidth, textureHeight,scale);
@@ -75,7 +75,7 @@ public class RenderUtil {
         renderContinuousTexture(stack, x + scaledPadding, y + scaledPadding, width - scaledPadding * 2, height - scaledPadding * 2, image, tx1 + padding, ty1 + padding, tx2 - padding, ty2 - padding, textureWidth, textureHeight,scale);
     }
 
-    public static void renderContinuousTexture(PoseStack stack, int x, int y, int width, int height, String image, int tx1, int ty1, int tx2, int ty2, int textureWidth, int textureHeight, double scale) {
+    public static void renderContinuousTexture(MatrixStack stack, int x, int y, int width, int height, String image, int tx1, int ty1, int tx2, int ty2, int textureWidth, int textureHeight, double scale) {
         int tw = (tx2 - tx1);
         int th = (ty2 - ty1);
 
@@ -106,7 +106,7 @@ public class RenderUtil {
         renderImage(stack, Math.max((int) (x + xrepeations * tw) - tw, x), Math.max((int) (y + yrepeations * th) - th, y), (int) minW, (int) minH, ux, uy, uw, uh, image);
     }
 
-    public static void renderGui(PoseStack stack, int x, int y, int width, int height) {
+    public static void renderGui(MatrixStack stack, int x, int y, int width, int height) {
         renderContinuousTexture(stack, x,y,width,height,"textures/gui/demo_background.png",0,0,248,166,256,256,5);
     }
 
@@ -119,16 +119,16 @@ public class RenderUtil {
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 
-    public static void renderGuiItem(PoseStack stack, ItemStack item) {
+    public static void renderGuiItem(MatrixStack stack, ItemStack item) {
         RenderSystem.enableDepthTest();
-        stack.pushPose();
+        stack.push();
         ItemRenderer renderer = CodeUtilities.MC.getItemRenderer();
-        renderer.blitOffset = 200f;
+        renderer.zOffset = 200f;
         Vector4f pos = new Vector4f(0, 0, 0, 1);
-        pos.transform(stack.last().pose());
-        renderer.renderGuiItem(item, (int) pos.x(), (int) pos.y());
-        renderer.blitOffset = 0f;
-        stack.popPose();
+        pos.transform(stack.peek().getPositionMatrix());
+        renderer.renderGuiItemIcon(item, (int) pos.getX(), (int) pos.getY());
+        renderer.zOffset = 0f;
+        stack.pop();
         RenderSystem.disableDepthTest();
     }
 }

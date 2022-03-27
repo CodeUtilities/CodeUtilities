@@ -11,11 +11,11 @@ import io.github.codeutilities.script.argument.ScriptClientValueArgument;
 import io.github.codeutilities.script.argument.ScriptNumberArgument;
 import io.github.codeutilities.script.argument.ScriptTextArgument;
 import io.github.codeutilities.script.argument.ScriptVariableArgument;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
 
 public class ScriptEditActionScreen extends CScreen {
 
@@ -26,15 +26,15 @@ public class ScriptEditActionScreen extends CScreen {
         this.script = script;
 
         ItemStack deleteIcon = new ItemStack(Items.RED_DYE);
-        deleteIcon.setHoverName(new TextComponent("Delete")
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.RED)
+        deleteIcon.setCustomName(new LiteralText("Delete")
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.RED)
                 .withItalic(false)));
 
         ItemStack addIcon = new ItemStack(Items.LIME_DYE);
-        addIcon.setHoverName(new TextComponent("Add")
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.GREEN)
+        addIcon.setCustomName(new LiteralText("Add")
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.GREEN)
                 .withItalic(false)));
 
         int y = 5;
@@ -62,7 +62,7 @@ public class ScriptEditActionScreen extends CScreen {
                 throw new IllegalArgumentException("Invalid argument type");
             }
             widgets.add(new CItem(5, y, icon));
-            widgets.add(new CText(15, y + 2, new TextComponent(text)));
+            widgets.add(new CText(15, y + 2, new LiteralText(text)));
 
             CItem delete = new CItem(80, y, deleteIcon);
             int currentIndex = index;
@@ -92,7 +92,7 @@ public class ScriptEditActionScreen extends CScreen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         CodeUtilities.MC.setScreen(new ScriptEditScreen(script));
     }
 }

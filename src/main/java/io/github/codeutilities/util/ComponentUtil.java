@@ -1,6 +1,7 @@
 package io.github.codeutilities.util;
 
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -11,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class ComponentUtil {
 
-    public static Text fromString(String message) {
+    public static MutableText fromString(String message) {
         LiteralText result = new LiteralText("");
 
         try {
@@ -53,7 +54,7 @@ public class ComponentUtil {
         return result;
     }
 
-    public static String toFormattedString(LiteralText message) {
+    public static String toFormattedString(Text message) {
         StringBuilder result = new StringBuilder();
 
         Style style = message.getStyle();
@@ -61,7 +62,7 @@ public class ComponentUtil {
         String format = "";
 
         if (style.getColor() != null) {
-            format += "§x§" + String.join("§", String.format("%06X", style.getColor().getName()).split(""));
+            format += "§x§" + String.join("§", String.format("%06X", style.getColor().getRgb()).split(""));
         }
 
         if (style.isBold()) {

@@ -1,7 +1,7 @@
 package io.github.codeutilities.screen.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.codeutilities.util.RenderUtil;
+import net.minecraft.client.util.math.MatrixStack;
 
 public class CImage implements CWidget {
 
@@ -20,7 +20,7 @@ public class CImage implements CWidget {
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float tickDelta) {
+    public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
         RenderUtil.renderImage(stack, x, y, width, height, 0, 0, 1, 1, img);
     }
 }

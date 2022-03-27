@@ -1,10 +1,10 @@
 package io.github.codeutilities.screen.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.util.math.MatrixStack;
 
 public interface CWidget {
 
-    void render(PoseStack stack, int mouseX, int mouseY, float tickDelta);
+    void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta);
 
     default void mouseClicked(double x, double y, int button) {
     }
@@ -18,7 +18,7 @@ public interface CWidget {
     default void mouseScrolled(double mouseX, double mouseY, double amount) {
     }
 
-    default void renderOverlay(PoseStack stack, int mouseX, int mouseY, float tickDelta) {
+    default void renderOverlay(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
 
     }
 }

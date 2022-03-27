@@ -2,17 +2,18 @@ package io.github.codeutilities.script.event;
 
 import io.github.codeutilities.event.KeyPressEvent;
 import io.github.codeutilities.event.ReceiveChatEvent;
+import io.github.codeutilities.event.SendChatEvent;
 import io.github.codeutilities.event.TickEvent;
 import io.github.codeutilities.event.system.Event;
-import io.github.codeutilities.event.SendChatEvent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
-import java.awt.*;
 
 public enum ScriptEventType {
 
@@ -36,12 +37,12 @@ public enum ScriptEventType {
             .setStyle(Style.EMPTY
                 .withColor(Formatting.WHITE)
                 .withItalic(false)));
-        ListTag lore = new ListTag();
-        lore.add(StringTag.valueOf(Component.Serializer.toJson(new TextComponent(description)
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.GRAY)
+        NbtList lore = new NbtList();
+        lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(description)
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.GRAY)
                 .withItalic(false)))));
-        icon.getTagElement("display")
+        icon.getSubNbt("display")
             .put("Lore", lore);
     }
 

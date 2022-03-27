@@ -39,11 +39,15 @@ public class ChatUtil {
         sendMessage(new LiteralText(text), null);
     }
 
+    public static void sendMessage(Text text) {
+        sendMessage(text, null);
+    }
+
     public static void sendMessage(String text, ChatType prefixType) {
         sendMessage(new LiteralText(text), prefixType);
     }
 
-    public static void sendMessage(LiteralText text, ChatType prefixType) {
+    public static void sendMessage(Text text, ChatType prefixType) {
         if (CodeUtilities.MC.player == null) return;
         CodeUtilities.MC.player.sendMessage(new LiteralText(prefixType.getString()).append(text), false);
     }
@@ -54,4 +58,8 @@ public class ChatUtil {
         return component;
     }
 
+    public static void sendActionBar(Text msg) {
+        if (CodeUtilities.MC.player == null) return;
+        CodeUtilities.MC.player.sendMessage(msg, true);
+    }
 }

@@ -9,10 +9,10 @@ import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.argument.ScriptNumberArgument;
 import io.github.codeutilities.script.argument.ScriptTextArgument;
 import io.github.codeutilities.script.argument.ScriptVariableArgument;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 
 public class ScriptAddArgumentScreen extends CScreen {
 
@@ -27,20 +27,20 @@ public class ScriptAddArgumentScreen extends CScreen {
         CTextField input = new CTextField("Input", 2, 2, 96, 35, true);
 
         ItemStack textIcon = new ItemStack(Items.BOOK);
-        textIcon.setHoverName(new TextComponent("Text")
-            .withStyle(Style.EMPTY.withItalic(false)));
+        textIcon.setCustomName(new LiteralText("Text")
+            .fillStyle(Style.EMPTY.withItalic(false)));
 
         ItemStack numberIcon = new ItemStack(Items.SLIME_BALL);
-        numberIcon.setHoverName(new TextComponent("Number")
-            .withStyle(Style.EMPTY.withItalic(false)));
+        numberIcon.setCustomName(new LiteralText("Number")
+            .fillStyle(Style.EMPTY.withItalic(false)));
 
         ItemStack variableIcon = new ItemStack(Items.MAGMA_CREAM);
-        variableIcon.setHoverName(new TextComponent("Variable")
-            .withStyle(Style.EMPTY.withItalic(false)));
+        variableIcon.setCustomName(new LiteralText("Variable")
+            .fillStyle(Style.EMPTY.withItalic(false)));
 
         ItemStack clientValueIcon = new ItemStack(Items.NAME_TAG);
-        clientValueIcon.setHoverName(new TextComponent("Client Value")
-            .withStyle(Style.EMPTY.withItalic(false)));
+        clientValueIcon.setCustomName(new LiteralText("Client Value")
+            .fillStyle(Style.EMPTY.withItalic(false)));
 
         CItem addNumber = new CItem(2, 40, numberIcon);
         CItem addText = new CItem(12, 40, textIcon);
@@ -81,7 +81,7 @@ public class ScriptAddArgumentScreen extends CScreen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         CodeUtilities.MC.setScreen(new ScriptEditActionScreen(action, script));
     }
 }

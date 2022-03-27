@@ -11,30 +11,35 @@ import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
 import io.github.codeutilities.util.ComponentUtil;
 import io.github.codeutilities.util.chat.ChatUtil;
-import net.minecraft.block.Material;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public enum ScriptActionType {
 
     DISPLAY_CHAT("DisplayChat", "Displays a message in the chat. Takes in text(s) for the message to send.", Items.BOOK, ctx -> {
         ctx.minArguments(1);
-        TextComponent msg = ComponentUtil.fromString(ctx.argValue(0).asText());
+        MutableText msg = ComponentUtil.fromString(ctx.argValue(0).asText());
         for (int i = 1; i < ctx.arguments().size(); i++) {
-            msg.add(ComponentUtil.fromString(ctx.argValue(i).asText()));
+            msg.append(ComponentUtil.fromString(ctx.argValue(i).asText()));
         }
         ChatUtil.sendMessage(msg);
     }),
 
     ACTIONBAR("ActionBar", "Displays a message in the action bar. Takes in text(s) for the message to send.", Items.SPRUCE_SIGN, ctx -> {
         ctx.minArguments(1);
-        MutableComponent msg = ComponentUtil.fromString(ctx.argValue(0).asText());
+        MutableText msg = ComponentUtil.fromString(ctx.argValue(0).asText());
         for (int i = 1; i < ctx.arguments().size(); i++) {
             msg.append(ComponentUtil.fromString(ctx.argValue(i).asText()));
         }
@@ -47,7 +52,7 @@ public enum ScriptActionType {
         for (int i = 1; i < ctx.arguments().size(); i++) {
             msg.append(" ").append(ctx.argValue(i).asText());
         }
-        CodeUtilities.MC.player.chat(msg.toString());
+        CodeUtilities.MC.player.sendChatMessage(msg.toString());
     }),
 
     REPEAT_MULTIPLE("RepeatMultiple", "Repeats a specified amount of times. Takes in a number for the amount of times to repeat.", Items.REDSTONE, ctx -> {
@@ -426,16 +431,16 @@ public enum ScriptActionType {
         this.name = name;
         this.hasChildren = hasChildren;
         icon = new ItemStack(type);
-        icon.setHoverName(new TextComponent(name)
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.WHITE)
+        icon.setCustomName(new LiteralText(name)
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.WHITE)
                 .withItalic(false)));
-        ListTag lore = new ListTag();
-        lore.add(StringTag.valueOf(Component.Serializer.toJson(new TextComponent(description)
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.GRAY)
+        NbtList lore = new NbtList();
+        lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(description)
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.GRAY)
                 .withItalic(false)))));
-        icon.getTagElement("display")
+        icon.getSubNbt("display")
             .put("Lore", lore);
     }
 

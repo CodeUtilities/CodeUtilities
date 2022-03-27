@@ -1,7 +1,7 @@
 package io.github.codeutilities.event;
 
-import com.mojang.blaze3d.platform.InputConstants.Key;
 import io.github.codeutilities.event.system.CancellableEvent;
+import net.minecraft.client.util.InputUtil.Key;
 
 public class KeyPressEvent implements CancellableEvent {
     private boolean cancelled = false;

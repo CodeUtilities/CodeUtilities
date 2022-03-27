@@ -1,13 +1,12 @@
 package io.github.codeutilities.screen.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.util.RenderUtil;
 import java.awt.Rectangle;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sound.SoundEvents;
 
 public class CButton implements CWidget {
 
@@ -40,13 +39,13 @@ public class CButton implements CWidget {
         RenderUtil.renderButton(stack, 0, 0, width * 2, height * 2, rect.contains(mouseX, mouseY), false);
         stack.pop();
 
-        Font f = CodeUtilities.MC.font;
+        TextRenderer f = CodeUtilities.MC.textRenderer;
 
         stack.translate(rect.width / 2f, rect.height / 2f, 0);
         stack.scale(0.5f, 0.5f, 0.5f);
-        stack.translate(-f.width(text) / 2f, -f.lineHeight / 2f, 0);
+        stack.translate(-f.getWidth(text) / 2f, -f.fontHeight / 2f, 0);
 
-        f.drawShadow(stack, text, 0, 0, 0xFFFFFF);
+        f.drawWithShadow(stack, text, 0, 0, 0xFFFFFF);
 
         stack.pop();
     }
@@ -56,7 +55,7 @@ public class CButton implements CWidget {
         Rectangle rect = new Rectangle(this.x, this.y, width, height);
 
         if (rect.contains(x, y)) {
-            CodeUtilities.MC.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f));
+            CodeUtilities.MC.getSoundManager().play(PositionedSoundInstance.ambient(SoundEvents.UI_BUTTON_CLICK, 1f,1f));
             onClick.run();
         }
 

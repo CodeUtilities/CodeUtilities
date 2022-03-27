@@ -24,7 +24,7 @@ public class ScriptCreationScreen extends CScreen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         CodeUtilities.MC.setScreen(new ScriptListScreen());
     }
 }
