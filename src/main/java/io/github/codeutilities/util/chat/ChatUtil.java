@@ -62,4 +62,12 @@ public class ChatUtil {
         if (CodeUtilities.MC.player == null) return;
         CodeUtilities.MC.player.sendMessage(msg, true);
     }
+
+    public static void error(String s) {
+        sendMessage(s, ChatType.FAIL);
+    }
+
+    public static void info(String s) {
+        sendMessage(s, ChatType.INFO_BLUE);
+    }
 }

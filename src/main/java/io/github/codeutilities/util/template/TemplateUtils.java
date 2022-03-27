@@ -1,8 +1,10 @@
 package io.github.codeutilities.util.template;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.github.codeutilities.CodeUtilities;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 
 import java.awt.*;
@@ -18,9 +20,9 @@ public class TemplateUtils {
     }
 
     public static void applyRawTemplateNBT(ItemStack stack, LiteralText name, String author, String codeData, int version) {
-        CompoundTag publicBukkitNBT = new CompoundTag();
-        CompoundTag itemNBT = new CompoundTag();
-        CompoundTag codeNBT = new CompoundTag();
+        NbtCompound publicBukkitNBT = new NbtCompound();
+        NbtCompound itemNBT = new NbtCompound();
+        NbtCompound codeNBT = new NbtCompound();
 
         codeNBT.putString("name", name.toString());
         codeNBT.putString("author", author);
@@ -32,7 +34,7 @@ public class TemplateUtils {
 
         // Assign the bukkit container to the item. (Contains the template data)
         itemNBT.put("PublicBukkitValues", publicBukkitNBT);
-        stack.setTag(itemNBT);
+        stack.setNbt(itemNBT);
         // stack.setCustomName(name);
     }
 
@@ -49,10 +51,10 @@ public class TemplateUtils {
     }
 
     public static JsonObject fromItemStack(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
-        CompoundTag publicBukkitNBT = tag.getCompound("PublicBukkitValues");
+        NbtCompound tag = stack.getNbt();
+        NbtCompound publicBukkitNBT = tag.getCompound("PublicBukkitValues");
         String template = publicBukkitNBT.getString("hypercube:codetemplatedata");
-        return CodeUtilities.JSON_PARSER.parse(template).getAsJsonObject();
+        return JsonParser.parseString(template).getAsJsonObject();
     }
 
     public static boolean isTemplate(ItemStack stack) {
@@ -60,12 +62,12 @@ public class TemplateUtils {
             return false;
         }
 
-        CompoundTag tag = stack.getTag();
+        NbtCompound tag = stack.getNbt();
         if (tag == null) {
             return false;
         }
 
-        CompoundTag publicBukkitNBT = tag.getCompound("PublicBukkitValues");
+        NbtCompound publicBukkitNBT = tag.getCompound("PublicBukkitValues");
         if (publicBukkitNBT == null) {
             return false;
         }

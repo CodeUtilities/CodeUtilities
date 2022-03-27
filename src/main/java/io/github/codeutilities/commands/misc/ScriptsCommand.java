@@ -12,7 +12,7 @@ public class ScriptsCommand implements Command {
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
         cd.register(
             literal("scripts").executes(ctx -> {
-                CodeUtilities.MC.open(() -> CodeUtilities.MC.setScreen(new ScriptListScreen()));
+                CodeUtilities.MC.send(() -> CodeUtilities.MC.setScreen(new ScriptListScreen()));
                 return 0;
             })
         );

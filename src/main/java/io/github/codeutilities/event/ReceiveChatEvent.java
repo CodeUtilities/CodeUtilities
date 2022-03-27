@@ -1,18 +1,18 @@
 package io.github.codeutilities.event;
 
 import io.github.codeutilities.event.system.CancellableEvent;
-import net.minecraft.network.chat.Component;
+import net.minecraft.text.Text;
 
 public class ReceiveChatEvent implements CancellableEvent {
 
-    private final Component message;
+    private final Text message;
     private boolean cancelled = false;
 
-    public ReceiveChatEvent(Component message) {
+    public ReceiveChatEvent(Text message) {
         this.message = message;
     }
 
-    public Component getMessage() {
+    public Text getMessage() {
         return message;
     }
 

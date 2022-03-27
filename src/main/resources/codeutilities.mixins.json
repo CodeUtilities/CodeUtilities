@@ -6,7 +6,6 @@
   "mixins": [
     "MChatComponent",
     "MChatScreen",
-    "MClientPacketListener",
     "MKeyboardHandler",
     "MLocalPlayer"
   ],

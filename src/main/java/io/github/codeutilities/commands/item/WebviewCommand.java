@@ -11,10 +11,8 @@ import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
-
-import java.awt.*;
 
 public class WebviewCommand implements Command {
 
@@ -36,12 +34,11 @@ public class WebviewCommand implements Command {
 
                                 String data = template.get("code").getAsString();
 
-                                Text text = new LiteralText(
-                                        "⇵ Click this message to view this code template in web!");
-                                text.withStyle((style) -> style
-                                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
-                                                "https://dfonline.dev/edit/?template=" + data))
-                                        .withColor(Formatting.AQUA));
+                                MutableText text = new LiteralText(
+                                    "⇵ Click this message to view this code template in web!");
+                                text.setStyle(text.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
+                                        "https://dfonline.dev/edit/?template=" + data))
+                                    .withColor(Formatting.AQUA));
 
                                 CodeUtilities.MC.player.sendMessage(text, false);
                             }

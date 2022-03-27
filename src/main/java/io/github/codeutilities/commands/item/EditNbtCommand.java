@@ -30,7 +30,7 @@ public class EditNbtCommand implements Command {
                         return 1;
                     }
 
-                    mc.setScreen(() -> mc.setScreen(new EditNbtScreen(stack)));
+                    mc.setScreen(new EditNbtScreen(stack));
 
                     return 1;
                 })

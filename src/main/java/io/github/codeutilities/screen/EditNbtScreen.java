@@ -3,10 +3,10 @@ package io.github.codeutilities.screen;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.screen.widget.CTextField;
 import io.github.codeutilities.util.chat.ChatUtil;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
-import net.minecraft.nbt.TextComponentTagVisitor;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.nbt.visitor.NbtTextFormatter;
 
 public class EditNbtScreen extends CScreen {
 
@@ -17,9 +17,9 @@ public class EditNbtScreen extends CScreen {
         this.item = item;
         String nbt = "{}";
         try {
-            CompoundTag tag = item.getTag();
+            NbtCompound tag = item.getNbt();
             if (tag != null) {
-                nbt = new TextComponentTagVisitor("  ", 0).visit(tag).getString();
+                nbt = new NbtTextFormatter("  ", 0).apply(tag).getString();
             }
         } catch (Exception ignored) {
         }
@@ -28,8 +28,8 @@ public class EditNbtScreen extends CScreen {
 
         textField.setChangedListener(() -> {
             try {
-                CompoundTag tag = TagParser.parseTag(textField.getText());
-                item.setTag(tag);
+                NbtCompound tag = StringNbtReader.parse(textField.getText());
+                item.setNbt(tag);
                 textField.textColor = 0xFFFFFFFF;
             } catch (Exception err) {
                 textField.textColor = 0xFFFF3333;
@@ -39,12 +39,12 @@ public class EditNbtScreen extends CScreen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         if (CodeUtilities.MC.player.isCreative()) {
-            CodeUtilities.MC.gameMode.handleCreativeModeItemAdd(item, CodeUtilities.MC.player.getInventory().selected + 36);
+            CodeUtilities.MC.interactionManager.clickCreativeStack(item, CodeUtilities.MC.player.getInventory().selectedSlot + 36);
         } else {
             ChatUtil.sendMessage("Unable to edit item NBT (Not in creative mode)");
         }
-        super.onClose();
+        super.close();
     }
 }

@@ -6,10 +6,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.util.ItemUtil;
+import io.github.codeutilities.util.chat.ChatUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.commands.arguments.item.ItemArgument;
-import net.minecraft.commands.arguments.item.ItemInput;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.command.argument.ItemStackArgument;
+import net.minecraft.command.argument.ItemStackArgumentType;
+import net.minecraft.item.ItemStack;
 
 public class DfGiveCommand implements Command {
 
@@ -18,28 +19,28 @@ public class DfGiveCommand implements Command {
         cd.register(
             literal("dfgive")
                 .then(
-                    argument("item", ItemArgument.item())
+                    argument("item", ItemStackArgumentType.itemStack())
                         .then(
                             argument("amount", IntegerArgumentType.integer(1,64))
                                 .executes(ctx -> {
                                     give(
-                                        ItemArgument.getItem(ctx, "item"),
+                                        ItemStackArgumentType.getItemStackArgument(ctx, "item"),
                                         IntegerArgumentType.getInteger(ctx, "amount")
                                     );
                                     return 1;
                                 })
                         )
                         .executes(ctx -> {
-                            give(ItemArgument.getItem(ctx, "item"),1);
+                            give(ItemStackArgumentType.getItemStackArgument(ctx, "item"),1);
                             return 1;
                         })
                 )
         );
     }
 
-    private void give(ItemInput input, int amount) throws CommandSyntaxException {
-        if (amount > input.getItem().getMaxStackSize()) {
-            ChatUtil.error("This item only supports a max stack size of " + input.getItem().getMaxStackSize());
+    private void give(ItemStackArgument input, int amount) throws CommandSyntaxException {
+        if (amount > input.getItem().getMaxCount()) {
+            ChatUtil.error("This item only supports a max stack size of " + input.getItem().getMaxCount());
             return;
         }
         if (amount < 1) {
@@ -49,7 +50,7 @@ public class DfGiveCommand implements Command {
             ChatUtil.error("You must be in creative mode to use this command");
             return;
         }
-        ItemStack stack = input.createItemStack(amount,false);
+        ItemStack stack = input.createStack(amount,false);
 
         if (ItemUtil.handEmpty()) {
             ItemUtil.setHandItem(stack);

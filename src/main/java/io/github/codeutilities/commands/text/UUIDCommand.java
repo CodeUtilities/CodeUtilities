@@ -10,13 +10,7 @@ import io.github.codeutilities.util.WebUtil;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
@@ -70,7 +64,7 @@ public class UUIDCommand implements Command {
                 .withHoverEvent(new HoverEvent(
                     HoverEvent.Action.SHOW_TEXT,
                     new LiteralText("Click to copy")
-                        .withColor(Formatting.GREEN)
+                        .formatted(Formatting.GREEN)
                 ))
                 .withClickEvent(
                     new ClickEvent(
