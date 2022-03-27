@@ -6,24 +6,31 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
-import io.github.codeutilities.util.ChatUtil;
 import io.github.codeutilities.util.WebUtil;
+import io.github.codeutilities.util.chat.ChatType;
+import io.github.codeutilities.util.chat.ChatUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
 
 public class UUIDCommand implements Command {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
-        Minecraft mc = CodeUtilities.MC;
+        MinecraftClient mc = CodeUtilities.MC;
         cd.register(literal("uuid")
                 .executes(ctx -> {
-                    showUUID(mc.player.getStringUUID());
+                    showUUID(mc.player.getUuid().toString());
                     return 1;
                 })
                 .then(argument("player", StringArgumentType.string())
@@ -45,7 +52,7 @@ public class UUIDCommand implements Command {
 
     private void showUUID(String uuid) {
         if (uuid == null) {
-            ChatUtil.error("Player not found!");
+            ChatUtil.sendMessage("Player not found!", ChatType.FAIL);
             return;
         }
         if (!uuid.contains("-")) {
@@ -57,12 +64,13 @@ public class UUIDCommand implements Command {
             sb.insert(23, "-");
             uuid = sb.toString();
         }
-        ChatUtil.send(new TextComponent("UUID: " + uuid)
-            .withStyle(Style.EMPTY
+
+        CodeUtilities.MC.player.sendMessage(new LiteralText("UUID: " + uuid)
+                .setStyle(Style.EMPTY
                 .withHoverEvent(new HoverEvent(
                     HoverEvent.Action.SHOW_TEXT,
-                    new TextComponent("Click to copy")
-                        .withStyle(ChatFormatting.GREEN)
+                    new LiteralText("Click to copy")
+                        .withColor(Formatting.GREEN)
                 ))
                 .withClickEvent(
                     new ClickEvent(
@@ -70,7 +78,7 @@ public class UUIDCommand implements Command {
                         uuid
                     )
                 )
-                .withColor(ChatFormatting.GREEN)
-            ));
+                .withColor(Formatting.GREEN)
+            ), false);
     }
 }

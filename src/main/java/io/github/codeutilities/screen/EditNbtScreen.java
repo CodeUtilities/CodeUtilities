@@ -2,11 +2,8 @@ package io.github.codeutilities.screen;
 
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.screen.widget.CTextField;
-import io.github.codeutilities.util.ChatUtil;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
-import net.minecraft.nbt.TextComponentTagVisitor;
-import net.minecraft.world.item.ItemStack;
+import io.github.codeutilities.util.chat.ChatUtil;
+import net.minecraft.item.ItemStack;
 
 public class EditNbtScreen extends CScreen {
 
@@ -43,7 +40,7 @@ public class EditNbtScreen extends CScreen {
         if (CodeUtilities.MC.player.isCreative()) {
             CodeUtilities.MC.gameMode.handleCreativeModeItemAdd(item, CodeUtilities.MC.player.getInventory().selected + 36);
         } else {
-            ChatUtil.error("Unable to edit item NBT (Not in creative mode)");
+            ChatUtil.sendMessage("Unable to edit item NBT (Not in creative mode)");
         }
         super.onClose();
     }

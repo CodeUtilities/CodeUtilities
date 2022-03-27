@@ -1,7 +1,6 @@
 package io.github.codeutilities.loader;
 
 public class Loader {
-
     private static Loader instance;
 
     private Loader() {

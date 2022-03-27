@@ -8,7 +8,7 @@ import java.nio.file.Path;
 public class FileUtil {
 
     public static Path cuFolder() {
-        return CodeUtilities.MC.gameDirectory.toPath().resolve("CodeUtilities");
+        return CodeUtilities.MC.runDirectory.toPath().resolve("CodeUtilities");
     }
 
     public static Path cuFolder(String path) {

@@ -9,32 +9,27 @@ import io.github.codeutilities.script.values.ScriptNumberValue;
 import io.github.codeutilities.script.values.ScriptTextValue;
 import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
-import io.github.codeutilities.util.ChatUtil;
 import io.github.codeutilities.util.ComponentUtil;
+import io.github.codeutilities.util.chat.ChatUtil;
+import net.minecraft.block.Material;
+import net.minecraft.item.Items;
+import net.minecraft.text.Text;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 public enum ScriptActionType {
 
     DISPLAY_CHAT("DisplayChat", "Displays a message in the chat. Takes in text(s) for the message to send.", Items.BOOK, ctx -> {
         ctx.minArguments(1);
-        MutableComponent msg = ComponentUtil.fromString(ctx.argValue(0).asText());
+        TextComponent msg = ComponentUtil.fromString(ctx.argValue(0).asText());
         for (int i = 1; i < ctx.arguments().size(); i++) {
-            msg.append(ComponentUtil.fromString(ctx.argValue(i).asText()));
+            msg.add(ComponentUtil.fromString(ctx.argValue(i).asText()));
         }
-        ChatUtil.send(msg);
+        ChatUtil.sendMessage(msg);
     }),
 
     ACTIONBAR("ActionBar", "Displays a message in the action bar. Takes in text(s) for the message to send.", Items.SPRUCE_SIGN, ctx -> {

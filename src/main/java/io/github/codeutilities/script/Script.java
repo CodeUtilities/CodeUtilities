@@ -13,7 +13,7 @@ import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
 import io.github.codeutilities.script.event.ScriptEvent;
 import io.github.codeutilities.script.execution.ScriptContext;
-import io.github.codeutilities.util.ChatUtil;
+
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;

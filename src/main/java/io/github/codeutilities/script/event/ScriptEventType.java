@@ -5,17 +5,14 @@ import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.TickEvent;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.event.SendChatEvent;
-import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import org.w3c.dom.Text;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
+
+import java.awt.*;
 
 public enum ScriptEventType {
 
@@ -35,9 +32,9 @@ public enum ScriptEventType {
         this.codeutilitiesEvent = codeutilitiesEvent;
         this.name = name;
         icon = new ItemStack(item);
-        icon.setHoverName(new TextComponent(name)
-            .withStyle(Style.EMPTY
-                .withColor(ChatFormatting.WHITE)
+        icon.setCustomName(new LiteralText(name)
+            .setStyle(Style.EMPTY
+                .withColor(Formatting.WHITE)
                 .withItalic(false)));
         ListTag lore = new ListTag();
         lore.add(StringTag.valueOf(Component.Serializer.toJson(new TextComponent(description)

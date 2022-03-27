@@ -15,21 +15,13 @@ import io.github.codeutilities.script.values.ScriptValue;
 import io.github.codeutilities.util.ComponentUtil;
 import java.lang.reflect.Type;
 import java.util.function.BiFunction;
-import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.item.Items;
 
 public enum ScriptClientValueArgument implements ScriptArgument {
 
-    EVENT_KEY("KeyPressed","The key code of the key pressed. (KeyPressEvent)", Items.STONE_BUTTON, (event,context) -> {
+    EVENT_KEY("KeyPressed","The key code of the key pressed. (KeyPressEvent)", Items.STONE_BUTTON, (event, context) -> {
         if (event instanceof KeyPressEvent e) {
-            return new ScriptNumberValue(e.getKey().getValue());
+            return new ScriptNumberValue(e.getKey().geValue());
         } else {
             throw new IllegalStateException("Event is not a KeyPressEvent");
         }

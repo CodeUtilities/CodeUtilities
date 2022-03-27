@@ -1,62 +1,43 @@
 package io.github.codeutilities.util;
 
 import io.github.codeutilities.CodeUtilities;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.collection.DefaultedList;
 
 public class ItemUtil {
 
-    public static void giveItem(ItemStack stack) {
-        Minecraft mc = CodeUtilities.MC;
+    public static void giveItem(ItemStack item) {
+        MinecraftClient mc = CodeUtilities.MC;
+        DefaultedList<ItemStack> mainInventory = mc.player.getInventory().main;
 
-        if (!mc.player.isCreative()) {
-            return;
-        }
-
-        for (int slot = 0; slot < 9*4; slot++) {
-            if (mc.player.getInventory().getItem(slot).isEmpty()) {
-                mc.player.getInventory().setItem(slot, stack);
-                mc.player.getInventory().setItem(slot,stack);
-                if (slot < 9) {
-                    mc.gameMode.handleCreativeModeItemAdd(stack, slot+36);
+        for (int index = 0; index < mainInventory.size(); index++) {
+            ItemStack i = mainInventory.get(index);
+            ItemStack compareItem = i.copy();
+            compareItem.setCount(item.getCount());
+            if (item == compareItem) {
+                while (i.getCount() < i.getMaxCount() && item.getCount() > 0) {
+                    i.setCount(i.getCount() + 1);
+                    item.setCount(item.getCount() - 1);
                 }
-                return;
-            } else if (mc.player.getInventory().getItem(slot).getItem() == stack.getItem() && mc.player.getInventory().getItem(slot).getCount() < stack.getMaxStackSize()) {
-                int current = mc.player.getInventory().getItem(slot).getCount();
-                int addition = stack.getCount();
-                int max = stack.getMaxStackSize();
-                int change = Math.min(max - current, addition);
-                mc.player.getInventory().getItem(slot).setCount(current + change);
-                stack.setCount(addition - change);
-                if (slot < 9) {
-                    mc.gameMode.handleCreativeModeItemAdd(mc.player.getInventory().getItem(slot), slot+36);
-                }
-                if (stack.getCount() == 0) {
+            } else {
+                if (i.getItem() == Items.AIR) {
+                    if (index < 9)
+                        MinecraftClient.getInstance().interactionManager.clickCreativeStack(item, index + 36);
+                    mainInventory.set(index, item);
                     return;
                 }
             }
         }
-
-        mc.gameMode.handleCreativeModeItemDrop(stack);
     }
 
     public static boolean handEmpty() {
-        return Minecraft.getInstance().player.getMainHandItem().isEmpty();
+        return MinecraftClient.getInstance().player.getMainHandStack().isEmpty();
     }
 
-    public static void setHandItem(ItemStack stack) {
-        Minecraft mc = CodeUtilities.MC;
-        if (!mc.player.isCreative()) {
-            return;
-        }
-        mc.gameMode.handleCreativeModeItemAdd(
-            stack,
-            mc.player.getInventory().selected
-        );
-        mc.player.getInventory().setItem(
-            mc.player.getInventory().selected,
-            stack
-        );
+    public static void setHandItem(ItemStack item) {
+        MinecraftClient mc = CodeUtilities.MC;
+        mc.interactionManager.clickCreativeStack(item, mc.player.getInventory().selectedSlot + 36);
     }
-
 }

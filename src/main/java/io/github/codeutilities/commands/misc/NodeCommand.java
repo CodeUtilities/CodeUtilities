@@ -14,18 +14,18 @@ public class NodeCommand implements Command {
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
         HashMap<String, String> nodes = new HashMap<>();
 
-        nodes.put("1","node1");
-        nodes.put("2","node2");
-        nodes.put("3","node3");
-        nodes.put("4","node4");
-        nodes.put("5","node5");
-        nodes.put("beta","beta");
+        nodes.put("1", "node1");
+        nodes.put("2", "node2");
+        nodes.put("3", "node3");
+        nodes.put("4", "node4");
+        nodes.put("5", "node5");
+        nodes.put("beta", "beta");
 
         LiteralArgumentBuilder<FabricClientCommandSource> cmd = literal("node");
 
         for (Entry<String, String> node : nodes.entrySet()) {
             cmd.then(literal(node.getKey()).executes(ctx -> {
-                CodeUtilities.MC.player.chat("/server " + node.getValue());
+                CodeUtilities.MC.player.sendChatMessage("/server " + node.getValue());
                 return 1;
             }));
         }

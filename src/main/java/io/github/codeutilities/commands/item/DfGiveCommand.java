@@ -5,7 +5,6 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
-import io.github.codeutilities.util.ChatUtil;
 import io.github.codeutilities.util.ItemUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.commands.arguments.item.ItemArgument;
