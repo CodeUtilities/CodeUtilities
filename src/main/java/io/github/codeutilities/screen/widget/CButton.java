@@ -6,7 +6,6 @@ import io.github.codeutilities.util.RenderUtil;
 import java.awt.Rectangle;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sounds.SoundEvents;
 
 public class CButton implements CWidget {
@@ -28,17 +27,17 @@ public class CButton implements CWidget {
     }
 
     @Override
-    public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
-        stack.push();
+    public void render(PoseStack stack, int mouseX, int mouseY, float tickDelta) {
+        stack.pushPose();
         stack.translate(x, y, 0);
 
-        stack.push();
+        stack.pushPose();
         stack.scale(0.5f, 0.5f, 0.5f);
 
         Rectangle rect = new Rectangle(x, y, width, height);
 
         RenderUtil.renderButton(stack, 0, 0, width * 2, height * 2, rect.contains(mouseX, mouseY), false);
-        stack.pop();
+        stack.popPose();
 
         Font f = CodeUtilities.MC.font;
 
@@ -48,7 +47,7 @@ public class CButton implements CWidget {
 
         f.drawShadow(stack, text, 0, 0, 0xFFFFFF);
 
-        stack.pop();
+        stack.popPose();
     }
 
     @Override

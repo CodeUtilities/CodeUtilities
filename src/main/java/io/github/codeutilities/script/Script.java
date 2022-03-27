@@ -14,6 +14,8 @@ import io.github.codeutilities.script.action.ScriptActionType;
 import io.github.codeutilities.script.event.ScriptEvent;
 import io.github.codeutilities.script.execution.ScriptContext;
 
+import io.github.codeutilities.util.chat.ChatType;
+import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -51,7 +53,7 @@ public class Script {
                     try {
                         execute(pos + 1, event);
                     } catch (Exception err) {
-                        ChatUtil.error("Error while invoking event " + se.getType().getName() + " in script " + name + ": " + err.getMessage());
+                        ChatUtil.sendMessage("Error while invoking event " + se.getType().getName() + " in script " + name + ": " + err.getMessage(), ChatType.FAIL);
                         LOGGER.error("Error while invoking event " + se.getType().getName(), err);
                         err.printStackTrace();
                     }

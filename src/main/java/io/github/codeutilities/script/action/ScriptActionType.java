@@ -11,15 +11,21 @@ import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
 import io.github.codeutilities.util.ComponentUtil;
 import io.github.codeutilities.util.chat.ChatUtil;
-import net.minecraft.block.Material;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public enum ScriptActionType {
 
@@ -27,7 +33,7 @@ public enum ScriptActionType {
         ctx.minArguments(1);
         TextComponent msg = ComponentUtil.fromString(ctx.argValue(0).asText());
         for (int i = 1; i < ctx.arguments().size(); i++) {
-            msg.add(ComponentUtil.fromString(ctx.argValue(i).asText()));
+            msg.append(ComponentUtil.fromString(ctx.argValue(i).asText()));
         }
         ChatUtil.sendMessage(msg);
     }),

@@ -1,15 +1,14 @@
 package io.github.codeutilities.util.chat;
 
 import io.github.codeutilities.CodeUtilities;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.*;
-import org.jetbrains.annotations.Nullable;
-
-import java.awt.*;
-import java.util.List;
+import java.awt.Color;
+import java.util.UUID;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.sounds.SoundEvent;
 
 public class ChatUtil {
 
@@ -28,7 +27,7 @@ public class ChatUtil {
     }
 
     public static void chat(String message) {
-        CodeUtilities.MC.player.sendChatMessage(message);
+        CodeUtilities.MC.player.chat(message);
     }
 
     public static void executeCommand(String command) {
@@ -36,19 +35,27 @@ public class ChatUtil {
     }
 
     public static void sendMessage(String text) {
-        sendMessage(new LiteralText(text), null);
+        sendMessage(new TextComponent(text), null);
+    }
+
+    public static void sendActionBar(Component text) {
+        CodeUtilities.MC.gui.setOverlayMessage(text, false);
+    }
+
+    public static void sendMessage(TextComponent text) {
+        sendMessage(text, null);
     }
 
     public static void sendMessage(String text, ChatType prefixType) {
-        sendMessage(new LiteralText(text), prefixType);
+        sendMessage(new TextComponent(text), prefixType);
     }
 
-    public static void sendMessage(LiteralText text, ChatType prefixType) {
+    public static void sendMessage(TextComponent text, ChatType prefixType) {
         if (CodeUtilities.MC.player == null) return;
-        CodeUtilities.MC.player.sendMessage(new LiteralText(prefixType.getString()).append(text), false);
+        CodeUtilities.MC.player.sendMessage(new TextComponent(prefixType.getString()).append(text), UUID.randomUUID());
     }
 
-    public static MutableText setColor(MutableText component, Color color) {
+    public static MutableComponent setColor(MutableComponent component, Color color) {
         Style colorStyle = component.getStyle().withColor(TextColor.fromRgb(color.getRGB()));
         component.setStyle(colorStyle);
         return component;

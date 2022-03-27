@@ -3,7 +3,10 @@ package io.github.codeutilities.screen;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.screen.widget.CTextField;
 import io.github.codeutilities.util.chat.ChatUtil;
-import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.nbt.TextComponentTagVisitor;
+import net.minecraft.world.item.ItemStack;
 
 public class EditNbtScreen extends CScreen {
 

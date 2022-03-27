@@ -2,17 +2,18 @@ package io.github.codeutilities.script.event;
 
 import io.github.codeutilities.event.KeyPressEvent;
 import io.github.codeutilities.event.ReceiveChatEvent;
+import io.github.codeutilities.event.SendChatEvent;
 import io.github.codeutilities.event.TickEvent;
 import io.github.codeutilities.event.system.Event;
-import io.github.codeutilities.event.SendChatEvent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
-import net.minecraft.util.Formatting;
-
-import java.awt.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public enum ScriptEventType {
 
@@ -32,9 +33,9 @@ public enum ScriptEventType {
         this.codeutilitiesEvent = codeutilitiesEvent;
         this.name = name;
         icon = new ItemStack(item);
-        icon.setCustomName(new LiteralText(name)
+        icon.setHoverName(new TextComponent(name)
             .setStyle(Style.EMPTY
-                .withColor(Formatting.WHITE)
+                .withColor(ChatFormatting.WHITE)
                 .withItalic(false)));
         ListTag lore = new ListTag();
         lore.add(StringTag.valueOf(Component.Serializer.toJson(new TextComponent(description)

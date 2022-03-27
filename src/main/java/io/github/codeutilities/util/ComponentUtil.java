@@ -1,18 +1,17 @@
 package io.github.codeutilities.util;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.Formatting;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.TextComponent;
 
 public class ComponentUtil {
 
-    public static Text fromString(String message) {
-        LiteralText result = new LiteralText("");
+    public static TextComponent fromString(String message) {
+        TextComponent result = new TextComponent("");
 
         try {
             Pattern pattern = Pattern.compile("(§[a-f0-9lonmkrA-FLONMRK]|§x(§[a-f0-9A-F]){6})");
@@ -25,35 +24,35 @@ public class ComponentUtil {
                 int start = matcher.start();
                 String text = message.substring(lastIndex, start);
                 if (text.length() != 0) {
-                    Text t = new LiteralText(text);
-                    t.getWithStyle(s);
+                    Component t = new TextComponent(text);
+                    t.toFlatList(s);
                     result.append(t);
                 }
                 String col = matcher.group();
 
                 if (col.length() == 2) {
-                    s = s.withFormatting(Formatting.byCode(col.charAt(1)));
+                    s = s.applyFormats(ChatFormatting.getByCode(col.charAt(1)));
                 } else {
                     s = Style.EMPTY.withColor(
-                        TextColor.parse("#" + col.replaceAll("§", "").substring(1)));
+                        TextColor.parseColor("#" + col.replaceAll("§", "").substring(1)));
                 }
                 lastIndex = matcher.end();
             }
             String text = message.substring(lastIndex);
             if (text.length() != 0) {
-                LiteralText t = new LiteralText(text);
+                TextComponent t = new TextComponent(text);
                 t.setStyle(s);
                 result.append(t);
             }
         } catch (Exception err) {
             err.printStackTrace();
-            return new LiteralText("CodeUtilities Text Error");
+            return new TextComponent("CodeUtilities Text Error");
         }
 
         return result;
     }
 
-    public static String toFormattedString(LiteralText message) {
+    public static String toFormattedString(Component message) {
         StringBuilder result = new StringBuilder();
 
         Style style = message.getStyle();
@@ -61,7 +60,7 @@ public class ComponentUtil {
         String format = "";
 
         if (style.getColor() != null) {
-            format += "§x§" + String.join("§", String.format("%06X", style.getColor().getName()).split(""));
+            format += "§x§" + String.join("§", String.format("%06X", style.getColor().getValue()).split(""));
         }
 
         if (style.isBold()) {
@@ -81,10 +80,10 @@ public class ComponentUtil {
         }
 
         result.append(format);
-        result.append(message.asString());
+        result.append(message.getContents());
 
-        for (Text sibling : message.getSiblings()) {
-            result.append(toFormattedString(new LiteralText(sibling.toString())));
+        for (Component sibling : message.getSiblings()) {
+            result.append(toFormattedString(new TextComponent(sibling.toString())));
         }
 
         return result.toString();
