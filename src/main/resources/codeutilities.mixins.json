@@ -7,7 +7,9 @@
     "MChatComponent",
     "MChatScreen",
     "MKeyboardHandler",
-    "MLocalPlayer"
+    "MLocalPlayer",
+    "MMinecraftClient",
+    "MOptionsScreen"
   ],
   "client": [
   ],

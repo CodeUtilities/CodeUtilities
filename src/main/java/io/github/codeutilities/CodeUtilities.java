@@ -2,6 +2,7 @@ package io.github.codeutilities;
 
 import com.google.gson.JsonParser;
 import io.github.codeutilities.commands.CommandManager;
+import io.github.codeutilities.config.ConfigManager;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.script.ScriptManager;
 import net.fabricmc.api.ModInitializer;
@@ -19,6 +20,7 @@ public class CodeUtilities implements ModInitializer {
         LOGGER.info("Initializing");
 
         Loader loader = Loader.getInstance();
+        loader.load(new ConfigManager());
         loader.load(new CommandManager());
         loader.load(new ScriptManager());
 
