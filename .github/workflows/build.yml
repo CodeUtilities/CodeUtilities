@@ -15,7 +15,7 @@ jobs:
       with:
         java-version: 17
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build '-Pversion=${{ github.run_number }}'
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
@@ -28,5 +28,5 @@ jobs:
         automatic_release_tag: "Build-${{ github.run_number }}"
         prerelease: false
         files: |
-          LICENSE.txt
+          LICENSE
           ./build/libs/CodeUtilities-${{ github.run_number }}.jar
