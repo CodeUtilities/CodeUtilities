@@ -14,8 +14,8 @@ public class CButton implements CWidget {
     private final int y;
     private final int width;
     private final int height;
-    private final String text;
-    private final Runnable onClick;
+    private String text;
+    private Runnable onClick;
 
     public CButton(int x, int y, int width, int height, String text, Runnable onClick) {
         this.x = x;
@@ -60,5 +60,13 @@ public class CButton implements CWidget {
         }
 
         CWidget.super.mouseClicked(x, y, button);
+    }
+
+    public void setOnClick(Runnable onClick) {
+        this.onClick = onClick;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

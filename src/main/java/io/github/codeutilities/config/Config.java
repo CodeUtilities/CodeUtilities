@@ -1,10 +1,10 @@
 package io.github.codeutilities.config;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.util.FileUtil;
+import java.util.List;
 
 public class Config {
 
@@ -28,11 +28,7 @@ public class Config {
 
     public void saveToFile() {
         JsonObject saveData = new JsonObject();
-        for (String key : data.keySet()) {
-            if (!key.startsWith("desc:")) {
-                saveData.add(key, data.get(key));
-            }
-        }
+        save(saveData, data);
 
         try {
             FileUtil.writeFile(FileUtil.cuFolder("config.json"), saveData.toString());
@@ -40,6 +36,21 @@ public class Config {
         } catch (Exception err) {
             CodeUtilities.LOGGER.error("Failed to save config!");
             err.printStackTrace();
+        }
+    }
+
+    private void save(JsonObject to, JsonObject from) {
+        for (String key : from.keySet()) {
+            if (ConfigManager.INFO_PREFIXES.stream().anyMatch(key::startsWith)) {
+                continue;
+            }
+            if (from.get(key).isJsonObject()) {
+                JsonObject sub = new JsonObject();
+                save(sub, from.getAsJsonObject(key));
+                to.add(key, sub);
+            } else {
+                to.add(key, from.get(key));
+            }
         }
     }
 

@@ -3,10 +3,12 @@ package io.github.codeutilities.config;
 import io.github.codeutilities.event.ShutdownEvent;
 import io.github.codeutilities.event.system.EventManager;
 import io.github.codeutilities.loader.Loadable;
+import java.util.List;
 
 public class ConfigManager implements Loadable {
 
     private static Config config;
+    public static final List<String> INFO_PREFIXES = List.of("desc:","options:");
 
     @Override
     public void load() {

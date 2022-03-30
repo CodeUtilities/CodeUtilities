@@ -1,10 +1,12 @@
 package io.github.codeutilities.screen;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.config.ConfigManager;
+import io.github.codeutilities.screen.widget.CButton;
 import io.github.codeutilities.screen.widget.CScrollPanel;
 import io.github.codeutilities.screen.widget.CText;
 import io.github.codeutilities.screen.widget.CTextField;
@@ -36,7 +38,7 @@ public class ConfigScreen extends CScreen {
 
     private void generate(JsonObject json, int x, int[] y) {
         for (String key : json.keySet()) {
-            if (key.startsWith("desc:")) {
+            if (ConfigManager.INFO_PREFIXES.stream().anyMatch(key::startsWith)) {
                 continue;
             }
             JsonElement element = json.get(key);
@@ -51,34 +53,59 @@ public class ConfigScreen extends CScreen {
                 y[0] += 5;
                 generate(object, x+10, y);
             } else if (element instanceof JsonPrimitive prim) {
-                CText title = new CText(x,y[0],new LiteralText(key + description + ":"));
+                CText title = new CText(x, y[0], new LiteralText(key + description + ":"));
                 scroll.add(title);
                 y[0] += 5;
-                String value = prim.getAsString();
-                CTextField field = new CTextField(value,x,y[0],120-x,8,false);
-                scroll.add(field);
-                y[0] += 10;
+                String[] value = new String[]{prim.getAsString()};
 
-                field.setChangedListener(() -> {
-                    try {
-                        if (prim.isBoolean()) {
-                            if (field.getText().equalsIgnoreCase("true")) {
-                                json.add(key, new JsonPrimitive(true));
-                            } else if (field.getText().equalsIgnoreCase("false")) {
-                                json.add(key, new JsonPrimitive(false));
+                boolean isEnum = json.has("options:" + key);
+
+                if (!isEnum) {
+                    CTextField field = new CTextField(value[0], x, y[0], 115 - x, 8, false);
+                    scroll.add(field);
+                    y[0] += 10;
+
+                    field.setChangedListener(() -> {
+                        try {
+                            if (prim.isBoolean()) {
+                                if (field.getText().equalsIgnoreCase("true")) {
+                                    json.add(key, new JsonPrimitive(true));
+                                } else if (field.getText().equalsIgnoreCase("false")) {
+                                    json.add(key, new JsonPrimitive(false));
+                                } else {
+                                    throw new Exception("Invalid boolean value");
+                                }
+                            } else if (prim.isNumber()) {
+                                json.add(key, new JsonPrimitive(Double.parseDouble(field.getText())));
                             } else {
-                                throw new Exception("Invalid boolean value");
+                                json.add(key, new JsonPrimitive(field.getText()));
                             }
-                        } else if (prim.isNumber()) {
-                            json.add(key, new JsonPrimitive(Double.parseDouble(field.getText())));
-                        } else {
-                            json.add(key, new JsonPrimitive(field.getText()));
+                            field.textColor = 0xFFFFFF;
+                        } catch (Exception e) {
+                            field.textColor = 0xFF0000;
                         }
-                        field.textColor = 0xFFFFFF;
-                    } catch (Exception e) {
-                        field.textColor = 0xFF0000;
-                    }
-                });
+                    });
+                } else {
+                    JsonArray options = json.get("options:" + key).getAsJsonArray();
+                    CButton button = new CButton(x, y[0], 115 - x, 8, value[0], () -> {});
+                    button.setOnClick(() -> {
+                        int index = 0;
+                        for (JsonElement option : options) {
+                            if (option.getAsString().equals(value[0])) {
+                                break;
+                            }
+                            index++;
+                        }
+                        index++;
+                        if (index >= options.size()) {
+                            index = 0;
+                        }
+                        json.addProperty(key, options.get(index).getAsString());
+                        button.setText(options.get(index).getAsString());
+                        value[0] = options.get(index).getAsString();
+                    });
+                    scroll.add(button);
+                }
             } else {
                 CodeUtilities.LOGGER.warn("Unknown json element type: " + element.getClass().getName());
             }
