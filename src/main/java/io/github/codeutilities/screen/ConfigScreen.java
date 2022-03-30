@@ -5,13 +5,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import io.github.codeutilities.CodeUtilities;
-import io.github.codeutilities.config.ConfigManager;
+import io.github.codeutilities.config.Config;
 import io.github.codeutilities.screen.widget.CButton;
 import io.github.codeutilities.screen.widget.CScrollPanel;
 import io.github.codeutilities.screen.widget.CText;
 import io.github.codeutilities.screen.widget.CTextField;
 import io.github.codeutilities.screen.widget.CWidget;
 import net.minecraft.text.LiteralText;
+
+import java.util.Arrays;
 
 public class ConfigScreen extends CScreen {
 
@@ -21,7 +23,7 @@ public class ConfigScreen extends CScreen {
     public ConfigScreen() {
         super(120, 100);
 
-        JsonObject json = ConfigManager.getConfig().json();
+        JsonObject json = Config.getConfig().json();
 
         scroll = new CScrollPanel(0, 0, 120, 100);
 
@@ -32,13 +34,13 @@ public class ConfigScreen extends CScreen {
 
     @Override
     public void close() {
-        ConfigManager.getConfig().saveToFile();
+        Config.getConfig().saveToFile();
         super.close();
     }
 
     private void generate(JsonObject json, int x, int[] y) {
         for (String key : json.keySet()) {
-            if (ConfigManager.INFO_PREFIXES.stream().anyMatch(key::startsWith)) {
+            if (Arrays.stream(Config.infoPrefixes).anyMatch(key::startsWith)) {
                 continue;
             }
             JsonElement element = json.get(key);

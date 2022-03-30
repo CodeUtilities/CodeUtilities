@@ -1,3 +1,8 @@
+/*  NBSDecoder.java originally made by koca2000 taken from https://github.com/koca2000/NoteBlockAPI/blob/master/src/main/java/com/xxmicloxx/NoteBlockAPI/NBSDecoder.java
+ *
+ *  This file is originally licensed under the GNU Lesser General Public License v3.0 for more info: https://www.gnu.org/licenses/lgpl-3.0.en.html
+ */
+
 package io.github.codeutilities.util.nbs;
 
 import io.github.codeutilities.util.chat.ChatType;
@@ -6,7 +11,6 @@ import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.*;
 import java.math.BigDecimal;
 
-// Credit to https://github.com/koca2000/NoteBlockAPI/blob/master/src/main/java/com/xxmicloxx/NoteBlockAPI/NBSDecoder.java
 public class NBSDecoder {
 
     public static SongData parse(File songFile) throws IOException, OutdatedNBSException {

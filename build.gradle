@@ -1,10 +1,14 @@
 plugins {
     id 'fabric-loom' version '0.11-SNAPSHOT'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 //version = project.mod_version -> set version by doing gradlew build '-Pversion=HERE'
 group = project.maven_group
+
+targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     // Add repositories to retrieve artifacts from in here.
@@ -25,11 +29,12 @@ dependencies {
 }
 
 processResources {
-    inputs.property "version", project.version
-    filteringCharset "UTF-8"
+    expand(project: project)
+}
 
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
+build {
+    dependsOn {
+        shadowJar
     }
 }
 

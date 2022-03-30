@@ -1,13 +1,14 @@
 package io.github.codeutilities.config;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class ConfigDefaults {
 
-    public static Config getDefaults() {
-        Config config = new Config();
-        JsonObject root = config.json();
+    public static JsonObject getDefaults() {
+        JsonObject root = new JsonObject();
 
         stringSetting(root,"Simple","abc", "A simple text setting");
 
@@ -22,7 +23,7 @@ public class ConfigDefaults {
 
         enumSetting(root,"Enum","Good","Example enum", "Good", "Bad");
 
-        return config;
+        return root;
     }
 
     private static void stringSetting(JsonObject obj, String name, String value, String desc) {
@@ -30,7 +31,7 @@ public class ConfigDefaults {
         obj.addProperty("desc:" + name, desc);
     }
 
-    private static void objectSetting(JsonObject obj, String name, JsonObject json, String desc) {
+    private static <T extends JsonElement> void objectSetting(JsonObject obj, String name, T json, String desc) {
         obj.add(name, json);
         obj.addProperty("desc:" + name, desc);
     }
