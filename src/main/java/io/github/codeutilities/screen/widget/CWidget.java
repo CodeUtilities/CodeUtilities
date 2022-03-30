@@ -1,5 +1,6 @@
 package io.github.codeutilities.screen.widget;
 
+import java.awt.Rectangle;
 import net.minecraft.client.util.math.MatrixStack;
 
 public interface CWidget {
@@ -21,4 +22,6 @@ public interface CWidget {
     default void renderOverlay(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
 
     }
+
+    Rectangle getBounds();
 }

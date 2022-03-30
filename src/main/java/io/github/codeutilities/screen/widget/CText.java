@@ -1,6 +1,7 @@
 package io.github.codeutilities.screen.widget;
 
 import io.github.codeutilities.CodeUtilities;
+import java.awt.Rectangle;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -48,6 +49,11 @@ public class CText implements CWidget {
             f.draw(stack, text, 0, 0, color);
         }
         stack.pop();
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, 0, 0);
     }
 
     public void setText(Text t) {

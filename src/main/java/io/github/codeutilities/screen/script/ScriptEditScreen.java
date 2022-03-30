@@ -20,12 +20,15 @@ import net.minecraft.util.Formatting;
 public class ScriptEditScreen extends CScreen {
 
     private final Script script;
+    private static int scroll = 0;
+    private final CScrollPanel panel;
 
     public ScriptEditScreen(Script script) {
         super(95, 100);
         this.script = script;
-        CScrollPanel panel = new CScrollPanel(0, 0, 120, 100);
+        panel = new CScrollPanel(0, 0, 120, 100);
         widgets.add(panel);
+        panel.setScroll(scroll);
 
         ItemStack deleteIcon = new ItemStack(Items.RED_DYE);
         deleteIcon.setCustomName(new LiteralText("Delete")
@@ -99,6 +102,7 @@ public class ScriptEditScreen extends CScreen {
 
     @Override
     public void close() {
+        scroll = panel.getScroll();
         ScriptManager.getInstance().saveScript(script);
         CodeUtilities.MC.setScreen(new ScriptListScreen());
     }

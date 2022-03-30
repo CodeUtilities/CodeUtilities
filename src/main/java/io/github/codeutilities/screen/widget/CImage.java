@@ -1,6 +1,7 @@
 package io.github.codeutilities.screen.widget;
 
 import io.github.codeutilities.util.RenderUtil;
+import java.awt.Rectangle;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class CImage implements CWidget {
@@ -22,5 +23,10 @@ public class CImage implements CWidget {
     @Override
     public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
         RenderUtil.renderImage(stack, x, y, width, height, 0, 0, 1, 1, img);
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, width, height);
     }
 }

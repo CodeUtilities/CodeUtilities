@@ -49,7 +49,11 @@ public class ChatUtil {
 
     public static void sendMessage(Text text, ChatType prefixType) {
         if (CodeUtilities.MC.player == null) return;
-        CodeUtilities.MC.player.sendMessage(new LiteralText(prefixType.getString()).append(text), false);
+        String prefix = "";
+        if (prefixType != null) {
+            prefix = prefixType.getString();
+        }
+        CodeUtilities.MC.player.sendMessage(new LiteralText(prefix).append(text), false);
     }
 
     public static MutableText setColor(MutableText component, Color color) {

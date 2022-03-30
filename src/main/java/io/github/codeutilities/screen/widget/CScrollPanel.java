@@ -1,6 +1,7 @@
 package io.github.codeutilities.screen.widget;
 
 import io.github.codeutilities.util.RenderUtil;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.util.math.MatrixStack;
@@ -75,6 +76,23 @@ public class CScrollPanel implements CWidget {
             child.mouseScrolled(mouseX, mouseY, amount);
         }
         scroll += amount * 5;
+
+        if (scroll < -getMaxScroll()) {
+            scroll = -getMaxScroll();
+        }
+
+        if (scroll > 0) {
+            scroll = 0;
+        }
+
+    }
+
+    private int getMaxScroll() {
+        int max = 0;
+        for (CWidget child : children) {
+            max = Math.max(max, child.getBounds().y + child.getBounds().height);
+        }
+        return max - height;
     }
 
     public void add(CWidget child) {
@@ -85,16 +103,37 @@ public class CScrollPanel implements CWidget {
     public void renderOverlay(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
         mouseY -= scroll;
 
+        stack.push();
+        stack.translate(x, y, 0);
+        stack.translate(0, scroll, 0);
         for (CWidget child : children) {
             child.renderOverlay(stack, mouseX, mouseY, tickDelta);
         }
+        stack.pop();
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, width, height);
     }
 
     public CWidget[] getChildren() {
         return children.toArray(new CWidget[0]);
     }
 
-    public double getScroll() {
+    public int getScroll() {
         return scroll;
+    }
+
+    public void setScroll(int s) {
+        scroll = s;
+
+        if (scroll < -getMaxScroll()) {
+            scroll = -getMaxScroll();
+        }
+
+        if (scroll > 0) {
+            scroll = 0;
+        }
     }
 }

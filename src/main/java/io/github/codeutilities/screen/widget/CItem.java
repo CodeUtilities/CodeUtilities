@@ -48,6 +48,11 @@ public class CItem implements CWidget {
     }
 
     @Override
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, 8, 8);
+    }
+
+    @Override
     public void mouseClicked(double x, double y, int button) {
         Rectangle rect = new Rectangle(this.x, this.y, 8, 8);
 

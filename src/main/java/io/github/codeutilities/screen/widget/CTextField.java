@@ -31,6 +31,7 @@ public class CTextField implements CWidget {
         this.editable = editable;
     }
 
+    @Override
     public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
     }

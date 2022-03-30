@@ -62,6 +62,11 @@ public class CButton implements CWidget {
         CWidget.super.mouseClicked(x, y, button);
     }
 
+    @Override
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, width, height);
+    }
+
     public void setOnClick(Runnable onClick) {
         this.onClick = onClick;
     }
