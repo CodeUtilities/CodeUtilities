@@ -29,7 +29,7 @@ public class CScrollPanel implements CWidget {
         begin.transform(stack.peek().getPositionMatrix());
         end.transform(stack.peek().getPositionMatrix());
 
-        RenderUtil.setScissor(
+        RenderUtil.pushScissor(
             (int) begin.getX()*2,
             (int) begin.getY()*2,
             (int) (end.getX() - begin.getX())*2,
@@ -43,7 +43,7 @@ public class CScrollPanel implements CWidget {
             child.render(stack, mouseX, mouseY, tickDelta);
         }
 
-        RenderUtil.clearScissor();
+        RenderUtil.popScissor();
         stack.pop();
     }
 
@@ -88,5 +88,13 @@ public class CScrollPanel implements CWidget {
         for (CWidget child : children) {
             child.renderOverlay(stack, mouseX, mouseY, tickDelta);
         }
+    }
+
+    public CWidget[] getChildren() {
+        return children.toArray(new CWidget[0]);
+    }
+
+    public double getScroll() {
+        return scroll;
     }
 }

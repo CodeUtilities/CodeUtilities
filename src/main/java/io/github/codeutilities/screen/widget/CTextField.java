@@ -2,16 +2,18 @@ package io.github.codeutilities.screen.widget;
 
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.util.RenderUtil;
+import java.awt.Rectangle;
 import java.nio.FloatBuffer;
 import java.util.List;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Vector4f;
 
 public class CTextField implements CWidget {
 
     final int x, y, width, height;
-    final boolean editable;
+    boolean editable;
     public int textColor = 0xFFFFFFFF;
     String text;
     Runnable changedListener;
@@ -29,6 +31,13 @@ public class CTextField implements CWidget {
         this.editable = editable;
     }
 
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, width, height);
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
 
     @Override
     public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
@@ -38,15 +47,16 @@ public class CTextField implements CWidget {
         DrawableHelper.fill(stack, 0, 0, width, height, 0xFF888888);
         DrawableHelper.fill(stack, 1, 1, width - 1, height - 1, 0xFF000000);
 
-        FloatBuffer buff = FloatBuffer.allocate(16);
+        Vector4f begin = new Vector4f(0, 0, 1, 1);
+        Vector4f end = new Vector4f(width, height, 1, 1);
+        begin.transform(stack.peek().getPositionMatrix());
+        end.transform(stack.peek().getPositionMatrix());
 
-        stack.peek().getPositionMatrix().writeColumnMajor(buff);
-
-        RenderUtil.setScissor(
-            (int) ((x + buff.get(12)) * buff.get(0)),
-            (int) ((y + buff.get(13)) * buff.get(5)),
-            (int) ((width - 2) * buff.get(0) * 2),
-            (int) ((height - 2) * buff.get(5) * 2)
+        RenderUtil.pushScissor(
+            (int) begin.getX()*2,
+            (int) begin.getY()*2,
+            (int) (end.getX() - begin.getX())*2,
+            (int) (end.getY() - begin.getY())*2
         );
 
         stack.translate(2, 2 + scroll, 0);
@@ -91,7 +101,7 @@ public class CTextField implements CWidget {
         }
 
         stack.pop();
-        RenderUtil.clearScissor();
+        RenderUtil.popScissor();
     }
 
     @Override

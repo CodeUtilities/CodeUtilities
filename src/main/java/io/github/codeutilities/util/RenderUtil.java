@@ -2,6 +2,8 @@ package io.github.codeutilities.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.codeutilities.CodeUtilities;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -15,6 +17,8 @@ import net.minecraft.util.math.Vector4f;
 import org.lwjgl.opengl.GL11;
 
 public class RenderUtil {
+
+    private static final List<Scissor> scissorStack = new ArrayList<>();
 
     public static void renderImage(MatrixStack stack, int x, int y, int width, int height, float ux, float uy, float uw, float uh, String image) {
         RenderSystem.enableBlend();
@@ -107,16 +111,32 @@ public class RenderUtil {
     }
 
     public static void renderGui(MatrixStack stack, int x, int y, int width, int height) {
-        renderContinuousTexture(stack, x,y,width,height,"textures/gui/demo_background.png",0,0,248,166,256,256,5);
+        renderContinuousTexture(stack, x, y, width, height, "textures/gui/demo_background.png", 0, 0, 248, 166, 256, 256, 5);
     }
 
-    public static void setScissor(int x, int y, int width, int height) {
+    public static void pushScissor(int x, int y, int width, int height) {
+        if (scissorStack.size() != 0) {
+            Scissor state = scissorStack.get(scissorStack.size() - 1);
+            x = Math.max(x, state.x);
+            y = Math.max(y, state.y);
+            width = Math.min(width, state.x + state.width - x);
+            height = Math.min(height, state.y + state.height - y);
+        }
+
+        Scissor s = new Scissor(x, y, width, height);
+        scissorStack.add(s);
         GL11.glScissor(x, CodeUtilities.MC.getWindow().getHeight() - y - height, width, height);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
     }
 
-    public static void clearScissor() {
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+    public static void popScissor() {
+        scissorStack.remove(scissorStack.size() - 1);
+        if (scissorStack.size() > 0) {
+            Scissor s = scissorStack.get(scissorStack.size() - 1);
+            GL11.glScissor(s.x, CodeUtilities.MC.getWindow().getHeight() - s.y - s.height, s.width, s.height);
+        } else {
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        }
     }
 
     public static void renderGuiItem(MatrixStack stack, ItemStack item) {
@@ -130,5 +150,9 @@ public class RenderUtil {
         renderer.zOffset = 0f;
         stack.pop();
         RenderSystem.disableDepthTest();
+    }
+
+    private record Scissor(int x, int y, int width, int height) {
+
     }
 }

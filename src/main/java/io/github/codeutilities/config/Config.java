@@ -36,22 +36,16 @@ public class Config {
     }
 
     public void merge(Config other) {
-        for (String key : other.json().keySet()) {
-            if (!data.has(key)) {
-                if (data.isJsonObject()){
-                    subMerge(data.getAsJsonObject(), other.json().getAsJsonObject());
-                } else {
-                    data.add(key, other.json().get(key));
-                }
-            }
-        }
+        subMerge(data, other.json());
     }
 
     private void subMerge(JsonObject a, JsonObject b) {
         for (String key : b.keySet()) {
             if (!a.has(key)) {
-                if (a.isJsonObject()) {
-                    subMerge(a.getAsJsonObject(), b.getAsJsonObject());
+                if (b.get(key).isJsonObject()) {
+                    JsonObject sub = new JsonObject();
+                    subMerge(sub, b.getAsJsonObject(key));
+                    a.add(key, sub);
                 } else {
                     a.add(key, b.get(key));
                 }
