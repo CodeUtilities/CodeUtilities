@@ -3,18 +3,34 @@ package io.github.codeutilities.config;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.codeutilities.CodeUtilities;
+import io.github.codeutilities.event.ShutdownEvent;
+import io.github.codeutilities.event.system.EventManager;
 import io.github.codeutilities.util.FileUtil;
-import java.util.List;
+
+import java.util.Arrays;
 
 public class Config {
+    private static Config instance = null;
+    public static String[] infoPrefixes = {"desc:","options:"};
 
     private JsonObject data;
 
-    public Config() {
-        data = new JsonObject();
+    private Config() {
+        instance = this;
+
+        this.loadFromFile();
+        this.merge(ConfigDefaults.getDefaults());
+
+        EventManager.getInstance().register(ShutdownEvent.class, (e) -> {
+            this.saveToFile();
+        });
     }
 
-    public void loadFromFile() {
+    public static Config getConfig() {
+        return instance == null ? new Config() : instance;
+    }
+
+    private void loadFromFile() {
         if (FileUtil.cuFolder("config.json").toFile().exists()) {
             try {
                 data = JsonParser.parseString(FileUtil.readFile(FileUtil.cuFolder("config.json"))).getAsJsonObject();
@@ -28,7 +44,7 @@ public class Config {
 
     public void saveToFile() {
         JsonObject saveData = new JsonObject();
-        save(saveData, data);
+        save(saveData, this.data);
 
         try {
             FileUtil.writeFile(FileUtil.cuFolder("config.json"), saveData.toString());
@@ -41,7 +57,7 @@ public class Config {
 
     private void save(JsonObject to, JsonObject from) {
         for (String key : from.keySet()) {
-            if (ConfigManager.INFO_PREFIXES.stream().anyMatch(key::startsWith)) {
+            if (Arrays.stream(Config.infoPrefixes).anyMatch(key::startsWith)) {
                 continue;
             }
             if (from.get(key).isJsonObject()) {
@@ -54,8 +70,8 @@ public class Config {
         }
     }
 
-    public void merge(Config other) {
-        subMerge(data, other.json());
+    private void merge(JsonObject other) {
+        subMerge(this.data, other);
     }
 
     private void subMerge(JsonObject a, JsonObject b) {
@@ -73,6 +89,6 @@ public class Config {
     }
 
     public JsonObject json() {
-        return data;
+        return this.data;
     }
 }

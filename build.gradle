@@ -6,6 +6,9 @@ plugins {
 //version = project.mod_version -> set version by doing gradlew build '-Pversion=HERE'
 group = project.maven_group
 
+targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_17
+
 repositories {
     // Add repositories to retrieve artifacts from in here.
     // You should only use this when depending on other mods because
@@ -25,13 +28,9 @@ dependencies {
 }
 
 processResources {
-    inputs.property "version", project.version
-    filteringCharset "UTF-8"
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
-    }
+    expand(project: project)
 }
+
 
 def targetJavaVersion = 17
 tasks.withType(JavaCompile).configureEach {
