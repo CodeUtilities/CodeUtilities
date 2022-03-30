@@ -1,5 +1,6 @@
 package io.github.codeutilities.config;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.codeutilities.CodeUtilities;
@@ -26,8 +27,15 @@ public class Config {
     }
 
     public void saveToFile() {
+        JsonObject saveData = new JsonObject();
+        for (String key : data.keySet()) {
+            if (!key.startsWith("desc:")) {
+                saveData.add(key, data.get(key));
+            }
+        }
+
         try {
-            FileUtil.writeFile(FileUtil.cuFolder("config.json"), data.toString());
+            FileUtil.writeFile(FileUtil.cuFolder("config.json"), saveData.toString());
             CodeUtilities.LOGGER.info("Saved config!");
         } catch (Exception err) {
             CodeUtilities.LOGGER.error("Failed to save config!");

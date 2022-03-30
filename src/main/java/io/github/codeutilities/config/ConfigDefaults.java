@@ -1,6 +1,5 @@
 package io.github.codeutilities.config;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class ConfigDefaults {
@@ -26,5 +25,4 @@ public class ConfigDefaults {
 
         return config;
     }
-
 }
