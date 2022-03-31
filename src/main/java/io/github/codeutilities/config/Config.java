@@ -17,6 +17,7 @@ public class Config {
 
     private Config() {
         instance = this;
+        data = new JsonObject();
 
         this.loadFromFile();
         this.merge(ConfigDefaults.getDefaults());
