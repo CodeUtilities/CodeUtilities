@@ -1,5 +1,6 @@
 package io.github.codeutilities.screen.widget;
 
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.util.RenderUtil;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -30,11 +31,12 @@ public class CScrollPanel implements CWidget {
         begin.transform(stack.peek().getPositionMatrix());
         end.transform(stack.peek().getPositionMatrix());
 
+        int guiScale = (int) CodeUtilities.MC.getWindow().getScaleFactor();
         RenderUtil.pushScissor(
-            (int) begin.getX()*2,
-            (int) begin.getY()*2,
-            (int) (end.getX() - begin.getX())*2,
-            (int) (end.getY() - begin.getY())*2
+            (int) begin.getX()*guiScale,
+            (int) begin.getY()*guiScale,
+            (int) (end.getX() - begin.getX())*guiScale,
+            (int) (end.getY() - begin.getY())*guiScale
         );
 
         stack.translate(0, scroll, 0);

@@ -53,11 +53,12 @@ public class CTextField implements CWidget {
         begin.transform(stack.peek().getPositionMatrix());
         end.transform(stack.peek().getPositionMatrix());
 
+        int guiScale = (int) CodeUtilities.MC.getWindow().getScaleFactor();
         RenderUtil.pushScissor(
-            (int) begin.getX()*2,
-            (int) begin.getY()*2,
-            (int) (end.getX() - begin.getX())*2,
-            (int) (end.getY() - begin.getY())*2
+            (int) begin.getX()*guiScale,
+            (int) begin.getY()*guiScale,
+            (int) (end.getX() - begin.getX())*guiScale,
+            (int) (end.getY() - begin.getY())*guiScale
         );
 
         stack.translate(2, 2 + scroll, 0);
