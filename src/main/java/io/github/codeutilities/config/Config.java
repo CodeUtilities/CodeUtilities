@@ -61,6 +61,7 @@ public class Config {
             if (Arrays.stream(Config.infoPrefixes).anyMatch(key::startsWith)) {
                 continue;
             }
+
             if (from.get(key).isJsonObject()) {
                 JsonObject sub = new JsonObject();
                 save(sub, from.getAsJsonObject(key));

@@ -4,14 +4,18 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.codeutilities.CodeUtilities;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vector4f;
 import org.lwjgl.opengl.GL11;
@@ -154,5 +158,13 @@ public class RenderUtil {
 
     private record Scissor(int x, int y, int width, int height) {
 
+    }
+
+    public static void sendToaster(String title, String description, SystemToast.Type type) {
+        sendToaster(new LiteralText(title), new LiteralText(description), type);
+    }
+
+    public static void sendToaster(LiteralText title, LiteralText description, SystemToast.Type type) {
+        MinecraftClient.getInstance().getToastManager().add(new SystemToast(type, title, description));
     }
 }

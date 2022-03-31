@@ -3,7 +3,6 @@ package io.github.codeutilities.event;
 import io.github.codeutilities.event.system.CancellableEvent;
 
 public class SendChatEvent implements CancellableEvent {
-
     private boolean cancelled = false;
     private final String message;
 

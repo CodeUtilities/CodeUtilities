@@ -1,10 +1,10 @@
 package io.github.codeutilities.util.chat;
 
 public enum ChatType {
-    SUCCESS("§a§l»", 'f'),
-    FAIL("§4§l»", 'c'),
-    INFO_YELLOW("§6§l»", 'e'),
-    INFO_BLUE("§9§l»", 'b');
+    SUCCESS("§a§l» ", 'f'),
+    FAIL("§4§l» ", 'c'),
+    INFO_YELLOW("§6§l» ", 'e'),
+    INFO_BLUE("§9§l» ", 'b');
 
     private final String prefix;
     private final char trailing;

@@ -4,7 +4,6 @@ import io.github.codeutilities.event.system.CancellableEvent;
 import net.minecraft.text.Text;
 
 public class ReceiveChatEvent implements CancellableEvent {
-
     private final Text message;
     private boolean cancelled = false;
 
@@ -25,5 +24,4 @@ public class ReceiveChatEvent implements CancellableEvent {
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
     }
-
 }

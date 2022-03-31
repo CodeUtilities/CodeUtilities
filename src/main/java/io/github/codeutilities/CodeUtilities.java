@@ -1,6 +1,7 @@
 package io.github.codeutilities;
 
 import io.github.codeutilities.commands.CommandManager;
+import io.github.codeutilities.features.SupportMessages;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.script.ScriptManager;
 import net.fabricmc.api.ModInitializer;
@@ -20,6 +21,7 @@ public class CodeUtilities implements ModInitializer {
         Loader loader = Loader.getInstance();
         loader.load(new CommandManager());
         loader.load(new ScriptManager());
+        loader.load(new SupportMessages());
 
         LOGGER.info("Initialized");
     }

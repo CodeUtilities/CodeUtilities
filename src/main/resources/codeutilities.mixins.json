@@ -9,7 +9,8 @@
     "MKeyboardHandler",
     "MLocalPlayer",
     "MMinecraftClient",
-    "MOptionsScreen"
+    "MOptionsScreen",
+    "MWindow"
   ],
   "client": [
   ],

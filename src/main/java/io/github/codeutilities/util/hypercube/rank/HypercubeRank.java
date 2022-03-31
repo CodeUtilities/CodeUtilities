@@ -1,6 +1,6 @@
-package io.github.codeutilities.util.df.rank;
+package io.github.codeutilities.util.hypercube.rank;
 
-public enum DFRank {
+public enum HypercubeRank {
     OWNER("OWNER", 9),
     ADMIN("ADMIN", 8),
     DEV("DEV", 7),
@@ -16,7 +16,7 @@ public enum DFRank {
     private String teamName;
     private int rankWeight;
 
-    DFRank(String teamName, int rankWeight) {
+    HypercubeRank(String teamName, int rankWeight) {
         this.teamName = teamName;
         this.rankWeight = rankWeight;
     }

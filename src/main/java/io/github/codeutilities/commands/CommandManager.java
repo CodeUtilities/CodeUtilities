@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import io.github.codeutilities.util.df.rank.DFRank;
+import io.github.codeutilities.util.hypercube.rank.HypercubeRank;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 
@@ -17,7 +17,7 @@ public class CommandManager implements Loadable {
 
     private final CommandManager instance;
     private final List<Command> commands = new ArrayList<>();
-    public static final HashMap<Command, DFRank> rankedCommands = new HashMap<>();
+    public static final HashMap<Command, HypercubeRank> rankedCommands = new HashMap<>();
 
     public CommandManager() {
         instance = this;

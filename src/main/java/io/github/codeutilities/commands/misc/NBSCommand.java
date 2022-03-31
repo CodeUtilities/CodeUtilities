@@ -8,7 +8,7 @@ import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.commands.arguments.FileArgumentType;
 import io.github.codeutilities.util.FileUtil;
 import io.github.codeutilities.util.ItemUtil;
-import io.github.codeutilities.util.ToasterUtil;
+import io.github.codeutilities.util.RenderUtil;
 import io.github.codeutilities.util.chat.ChatUtil;
 import io.github.codeutilities.util.nbs.NBSDecoder;
 import io.github.codeutilities.util.nbs.NBSToTemplate;
@@ -96,12 +96,12 @@ public class NBSCommand implements Command {
                 stack.setCustomName(new LiteralText("§5Song§7 -§f " + d.getName()));
             }
 
-            ToasterUtil.sendToaster("NBS Loaded!", fileName, SystemToast.Type.NARRATOR_TOGGLE);
+            RenderUtil.sendToaster("NBS Loaded!", fileName, SystemToast.Type.NARRATOR_TOGGLE);
             ItemUtil.giveItem(stack);
         } catch (OutdatedNBSException e) {
-            ToasterUtil.sendToaster("§cLoading Error!", "Unsupported file version", SystemToast.Type.NARRATOR_TOGGLE);
+            RenderUtil.sendToaster("§cLoading Error!", "Unsupported file version", SystemToast.Type.NARRATOR_TOGGLE);
         } catch (IOException e) {
-            ToasterUtil.sendToaster("§cLoading Error!", "Invalid file", SystemToast.Type.NARRATOR_TOGGLE);
+            RenderUtil.sendToaster("§cLoading Error!", "Invalid file", SystemToast.Type.NARRATOR_TOGGLE);
         }
     }
 }
