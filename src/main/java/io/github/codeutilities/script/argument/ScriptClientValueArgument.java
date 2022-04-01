@@ -57,7 +57,9 @@ public enum ScriptClientValueArgument implements ScriptArgument {
         } else {
             throw new IllegalStateException("Event is not a SendChatEvent");
         }
-    });
+    }),
+
+    TIMESTAMP("Timestamp","The current timestamp in milliseconds.", Items.CLOCK, (event,context) -> new ScriptNumberValue(System.currentTimeMillis()));
 
     private final String name;
     private final ItemStack icon;

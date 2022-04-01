@@ -78,7 +78,7 @@ public class ScriptEditScreen extends CScreen {
             CItem add = new CItem(75, y - 5, addIcon);
             int currentIndex = index;
             add.setClickListener((btn) ->
-                CodeUtilities.MC.setScreen(new ScriptAddActionScreen(script, currentIndex))
+                CodeUtilities.MC.setScreen(new ScriptActionCategoryScreen(script, currentIndex))
             );
             panel.add(add);
 
@@ -95,7 +95,7 @@ public class ScriptEditScreen extends CScreen {
 
         CItem add = new CItem(75, y - 5, addIcon);
         add.setClickListener((btn) ->
-            CodeUtilities.MC.setScreen(new ScriptAddActionScreen(script, script.getParts().size()))
+            CodeUtilities.MC.setScreen(new ScriptActionCategoryScreen(script, script.getParts().size()))
         );
         panel.add(add);
     }

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.codeutilities.CodeUtilities;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -115,7 +114,7 @@ public class RenderUtil {
     }
 
     public static void renderGui(MatrixStack stack, int x, int y, int width, int height) {
-        renderContinuousTexture(stack, x, y, width, height, "textures/gui/demo_background.png", 0, 0, 248, 166, 256, 256, 5);
+        renderContinuousTexture(stack, x, y, width, height, "textures/gui/demo_background.png", 0, 0, 248, 166, 256, 256, 10,0.66);
     }
 
     public static void pushScissor(int x, int y, int width, int height) {

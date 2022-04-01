@@ -29,7 +29,7 @@ import net.minecraft.util.Formatting;
 
 public enum ScriptActionType {
 
-    DISPLAY_CHAT("DisplayChat", "Displays a message in the chat. Takes in text(s) for the message to send.", Items.BOOK, ctx -> {
+    DISPLAY_CHAT("DisplayChat", "Displays a message in the chat. Takes in text(s) for the message to send.", Items.BOOK, ScriptActionCategory.VISUALS, ctx -> {
         ctx.minArguments(1);
         MutableText msg = ComponentUtil.fromString(ctx.argValue(0).asText());
         for (int i = 1; i < ctx.arguments().size(); i++) {
@@ -38,7 +38,7 @@ public enum ScriptActionType {
         ChatUtil.sendMessage(msg);
     }),
 
-    ACTIONBAR("ActionBar", "Displays a message in the action bar. Takes in text(s) for the message to send.", Items.SPRUCE_SIGN, ctx -> {
+    ACTIONBAR("ActionBar", "Displays a message in the action bar. Takes in text(s) for the message to send.", Items.SPRUCE_SIGN, ScriptActionCategory.VISUALS, ctx -> {
         ctx.minArguments(1);
         MutableText msg = ComponentUtil.fromString(ctx.argValue(0).asText());
         for (int i = 1; i < ctx.arguments().size(); i++) {
@@ -47,7 +47,7 @@ public enum ScriptActionType {
         ChatUtil.sendActionBar(msg);
     }),
 
-    SEND_CHAT("SendChat", "Makes the player send a chat message. Takes in text(s) for the message to send.", Items.PAPER, ctx -> {
+    SEND_CHAT("SendChat", "Makes the player send a chat message. Takes in text(s) for the message to send.", Items.PAPER, ScriptActionCategory.ACTIONS, ctx -> {
         ctx.minArguments(1);
         StringBuilder msg = new StringBuilder(ctx.argValue(0).asText());
         for (int i = 1; i < ctx.arguments().size(); i++) {
@@ -56,7 +56,7 @@ public enum ScriptActionType {
         CodeUtilities.MC.player.sendChatMessage(msg.toString());
     }),
 
-    REPEAT_MULTIPLE("RepeatMultiple", "Repeats a specified amount of times. Takes in a number for the amount of times to repeat.", Items.REDSTONE, ctx -> {
+    REPEAT_MULTIPLE("RepeatMultiple", "Repeats a specified amount of times. Takes in a number for the amount of times to repeat.", Items.REDSTONE, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.minArguments(1);
         double times = ctx.argValue(0).asNumber();
         for (int i = 0; i < times; i++) {
@@ -64,9 +64,9 @@ public enum ScriptActionType {
         }
     }, true),
 
-    CLOSE_BRACKET("CloseBracket", "Closes the current code block.", Items.PISTON, ctx -> ctx.exactArguments(0)),
+    CLOSE_BRACKET("CloseBracket", "Closes the current code block.", Items.PISTON, ScriptActionCategory.MISC, ctx -> ctx.exactArguments(0)),
 
-    SET_VARIABLE("SetVariable", "Sets a variable to an other value. Takes in a variable and a value.", Items.IRON_INGOT, ctx -> {
+    SET_VARIABLE("SetVariable", "Sets a variable to an other value. Takes in a variable and a value.", Items.IRON_INGOT, ScriptActionCategory.VARIABLES, ctx -> {
         ctx.exactArguments(2);
         ctx.context().setVariable(
             ctx.argVariable(0).name(),
@@ -74,7 +74,7 @@ public enum ScriptActionType {
         );
     }),
 
-    INCREMENT("Increment", "Increments a variable by a specified amount. Takes in a variable and number(s).", Items.GLOWSTONE_DUST, ctx -> {
+    INCREMENT("Increment", "Increments a variable by a specified amount. Takes in a variable and number(s).", Items.GLOWSTONE_DUST, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.minArguments(1);
         double value = ctx.argValue(0).asNumber();
         if (ctx.arguments().size() > 1) {
@@ -90,7 +90,7 @@ public enum ScriptActionType {
         );
     }),
 
-    DECREMENT("Decrement", "Decrements a variable by a specified amount. Takes in a variable and number(s).", Items.REDSTONE, ctx -> {
+    DECREMENT("Decrement", "Decrements a variable by a specified amount. Takes in a variable and number(s).", Items.REDSTONE, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.minArguments(1);
         double value = ctx.argValue(0).asNumber();
         if (ctx.arguments().size() > 1) {
@@ -106,7 +106,7 @@ public enum ScriptActionType {
         );
     }),
 
-    ADD("Add", "Sets a variable to the sum of the number(s)", Items.BRICK, ctx -> {
+    ADD("Add", "Sets a variable to the sum of the number(s)", Items.BRICK, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.minArguments(2);
         double sum = 0;
         for (int i = 1; i < ctx.arguments().size(); i++) {
@@ -118,7 +118,7 @@ public enum ScriptActionType {
         );
     }),
 
-    SUBTRACT("Subtract", "Sets a variable to the difference of the number(s)", Items.NETHER_BRICK, ctx -> {
+    SUBTRACT("Subtract", "Sets a variable to the difference of the number(s)", Items.NETHER_BRICK, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.minArguments(2);
         double difference = ctx.argValue(1).asNumber();
         for (int i = 2; i < ctx.arguments().size(); i++) {
@@ -130,7 +130,7 @@ public enum ScriptActionType {
         );
     }),
 
-    MULTIPLY("Multiply", "Sets a variable to the product of the number(s)", Items.BRICKS, ctx -> {
+    MULTIPLY("Multiply", "Sets a variable to the product of the number(s)", Items.BRICKS, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.minArguments(2);
         double product = 1;
         for (int i = 1; i < ctx.arguments().size(); i++) {
@@ -142,7 +142,7 @@ public enum ScriptActionType {
         );
     }),
 
-    DIVIDE("Divide", "Sets a variable to the quotient of the number(s)", Items.NETHER_BRICKS, ctx -> {
+    DIVIDE("Divide", "Sets a variable to the quotient of the number(s)", Items.NETHER_BRICKS, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.minArguments(2);
         double quotient = ctx.argValue(1).asNumber();
         for (int i = 2; i < ctx.arguments().size(); i++) {
@@ -154,7 +154,7 @@ public enum ScriptActionType {
         );
     }),
 
-    MODULO("Modulo", "Sets a variable to the remainder of the number(s)", Items.NETHER_WART, ctx -> {
+    MODULO("Modulo", "Sets a variable to the remainder of the number(s)", Items.NETHER_WART, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.minArguments(2);
         double remainder = ctx.argValue(1).asNumber();
         for (int i = 2; i < ctx.arguments().size(); i++) {
@@ -166,57 +166,49 @@ public enum ScriptActionType {
         );
     }),
 
-    TIMESTAMP("Timestamp", "Sets the variable to the current timestamp in seconds with ms accuracy.", Items.CLOCK, ctx -> {
-        ctx.exactArguments(1);
-        ctx.context().setVariable(
-            ctx.argVariable(0).name(),
-            new ScriptNumberValue(System.currentTimeMillis() / 1000.0)
-        );
-    }),
-
-    IF_EQUALS("IfEquals", "Executes if the first value is equal to the second value.", Items.IRON_INGOT, ctx -> {
+    IF_EQUALS("IfEquals", "Executes if the first value is equal to the second value.", Items.IRON_INGOT, ScriptActionCategory.VARIABLES, ctx -> {
         ctx.exactArguments(2);
         if (ctx.argValue(0).valueEquals(ctx.argValue(1))) {
             ctx.inner().run();
         }
     }, true),
 
-    IF_NOT_EQUALS("IfNotEquals", "Executes if the first value is not equal to the second value.", Items.BARRIER, ctx -> {
+    IF_NOT_EQUALS("IfNotEquals", "Executes if the first value is not equal to the second value.", Items.BARRIER, ScriptActionCategory.VARIABLES, ctx -> {
         ctx.exactArguments(2);
         if (!ctx.argValue(0).valueEquals(ctx.argValue(1))) {
             ctx.inner().run();
         }
     }, true),
 
-    IF_GREATER("IfGreater", "Executes if the first number is greater than the second number.", Items.BRICK, ctx -> {
+    IF_GREATER("IfGreater", "Executes if the first number is greater than the second number.", Items.BRICK, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.exactArguments(2);
         if (ctx.argValue(0).asNumber() > ctx.argValue(1).asNumber()) {
             ctx.inner().run();
         }
     }, true),
 
-    IF_GREATER_EQUALS("IfGreaterEquals", "Executes if the first number is greater than or equal to the second number.", Items.BRICKS, ctx -> {
+    IF_GREATER_EQUALS("IfGreaterEquals", "Executes if the first number is greater than or equal to the second number.", Items.BRICKS, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.exactArguments(2);
         if (ctx.argValue(0).asNumber() >= ctx.argValue(1).asNumber()) {
             ctx.inner().run();
         }
     }, true),
 
-    IF_LESS("IfLess", "Executes if the first number is less than the second number.", Items.NETHER_BRICK, ctx -> {
+    IF_LESS("IfLess", "Executes if the first number is less than the second number.", Items.NETHER_BRICK, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.exactArguments(2);
         if (ctx.argValue(0).asNumber() < ctx.argValue(1).asNumber()) {
             ctx.inner().run();
         }
     }, true),
 
-    IF_LESS_EQUALS("IfLessEquals", "Executes if the first number is less than or equal to the second number.", Items.NETHER_BRICKS, ctx -> {
+    IF_LESS_EQUALS("IfLessEquals", "Executes if the first number is less than or equal to the second number.", Items.NETHER_BRICKS, ScriptActionCategory.NUMBERS, ctx -> {
         ctx.exactArguments(2);
         if (ctx.argValue(0).asNumber() <= ctx.argValue(1).asNumber()) {
             ctx.inner().run();
         }
     }, true),
 
-    CANCEL_EVENT("CancelEvent", "Cancels the event.", Items.BARRIER, ctx -> {
+    CANCEL_EVENT("CancelEvent", "Cancels the event.", Items.BARRIER, ScriptActionCategory.MISC, ctx -> {
         ctx.exactArguments(0);
         if (ctx.event() instanceof CancellableEvent ce) {
             ce.setCancelled(true);
@@ -225,7 +217,7 @@ public enum ScriptActionType {
         }
     }),
 
-    UNCANCEL_EVENT("UncancelEvent", "Uncancels the event.", Items.STRUCTURE_VOID, ctx -> {
+    UNCANCEL_EVENT("UncancelEvent", "Uncancels the event.", Items.STRUCTURE_VOID, ScriptActionCategory.MISC, ctx -> {
         ctx.exactArguments(0);
         if (ctx.event() instanceof CancellableEvent ce) {
             ce.setCancelled(false);
@@ -234,7 +226,7 @@ public enum ScriptActionType {
         }
     }),
 
-    CREATE_LIST("CreateList", "Creates a new list from values.", Items.ENDER_CHEST, ctx -> {
+    CREATE_LIST("CreateList", "Creates a new list from values.", Items.ENDER_CHEST, ScriptActionCategory.LISTS, ctx -> {
         ctx.minArguments(1);
         List<ScriptValue> content = new ArrayList<>();
         for (int i = 1; i < ctx.arguments().size(); i++) {
@@ -246,7 +238,7 @@ public enum ScriptActionType {
         );
     }),
 
-    APPEND_VALUE("AppendValue", "Appends values to a list.", Items.FURNACE, ctx -> {
+    APPEND_VALUE("AppendValue", "Appends values to a list.", Items.FURNACE, ScriptActionCategory.LISTS, ctx -> {
         ctx.minArguments(2);
         List<ScriptValue> list = ctx.argValue(0).asList();
         for (int i = 1; i < ctx.arguments().size(); i++) {
@@ -258,7 +250,7 @@ public enum ScriptActionType {
         );
     }),
 
-    GET_LIST_VALUE("GetListValue", "Gets the value at the specified index of a list.", Items.BOOK, ctx -> {
+    GET_LIST_VALUE("GetListValue", "Gets the value at the specified index of a list.", Items.BOOK, ScriptActionCategory.LISTS, ctx -> {
         ctx.minArguments(2);
         List<ScriptValue> list = ctx.argValue(1).asList();
         int index = (int) ctx.argValue(2).asNumber();
@@ -275,7 +267,7 @@ public enum ScriptActionType {
         }
     }),
 
-    SET_LIST_VALUE("SetListValue", "Sets the value at the specified index of a list.", Items.WRITABLE_BOOK, ctx -> {
+    SET_LIST_VALUE("SetListValue", "Sets the value at the specified index of a list.", Items.WRITABLE_BOOK, ScriptActionCategory.LISTS, ctx -> {
         ctx.minArguments(3);
         List<ScriptValue> list = ctx.argValue(0).asList();
         int index = (int) ctx.argValue(1).asNumber();
@@ -289,7 +281,7 @@ public enum ScriptActionType {
         );
     }),
 
-    REMOVE_LIST_VALUE("RemoveListValue", "Removes the value at the specified index of a list.", Items.TNT_MINECART, ctx -> {
+    REMOVE_LIST_VALUE("RemoveListValue", "Removes the value at the specified index of a list.", Items.TNT_MINECART, ScriptActionCategory.LISTS, ctx -> {
         ctx.minArguments(2);
         List<ScriptValue> list = ctx.argValue(0).asList();
         int index = (int) ctx.argValue(1).asNumber();
@@ -303,7 +295,7 @@ public enum ScriptActionType {
         );
     }),
 
-    LIST_LENGTH("ListLength", "Sets the variable to the length of the list.", Items.BOOKSHELF, ctx -> {
+    LIST_LENGTH("ListLength", "Sets the variable to the length of the list.", Items.BOOKSHELF, ScriptActionCategory.LISTS, ctx -> {
         ctx.exactArguments(2);
         ctx.context().setVariable(
             ctx.argVariable(0).name(),
@@ -311,7 +303,7 @@ public enum ScriptActionType {
         );
     }),
 
-    FOR_EACH("ForEach", "Executes the code for each value of a list and sets the variable to the value.", Items.ENDER_CHEST, ctx -> {
+    FOR_EACH("ForEach", "Executes the code for each value of a list and sets the variable to the value.", Items.ENDER_CHEST, ScriptActionCategory.LISTS, ctx -> {
         ctx.exactArguments(2);
         List<ScriptValue> list = ctx.argValue(1).asList();
         for (ScriptValue scriptValue : list) {
@@ -323,7 +315,7 @@ public enum ScriptActionType {
         }
     }, true),
 
-    IF_TEXT_CONTAINS("IfTextContains", "Executes the code if the text contains the specified text.", Items.NAME_TAG, ctx -> {
+    IF_TEXT_CONTAINS("IfTextContains", "Executes the code if the text contains the specified text.", Items.NAME_TAG, ScriptActionCategory.TEXTS, ctx -> {
         ctx.exactArguments(2);
         String text = ctx.argValue(0).asText();
         String contains = ctx.argValue(1).asText();
@@ -332,16 +324,16 @@ public enum ScriptActionType {
         }
     }, true),
 
-    IF_LIST_CONTAINS("IfListContains", "Executes the code if the list contains the specified value.", Items.BOOKSHELF, ctx -> {
+    IF_LIST_CONTAINS("IfListContains", "Executes the code if the list contains the specified value.", Items.BOOKSHELF, ScriptActionCategory.TEXTS, ctx -> {
         ctx.exactArguments(2);
         List<ScriptValue> list = ctx.argValue(0).asList();
         ScriptValue contains = ctx.argValue(1);
         if (list.contains(contains)) {
             ctx.inner().run();
         }
-    },true),
+    }, true),
 
-    CREATE_DICTIONARY("CreateDictionary", "Creates a new dictionary.", Items.BOOKSHELF, ctx -> {
+    CREATE_DICTIONARY("CreateDictionary", "Creates a new dictionary.", Items.BOOKSHELF, ScriptActionCategory.DICTIONARIES, ctx -> {
         ctx.exactArguments(1);
         ctx.context().setVariable(
             ctx.argVariable(0).name(),
@@ -349,7 +341,7 @@ public enum ScriptActionType {
         );
     }),
 
-    GET_DICT_VALUE("GetDictValue", "Gets a value of a dictionary.", Items.BOOK, ctx -> {
+    GET_DICT_VALUE("GetDictValue", "Gets a value of a dictionary.", Items.BOOK, ScriptActionCategory.DICTIONARIES, ctx -> {
         ctx.exactArguments(2);
         HashMap<String, ScriptValue> dict = ctx.argValue(1).asDictionary();
         String key = ctx.argValue(2).asText();
@@ -365,8 +357,8 @@ public enum ScriptActionType {
             );
         }
     }),
-    
-    SET_DICT_VALUE("SetDictValue", "Sets a value of a dictionary.", Items.FURNACE, ctx -> {
+
+    SET_DICT_VALUE("SetDictValue", "Sets a value of a dictionary.", Items.FURNACE, ScriptActionCategory.DICTIONARIES, ctx -> {
         ctx.exactArguments(3);
         HashMap<String, ScriptValue> dict = ctx.argValue(0).asDictionary();
         String key = ctx.argValue(1).asText();
@@ -377,7 +369,7 @@ public enum ScriptActionType {
         );
     }),
 
-    DICTIONARY_SIZE("DictionarySize", "Sets the variable to the size of the dictionary.", Items.BOOKSHELF, ctx -> {
+    DICTIONARY_SIZE("DictionarySize", "Sets the variable to the size of the dictionary.", Items.BOOKSHELF, ScriptActionCategory.DICTIONARIES, ctx -> {
         ctx.exactArguments(2);
         ctx.context().setVariable(
             ctx.argVariable(0).name(),
@@ -385,16 +377,16 @@ public enum ScriptActionType {
         );
     }),
 
-    IF_DICT_KEY("IfDictKey", "Executes the code if the dictionary contains the specified key.", Items.CHEST_MINECART, ctx -> {
-       ctx.exactArguments(2);
-       HashMap<String, ScriptValue> dict = ctx.argValue(0).asDictionary();
-       String key = ctx.argValue(1).asText();
-       if (dict.containsKey(key)) {
-           ctx.inner().run();
-       }
+    IF_DICT_KEY("IfDictKey", "Executes the code if the dictionary contains the specified key.", Items.CHEST_MINECART, ScriptActionCategory.DICTIONARIES, ctx -> {
+        ctx.exactArguments(2);
+        HashMap<String, ScriptValue> dict = ctx.argValue(0).asDictionary();
+        String key = ctx.argValue(1).asText();
+        if (dict.containsKey(key)) {
+            ctx.inner().run();
+        }
     }, true),
 
-    REMOVE_DICT_ENTRY("RemoveDictEntry", "Removes an entry from a dictionary by the key.", Items.TNT_MINECART, ctx -> {
+    REMOVE_DICT_ENTRY("RemoveDictEntry", "Removes an entry from a dictionary by the key.", Items.TNT_MINECART, ScriptActionCategory.DICTIONARIES, ctx -> {
         ctx.exactArguments(2);
         HashMap<String, ScriptValue> dict = ctx.argValue(0).asDictionary();
         String key = ctx.argValue(1).asText();
@@ -405,7 +397,7 @@ public enum ScriptActionType {
         );
     }),
 
-    DICT_FOR_EACH("DictForEach", "Executes the code for each key, value in the dictionary. Takes in 2 variables for key and value, and a dictionary", Items.CHEST_MINECART, ctx -> {
+    DICT_FOR_EACH("DictForEach", "Executes the code for each key, value in the dictionary. Takes in 2 variables for key and value, and a dictionary", Items.CHEST_MINECART, ScriptActionCategory.DICTIONARIES, ctx -> {
         ctx.exactArguments(3);
         HashMap<String, ScriptValue> dict = ctx.argValue(0).asDictionary();
         for (String key : dict.keySet()) {
@@ -421,23 +413,25 @@ public enum ScriptActionType {
         }
     },true),
 
-    WAIT("Wait", "Waits for the specified amount of time.", Items.CLOCK, ctx -> {
+    WAIT("Wait", "Waits for the specified amount of time.", Items.CLOCK, ScriptActionCategory.MISC, ctx -> {
         ctx.exactArguments(1);
         int time = (int) ctx.argValue(0).asNumber();
         ctx.task().stop();
         ctx.task().stack().increase();
-        Scheduler.schedule(time,() -> ctx.task().run());
+        Scheduler.schedule(time, () -> ctx.task().run());
     });
 
     private final Consumer<ScriptActionContext> consumer;
     private final ItemStack icon;
     private final String name;
     private final boolean hasChildren;
+    private final ScriptActionCategory category;
 
-    ScriptActionType(String name, String description, Item type, Consumer<ScriptActionContext> consumer, boolean hasChildren) {
+    ScriptActionType(String name, String description, Item type, ScriptActionCategory category, Consumer<ScriptActionContext> consumer, boolean hasChildren) {
         this.consumer = consumer;
         this.name = name;
         this.hasChildren = hasChildren;
+        this.category = category;
         icon = new ItemStack(type);
         icon.setCustomName(new LiteralText(name)
             .fillStyle(Style.EMPTY
@@ -452,8 +446,8 @@ public enum ScriptActionType {
             .put("Lore", lore);
     }
 
-    ScriptActionType(String name, String description, Item type, Consumer<ScriptActionContext> consumer) {
-        this(name, description, type, consumer, false);
+    ScriptActionType(String name, String description, Item type, ScriptActionCategory category, Consumer<ScriptActionContext> consumer) {
+        this(name, description, type, category, consumer, false);
     }
 
     public ItemStack getIcon() {
@@ -470,5 +464,9 @@ public enum ScriptActionType {
 
     public Consumer<ScriptActionContext> getConsumer() {
         return consumer;
+    }
+
+    public ScriptActionCategory getCategory() {
+        return category;
     }
 }
