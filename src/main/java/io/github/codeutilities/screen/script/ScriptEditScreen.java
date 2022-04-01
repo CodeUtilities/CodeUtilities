@@ -43,7 +43,7 @@ public class ScriptEditScreen extends CScreen {
                 .withItalic(false)));
 
         ItemStack argumentsIcon = new ItemStack(Items.CHEST);
-        argumentsIcon.setCustomName(new LiteralText("Arguments"));
+        argumentsIcon.setCustomName(new LiteralText("Arguments").fillStyle(Style.EMPTY.withItalic(false)));
 
         int y = 5;
         int index = 0;

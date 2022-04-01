@@ -144,16 +144,12 @@ public class RenderUtil {
     }
 
     public static void renderGuiItem(MatrixStack stack, ItemStack item) {
-        RenderSystem.enableDepthTest();
         stack.push();
         ItemRenderer renderer = CodeUtilities.MC.getItemRenderer();
-        renderer.zOffset = 200f;
         Vector4f pos = new Vector4f(0, 0, 0, 1);
         pos.transform(stack.peek().getPositionMatrix());
         renderer.renderGuiItemIcon(item, (int) pos.getX(), (int) pos.getY());
-        renderer.zOffset = 0f;
         stack.pop();
-        RenderSystem.disableDepthTest();
     }
 
     private record Scissor(int x, int y, int width, int height) {

@@ -13,7 +13,8 @@ import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
 import io.github.codeutilities.script.event.ScriptEvent;
 import io.github.codeutilities.script.execution.ScriptContext;
-
+import io.github.codeutilities.script.execution.ScriptPosStack;
+import io.github.codeutilities.script.execution.ScriptTask;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.File;
@@ -51,7 +52,7 @@ public class Script {
             if (part instanceof ScriptEvent se) {
                 if (se.getType().getCodeutilitiesEvent().equals(event.getClass())) {
                     try {
-                        execute(pos + 1, event);
+                        this.execute(new ScriptTask(new ScriptPosStack(pos+1), event,this));
                     } catch (Exception err) {
                         ChatUtil.sendMessage("Error while invoking event " + se.getType().getName() + " in script " + name + ": " + err.getMessage(), ChatType.FAIL);
                         LOGGER.error("Error while invoking event " + se.getType().getName(), err);
@@ -63,45 +64,61 @@ public class Script {
         }
     }
 
-    private void execute(int pos, Event event) {
-        while (pos < parts.size()) {
-            ScriptPart part = parts.get(pos);
+    public void execute(ScriptTask task) {
+        while (task.stack().peek() < parts.size()) {
+            ScriptPart part = parts.get(task.stack().peek());
             if (part instanceof ScriptEvent) {
                 return;
             } else if (part instanceof ScriptAction sa) {
                 Runnable inner = null;
                 if (sa.getType().hasChildren()) {
-                    int nextPos = pos + 1;
-                    inner = () -> execute(nextPos, event);
+                    int posCopy = task.stack().peek();
+                    inner = () -> task.stack().push(posCopy);
                     int depth = 0;
-                    while (pos < parts.size()) {
-                        ScriptPart nextPart = parts.get(pos);
+                    while (task.stack().peek() < parts.size()) {
+                        ScriptPart nextPart = parts.get(task.stack().peek());
                         if (nextPart instanceof ScriptEvent) {
-                            pos = Integer.MAX_VALUE;
+                            task.stack().clear();
+                            return;
                         } else if (nextPart instanceof ScriptAction sa2) {
                             if (sa2.getType().hasChildren()) {
                                 depth++;
                             } else if (sa2.getType() == ScriptActionType.CLOSE_BRACKET) {
+                                depth--;
                                 if (depth == 0) {
-                                    pos++;
                                     break;
                                 }
-                                depth--;
                             }
                         } else {
                             throw new IllegalStateException("Unexpected script part type: " + nextPart.getClass().getName());
                         }
-                        pos++;
+                        if (!task.stack().isEmpty()) {
+                            task.stack().increase();
+                        } else {
+                            return;
+                        }
                     }
+                    System.out.println("Skipped from: " + posCopy + " to: " + task.stack().peek());
                 }
-                sa.invoke(event, context, inner);
-                if (sa.getType() == ScriptActionType.CLOSE_BRACKET) {
+                sa.invoke(task.event(), context, inner,task);
+                if (!task.isRunning()) {
                     return;
+                }
+                if (sa.getType() == ScriptActionType.CLOSE_BRACKET) {
+                    if (task.stack().isEmpty()) {
+                        return;
+                    } else {
+                        task.stack().pop();
+                    }
                 }
             } else {
                 throw new IllegalArgumentException("Invalid script part");
             }
-            pos++;
+            if (!task.stack().isEmpty()) {
+                task.stack().increase();
+            } else {
+                return;
+            }
         }
     }
 

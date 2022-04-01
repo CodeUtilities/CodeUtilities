@@ -9,6 +9,7 @@ import io.github.codeutilities.script.ScriptPart;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
 import io.github.codeutilities.script.execution.ScriptContext;
+import io.github.codeutilities.script.execution.ScriptTask;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -22,9 +23,9 @@ public class ScriptAction implements ScriptPart {
         this.arguments = arguments;
     }
 
-    public void invoke(Event event, ScriptContext context, Runnable inner) {
+    public void invoke(Event event, ScriptContext context, Runnable inner, ScriptTask task) {
         type.getConsumer().accept(new ScriptActionContext(
-            context, arguments, event, inner
+            context, arguments, event, inner, task
         ));
     }
 

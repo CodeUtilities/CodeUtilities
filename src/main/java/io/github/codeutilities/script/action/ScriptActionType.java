@@ -10,6 +10,7 @@ import io.github.codeutilities.script.values.ScriptTextValue;
 import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
 import io.github.codeutilities.util.ComponentUtil;
+import io.github.codeutilities.util.Scheduler;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +59,6 @@ public enum ScriptActionType {
     REPEAT_MULTIPLE("RepeatMultiple", "Repeats a specified amount of times. Takes in a number for the amount of times to repeat.", Items.REDSTONE, ctx -> {
         ctx.minArguments(1);
         double times = ctx.argValue(0).asNumber();
-        System.out.println(times);
         for (int i = 0; i < times; i++) {
             ctx.inner().run();
         }
@@ -419,7 +419,15 @@ public enum ScriptActionType {
             );
             ctx.inner().run();
         }
-    },true);
+    },true),
+
+    WAIT("Wait", "Waits for the specified amount of time.", Items.CLOCK, ctx -> {
+        ctx.exactArguments(1);
+        int time = (int) ctx.argValue(0).asNumber();
+        ctx.task().stop();
+        ctx.task().stack().increase();
+        Scheduler.schedule(time,() -> ctx.task().run());
+    });
 
     private final Consumer<ScriptActionContext> consumer;
     private final ItemStack icon;

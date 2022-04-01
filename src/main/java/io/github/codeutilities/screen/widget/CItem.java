@@ -1,5 +1,6 @@
 package io.github.codeutilities.screen.widget;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.util.RenderUtil;
 import java.awt.Rectangle;
@@ -10,6 +11,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvents;
+import org.lwjgl.opengl.GL11;
 
 public class CItem implements CWidget {
 
@@ -40,6 +42,7 @@ public class CItem implements CWidget {
             stack.push();
             stack.translate(mouseX, mouseY, 0);
             stack.scale(0.5f, 0.5f, 1f);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
             CodeUtilities.MC.currentScreen.renderTooltip(stack, item.getTooltip(
                 CodeUtilities.MC.player, Default.NORMAL
             ), Optional.empty(), 0, 0);

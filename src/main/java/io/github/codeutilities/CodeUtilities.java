@@ -6,6 +6,7 @@ import io.github.codeutilities.features.afk.AfkFeature;
 import io.github.codeutilities.features.SupportMessages;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.script.ScriptManager;
+import io.github.codeutilities.util.Scheduler;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
@@ -26,6 +27,7 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new SupportMessages());
         loader.load(new AfkFeature());
         loader.load(new PrivateMessageManipulator());
+        loader.load(new Scheduler());
 
         LOGGER.info("Initialized");
     }
