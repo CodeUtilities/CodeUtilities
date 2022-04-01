@@ -1,6 +1,8 @@
 package io.github.codeutilities;
 
 import io.github.codeutilities.commands.CommandManager;
+import io.github.codeutilities.features.PrivateMessageManipulator;
+import io.github.codeutilities.features.afk.AfkFeature;
 import io.github.codeutilities.features.SupportMessages;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.script.ScriptManager;
@@ -22,6 +24,8 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new CommandManager());
         loader.load(new ScriptManager());
         loader.load(new SupportMessages());
+        loader.load(new AfkFeature());
+        loader.load(new PrivateMessageManipulator());
 
         LOGGER.info("Initialized");
     }

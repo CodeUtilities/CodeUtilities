@@ -17,7 +17,7 @@ public class MKeyboardHandler {
     private void keyPress(long window, int i, int j, int k, int m, CallbackInfo ci) {
         Key key = InputUtil.fromKeyCode(i,j);
 
-        KeyPressEvent event = new KeyPressEvent(key,k);
+        KeyPressEvent event = new KeyPressEvent(key, k);
         EventManager.getInstance().dispatch(event);
         if (event.isCancelled()) {
             ci.cancel();

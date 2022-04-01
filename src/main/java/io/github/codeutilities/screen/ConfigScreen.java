@@ -46,8 +46,11 @@ public class ConfigScreen extends CScreen {
             JsonElement element = json.get(key);
             String description = "";
             if (json.has("desc:" + key)) {
-                description = " (" + json.get("desc:" + key).getAsString() + ")";
+                if (!json.get("desc:" + key).isJsonNull()){
+                    description = " (" + json.get("desc:" + key).getAsString() + ")";
+                }
             }
+
             if (element.isJsonObject()) {
                 JsonObject object = element.getAsJsonObject();
                 CText title = new CText(x,y[0],new LiteralText(key + description + ":"));

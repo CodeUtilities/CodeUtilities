@@ -23,6 +23,13 @@ public class ConfigDefaults {
 
         enumSetting(root, "Queue Messages", "Main Chat", "Join & Leave Queue Messages", HypercubeRank.JRHELPER, "Main Chat", "Side Chat", "Toast", "Hidden");
 
+        booleanSetting(root, "Auto AFK", true, null, HypercubeRank.DEFAULT);
+        numberSetting(root, "Auto AFK Time", 2400, "Ticks", HypercubeRank.DEFAULT);
+
+        stringSetting(root, "AFK Response", "I am currently AFK (Automated Message)", "Response when /msg", HypercubeRank.DEFAULT);
+
+        booleanSetting(root, "Fast Message Response", true, null, HypercubeRank.DEFAULT);
+
         return root;
     }
 
