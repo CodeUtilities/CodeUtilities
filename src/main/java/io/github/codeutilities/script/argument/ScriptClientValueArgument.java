@@ -45,7 +45,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
 
     EVENT_MESSAGE("ReceivedMessage","The message received. (ReceiveChatEvent)", Items.WRITTEN_BOOK, (event,context) -> {
         if (event instanceof ReceiveChatEvent e) {
-            return new ScriptTextValue(ComponentUtil.toFormattedString(e.getMessage()));
+            return new ScriptTextValue(e.getMessage().getString());
         } else {
             throw new IllegalStateException("Event is not a ReceiveChatEvent");
         }

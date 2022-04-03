@@ -37,6 +37,7 @@ public class CommandManager implements Loadable {
         commands.add(new WebviewCommand());
         commands.add(new NBSCommand());
         commands.add(new AfkCommnd());
+        commands.add(new PingCommand());
 
         // Example of registering commands with a required df rank
         // rankedCommands.put(new TestCommand(), DFRank.JRHELPER);
