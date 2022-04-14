@@ -17,13 +17,13 @@ public class HypercubeUtil {
     }
 
     public static void setRank(HypercubeRank rank) {
-        if (rank.getRankWeight() >= HypercubeUtil.rank.getRankWeight()) {
+        if (HypercubeUtil.rank.hasPermission(rank)) {
             HypercubeUtil.rank = rank;
 
             for (Command command : CommandManager.rankedCommands.keySet()) {
                 HypercubeRank r = CommandManager.rankedCommands.get(command);
 
-                if (HypercubeUtil.rank.getRankWeight() >= r.getRankWeight()) {
+                if (rank.hasPermission(r)) {
                     if (!regCommands.contains(command)) {
                         regCommands.add(command);
                         command.register(ClientCommandManager.DISPATCHER);
