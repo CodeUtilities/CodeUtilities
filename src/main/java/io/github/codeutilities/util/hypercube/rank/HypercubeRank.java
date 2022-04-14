@@ -1,31 +1,31 @@
 package io.github.codeutilities.util.hypercube.rank;
 
 public enum HypercubeRank {
-    OWNER("OWNER", 9),
-    ADMIN("ADMIN", 8),
-    DEV("DEV", 7),
-    SRMOD("SR_MOD", 6),
-    MOD("MOD", 5),
-    JRMOD("JR_MOD", 4),
-    SRHELPER("SR_HELPER", 3),
-    HELPER("HELPER", 2),
-    JRHELPER("JR_HELPER", 1),
 
-    DEFAULT(null, 0);
+    DEFAULT(null),
+
+    JRHELPER("JR_HELPER"),
+    HELPER("HELPER"),
+    SRHELPER("SR_HELPER"),
+    JRMOD("JR_MOD"),
+    MOD("MOD"),
+    SRMOD("SR_MOD"),
+    DEV("DEV"),
+    ADMIN("ADMIN"),
+    OWNER("OWNER"),
+    ;
 
     private String teamName;
-    private int rankWeight;
 
-    HypercubeRank(String teamName, int rankWeight) {
+    HypercubeRank(String teamName) {
         this.teamName = teamName;
-        this.rankWeight = rankWeight;
     }
 
     public String getTeamName() {
         return teamName;
     }
 
-    public int getRankWeight() {
-        return rankWeight;
+    public boolean hasPermission(HypercubeRank req) {
+        return this.ordinal() >= req.ordinal();
     }
 }
