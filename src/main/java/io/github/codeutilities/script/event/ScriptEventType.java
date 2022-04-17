@@ -1,10 +1,10 @@
 package io.github.codeutilities.script.event;
 
-import io.github.codeutilities.event.KeyPressEvent;
-import io.github.codeutilities.event.ReceiveChatEvent;
-import io.github.codeutilities.event.SendChatEvent;
-import io.github.codeutilities.event.TickEvent;
-import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.event.IEvent;
+import io.github.codeutilities.event.impl.ChatReceivedEvent;
+import io.github.codeutilities.event.impl.ChatSentEvent;
+import io.github.codeutilities.event.impl.TickEvent;
+import io.github.codeutilities.event.impl.system.KeyPressEvent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -17,19 +17,19 @@ import net.minecraft.util.Formatting;
 
 public enum ScriptEventType {
 
-    SEND_CHAT(SendChatEvent.class,"OnSendChat", "Executed when a player sends a chat message.", Items.BOOK),
+    SEND_CHAT(ChatSentEvent.class,"OnSendChat", "Executed when a player sends a chat message.", Items.BOOK),
 
     KEY_PRESS(KeyPressEvent.class, "OnKeyPress", "Executed when a player presses a key.", Items.STONE_BUTTON),
 
-    RECEIVE_CHAT(ReceiveChatEvent.class, "OnReceiveChat", "Executed when a player receives a chat message.", Items.BOOK),
+    RECEIVE_CHAT(ChatReceivedEvent.class, "OnReceiveChat", "Executed when a player receives a chat message.", Items.BOOK),
 
     TICK_EVENT(TickEvent.class, "OnTick", "Executed every tick.", Items.CLOCK);
 
     private final String name;
     private final ItemStack icon;
-    private final Class<? extends Event> codeutilitiesEvent;
+    private final Class<? extends IEvent> codeutilitiesEvent;
 
-    ScriptEventType(Class<? extends Event> codeutilitiesEvent, String name, String description, Item item) {
+    ScriptEventType(Class<? extends IEvent> codeutilitiesEvent, String name, String description, Item item) {
         this.codeutilitiesEvent = codeutilitiesEvent;
         this.name = name;
         icon = new ItemStack(item);
@@ -54,7 +54,7 @@ public enum ScriptEventType {
         return name;
     }
 
-    public Class<? extends Event> getCodeutilitiesEvent() {
+    public Class<? extends IEvent> getCodeutilitiesEvent() {
         return codeutilitiesEvent;
     }
 }

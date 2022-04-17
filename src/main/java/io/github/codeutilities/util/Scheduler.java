@@ -1,7 +1,9 @@
 package io.github.codeutilities.util;
 
-import io.github.codeutilities.event.TickEvent;
-import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.impl.TickEvent;
+import io.github.codeutilities.event.listening.EventWatcher;
+import io.github.codeutilities.event.listening.IEventListener;
 import io.github.codeutilities.loader.Loadable;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,17 @@ public class Scheduler implements Loadable {
 
     @Override
     public void load() {
-        EventManager.getInstance().register(TickEvent.class, (e) -> {
+        EventRegister.getInstance().registerListener(new Scheduler.EventListener());
+    }
+
+    public static void schedule(int ticks, Runnable runnable) {
+        tasks.add(new MutablePair<>(ticks, runnable));
+    }
+
+    public static class EventListener implements IEventListener {
+
+        @EventWatcher
+        public void onTick(TickEvent event) {
             for(MutablePair<Integer,Runnable> task : new ArrayList<>(tasks)) {
                 task.setLeft(task.getLeft() - 1);
                 if(task.getLeft() <= 0) {
@@ -21,10 +33,8 @@ public class Scheduler implements Loadable {
                     tasks.remove(task);
                 }
             }
-        });
+        }
+
     }
 
-    public static void schedule(int ticks, Runnable runnable) {
-        tasks.add(new MutablePair<>(ticks, runnable));
-    }
 }

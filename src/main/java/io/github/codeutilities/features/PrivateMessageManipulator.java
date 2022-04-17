@@ -2,8 +2,10 @@ package io.github.codeutilities.features;
 
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.config.Config;
-import io.github.codeutilities.event.ReceiveChatEvent;
-import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.impl.ChatReceivedEvent;
+import io.github.codeutilities.event.listening.EventWatcher;
+import io.github.codeutilities.event.listening.IEventListener;
 import io.github.codeutilities.loader.Loadable;
 import io.github.codeutilities.util.chat.ChatUtil;
 import io.github.codeutilities.util.hypercube.HypercubePrivateMessage;
@@ -14,7 +16,13 @@ import java.util.regex.Pattern;
 public class PrivateMessageManipulator implements Loadable {
     @Override
     public void load() {
-        EventManager.getInstance().register(ReceiveChatEvent.class, (event -> {
+        EventRegister.getInstance().registerListener(new PrivateMessageManipulator.EventListener());
+    }
+
+    public static class EventListener implements IEventListener {
+
+        @EventWatcher
+        public void onChat(ChatReceivedEvent event) {
             String message = event.getMessage().getString();
 
             //Afk Reply
@@ -30,6 +38,8 @@ public class PrivateMessageManipulator implements Loadable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }));
+        }
+
     }
+
 }

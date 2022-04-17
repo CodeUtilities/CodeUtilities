@@ -1,12 +1,12 @@
 package io.github.codeutilities.script.execution;
 
-import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.event.IEvent;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.argument.ScriptVariableArgument;
 import io.github.codeutilities.script.values.ScriptValue;
 import java.util.List;
 
-public record ScriptActionContext(ScriptContext context, List<ScriptArgument> arguments, Event event, Runnable inner, ScriptTask task) {
+public record ScriptActionContext(ScriptContext context, List<ScriptArgument> arguments, IEvent event, Runnable inner, ScriptTask task) {
 
     public ScriptValue argValue(int i) {
         return arguments.get(i).getValue(event, context);

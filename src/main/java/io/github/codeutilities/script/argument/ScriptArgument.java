@@ -7,14 +7,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.event.IEvent;
 import io.github.codeutilities.script.execution.ScriptContext;
 import io.github.codeutilities.script.values.ScriptValue;
 import java.lang.reflect.Type;
 
 public interface ScriptArgument {
 
-    ScriptValue getValue(Event event, ScriptContext context);
+    ScriptValue getValue(IEvent event, ScriptContext context);
 
     class Serializer implements JsonDeserializer<ScriptArgument> {
 

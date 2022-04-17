@@ -1,23 +1,25 @@
-package io.github.codeutilities.event;
+package io.github.codeutilities.event.impl;
 
-import io.github.codeutilities.event.system.CancellableEvent;
+import io.github.codeutilities.event.ICancellable;
+import io.github.codeutilities.event.IEvent;
 import net.minecraft.text.Text;
 
-public class ReceiveChatEvent implements CancellableEvent {
+public class ChatReceivedEvent implements IEvent, ICancellable {
+
     private final Text message;
     private boolean cancelled = false;
 
-    public ReceiveChatEvent(Text message) {
+    public ChatReceivedEvent(Text message) {
         this.message = message;
     }
 
     public Text getMessage() {
-        return message;
+        return this.message;
     }
 
     @Override
     public boolean isCancelled() {
-        return cancelled;
+        return this.cancelled;
     }
 
     @Override

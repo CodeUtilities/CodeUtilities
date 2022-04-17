@@ -3,8 +3,10 @@ package io.github.codeutilities.config;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.codeutilities.CodeUtilities;
-import io.github.codeutilities.event.ShutdownEvent;
-import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.impl.ShutdownEvent;
+import io.github.codeutilities.event.listening.EventWatcher;
+import io.github.codeutilities.event.listening.IEventListener;
 import io.github.codeutilities.util.FileUtil;
 
 import java.util.Arrays;
@@ -22,10 +24,10 @@ public class Config {
         this.loadFromFile();
         this.merge(ConfigDefaults.getDefaults());
 
-        EventManager.getInstance().register(ShutdownEvent.class, (e) -> {
-            this.saveToFile();
-        });
+        EventRegister.getInstance().registerListener(new Config.EventListener());
     }
+
+
 
     public static Config getConfig() {
         return instance == null ? new Config() : instance;
@@ -92,5 +94,14 @@ public class Config {
 
     public JsonObject json() {
         return this.data;
+    }
+
+    public static class EventListener implements IEventListener {
+
+        @EventWatcher
+        public void onSystemShutDown(ShutdownEvent event) {
+           Config.getConfig().saveToFile();
+        }
+
     }
 }

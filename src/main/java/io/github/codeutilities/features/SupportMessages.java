@@ -1,8 +1,10 @@
 package io.github.codeutilities.features;
 
 import io.github.codeutilities.config.enums.QueueMessages;
-import io.github.codeutilities.event.ReceiveChatEvent;
-import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.impl.ChatReceivedEvent;
+import io.github.codeutilities.event.listening.EventWatcher;
+import io.github.codeutilities.event.listening.IEventListener;
 import io.github.codeutilities.loader.Loadable;
 import io.github.codeutilities.util.RenderUtil;
 import net.minecraft.client.toast.SystemToast;
@@ -10,7 +12,13 @@ import net.minecraft.client.toast.SystemToast;
 public class SupportMessages implements Loadable {
     @Override
     public void load() {
-        EventManager.getInstance().register(ReceiveChatEvent.class, (event -> {
+        EventRegister.getInstance().registerListener(new SupportMessages.EventListener());
+    }
+
+    public static class EventListener implements IEventListener {
+
+        @EventWatcher
+        public void onChat(ChatReceivedEvent event) {
             String message = event.getMessage().getString();
 
             if (message.startsWith("[SUPPORT] ")) {
@@ -36,6 +44,8 @@ public class SupportMessages implements Loadable {
                     event.setCancelled(true);
                 }
             }
-        }));
+        }
+
     }
+
 }

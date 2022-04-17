@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.event.IEvent;
 import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
 import io.github.codeutilities.script.event.ScriptEvent;
@@ -46,7 +46,7 @@ public class Script {
         this.file = file;
     }
 
-    public void invoke(Event event) {
+    public void invoke(IEvent event) {
         int pos = 0;
         for (ScriptPart part : parts) {
             if (part instanceof ScriptEvent se) {

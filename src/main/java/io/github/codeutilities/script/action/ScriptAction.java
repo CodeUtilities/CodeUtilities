@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.event.IEvent;
 import io.github.codeutilities.script.ScriptPart;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
@@ -23,7 +23,7 @@ public class ScriptAction implements ScriptPart {
         this.arguments = arguments;
     }
 
-    public void invoke(Event event, ScriptContext context, Runnable inner, ScriptTask task) {
+    public void invoke(IEvent event, ScriptContext context, Runnable inner, ScriptTask task) {
         type.getConsumer().accept(new ScriptActionContext(
             context, arguments, event, inner, task
         ));

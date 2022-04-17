@@ -1,8 +1,9 @@
 package io.github.codeutilities.mixin;
 
 import io.github.codeutilities.CodeUtilities;
-import io.github.codeutilities.event.ReceiveChatEvent;
-import io.github.codeutilities.event.system.EventManager;
+
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.impl.ChatReceivedEvent;
 import io.github.codeutilities.util.hypercube.rank.HypercubeRank;
 import io.github.codeutilities.util.hypercube.rank.HypercubeUtil;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -35,8 +36,8 @@ public class MChatComponent {
             cooldown = System.currentTimeMillis();
             lastMessage = packet.getMessage().getString();
 
-            ReceiveChatEvent event = new ReceiveChatEvent(packet.getMessage());
-            EventManager.getInstance().dispatch(event);
+            ChatReceivedEvent event = new ChatReceivedEvent(packet.getMessage());
+            EventRegister.getInstance().dispatch(event);
             if (event.isCancelled()) {
                 ci.cancel();
             }

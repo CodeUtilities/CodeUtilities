@@ -2,12 +2,10 @@ package io.github.codeutilities.script;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.github.codeutilities.event.KeyPressEvent;
-import io.github.codeutilities.event.ReceiveChatEvent;
-import io.github.codeutilities.event.TickEvent;
-import io.github.codeutilities.event.system.Event;
-import io.github.codeutilities.event.system.EventManager;
-import io.github.codeutilities.event.SendChatEvent;
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.IEvent;
+import io.github.codeutilities.event.listening.EventWatcher;
+import io.github.codeutilities.event.listening.IEventListener;
 import io.github.codeutilities.loader.Loadable;
 import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.argument.ScriptArgument;
@@ -23,7 +21,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class ScriptManager implements Loadable {
+public class ScriptManager implements Loadable, IEventListener {
 
     private static final Logger LOGGER = LogManager.getLogger("CuModules");
     private static ScriptManager instance;
@@ -99,15 +97,13 @@ public class ScriptManager implements Loadable {
     }
 
     private void loadEvents() {
-        EventManager manager = EventManager.getInstance();
+        EventRegister register = EventRegister.getInstance();
 
-        manager.register(SendChatEvent.class, this::handleEvent);
-        manager.register(KeyPressEvent.class, this::handleEvent);
-        manager.register(ReceiveChatEvent.class, this::handleEvent);
-        manager.register(TickEvent.class, this::handleEvent);
+        register.registerListener(this);
     }
 
-    private void handleEvent(Event event) {
+    @EventWatcher
+    public void handleEvent(IEvent event) {
         for (Script script : scripts) {
             script.invoke(event);
         }
@@ -133,4 +129,5 @@ public class ScriptManager implements Loadable {
         script.setFile(file);
         saveScript(script);
     }
+
 }

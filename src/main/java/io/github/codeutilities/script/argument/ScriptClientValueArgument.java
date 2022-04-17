@@ -4,10 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.codeutilities.event.KeyPressEvent;
-import io.github.codeutilities.event.ReceiveChatEvent;
-import io.github.codeutilities.event.SendChatEvent;
-import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.event.IEvent;
+import io.github.codeutilities.event.impl.ChatReceivedEvent;
+import io.github.codeutilities.event.impl.ChatSentEvent;
+import io.github.codeutilities.event.impl.system.KeyPressEvent;
 import io.github.codeutilities.script.execution.ScriptContext;
 import io.github.codeutilities.script.values.ScriptNumberValue;
 import io.github.codeutilities.script.values.ScriptTextValue;
@@ -44,7 +44,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
     }),
 
     EVENT_MESSAGE("ReceivedMessage","The message received. (ReceiveChatEvent)", Items.WRITTEN_BOOK, (event,context) -> {
-        if (event instanceof ReceiveChatEvent e) {
+        if (event instanceof ChatReceivedEvent e) {
             return new ScriptTextValue(e.getMessage().getString());
         } else {
             throw new IllegalStateException("Event is not a ReceiveChatEvent");
@@ -52,7 +52,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
     }),
 
     ENTERED_MESSAGE("EnteredMessage","The message entered. (SendChatEvent)", Items.WRITABLE_BOOK, (event,context) -> {
-        if (event instanceof SendChatEvent e) {
+        if (event instanceof ChatSentEvent e) {
             return new ScriptTextValue(e.getMessage());
         } else {
             throw new IllegalStateException("Event is not a SendChatEvent");
@@ -63,9 +63,9 @@ public enum ScriptClientValueArgument implements ScriptArgument {
 
     private final String name;
     private final ItemStack icon;
-    private final BiFunction<Event, ScriptContext, ScriptValue> consumer;
+    private final BiFunction<IEvent, ScriptContext, ScriptValue> consumer;
 
-    ScriptClientValueArgument(String name, String description, Item type, BiFunction<Event, ScriptContext, ScriptValue> consumer) {
+    ScriptClientValueArgument(String name, String description, Item type, BiFunction<IEvent, ScriptContext, ScriptValue> consumer) {
         this.name = name;
         this.icon = new ItemStack(type);
         icon.setCustomName(new LiteralText(name)
@@ -90,7 +90,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
     }
 
     @Override
-    public ScriptValue getValue(Event event, ScriptContext context) {
+    public ScriptValue getValue(IEvent event, ScriptContext context) {
         return consumer.apply(event, context);
     }
 

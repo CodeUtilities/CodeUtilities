@@ -1,8 +1,8 @@
 package io.github.codeutilities.mixin;
 
-import io.github.codeutilities.event.TickEvent;
-import io.github.codeutilities.event.system.EventManager;
-import io.github.codeutilities.event.SendChatEvent;
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.impl.ChatSentEvent;
+import io.github.codeutilities.event.impl.TickEvent;
 import net.minecraft.client.network.ClientPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,8 +14,8 @@ public class MLocalPlayer {
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
     private void chat(String string, CallbackInfo ci) {
-        SendChatEvent event = new SendChatEvent(string);
-        EventManager.getInstance().dispatch(event);
+        ChatSentEvent event = new ChatSentEvent(string);
+        EventRegister.getInstance().dispatch(event);
         if (event.isCancelled()) {
             ci.cancel();
         }
@@ -23,7 +23,7 @@ public class MLocalPlayer {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void tick(CallbackInfo ci) {
-        EventManager.getInstance().dispatch(new TickEvent());
+        EventRegister.getInstance().dispatch(new TickEvent());
     }
 
 }

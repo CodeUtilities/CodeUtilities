@@ -1,7 +1,7 @@
 package io.github.codeutilities.script.action;
 
 import io.github.codeutilities.CodeUtilities;
-import io.github.codeutilities.event.system.CancellableEvent;
+import io.github.codeutilities.event.ICancellable;
 import io.github.codeutilities.script.execution.ScriptActionContext;
 import io.github.codeutilities.script.values.ScriptDictionaryValue;
 import io.github.codeutilities.script.values.ScriptListValue;
@@ -210,7 +210,7 @@ public enum ScriptActionType {
 
     CANCEL_EVENT("CancelEvent", "Cancels the event.", Items.BARRIER, ScriptActionCategory.MISC, ctx -> {
         ctx.exactArguments(0);
-        if (ctx.event() instanceof CancellableEvent ce) {
+        if (ctx.event() instanceof ICancellable ce) {
             ce.setCancelled(true);
         } else {
             throw new IllegalStateException("Cannot cancel event as it is not cancellable.");
@@ -219,7 +219,7 @@ public enum ScriptActionType {
 
     UNCANCEL_EVENT("UncancelEvent", "Uncancels the event.", Items.STRUCTURE_VOID, ScriptActionCategory.MISC, ctx -> {
         ctx.exactArguments(0);
-        if (ctx.event() instanceof CancellableEvent ce) {
+        if (ctx.event() instanceof ICancellable ce) {
             ce.setCancelled(false);
         } else {
             throw new IllegalStateException("Cannot cancel event as it is not cancellable.");

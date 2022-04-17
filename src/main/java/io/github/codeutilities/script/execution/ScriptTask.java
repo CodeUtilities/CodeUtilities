@@ -1,16 +1,16 @@
 package io.github.codeutilities.script.execution;
 
-import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.event.IEvent;
 import io.github.codeutilities.script.Script;
 
 public class ScriptTask {
 
     private final ScriptPosStack stack;
-    private final Event event;
+    private final IEvent event;
     private boolean running;
     private final Script script;
 
-    public ScriptTask(ScriptPosStack stack, Event event, Script script) {
+    public ScriptTask(ScriptPosStack stack, IEvent event, Script script) {
         this.stack = stack;
         this.event = event;
         this.script = script;
@@ -30,7 +30,7 @@ public class ScriptTask {
         return stack;
     }
 
-    public Event event() {
+    public IEvent event() {
         return event;
     }
 

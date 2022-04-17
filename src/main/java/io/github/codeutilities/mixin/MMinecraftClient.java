@@ -1,7 +1,7 @@
 package io.github.codeutilities.mixin;
 
-import io.github.codeutilities.event.ShutdownEvent;
-import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.impl.ShutdownEvent;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MMinecraftClient {
     @Inject(method = "close", at = @At("HEAD"))
     public void close(CallbackInfo ci) {
-        EventManager.getInstance().dispatch(new ShutdownEvent());
+        EventRegister.getInstance().dispatch(new ShutdownEvent());
     }
 }

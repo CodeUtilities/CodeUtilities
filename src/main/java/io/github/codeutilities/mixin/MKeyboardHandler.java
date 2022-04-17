@@ -1,7 +1,7 @@
 package io.github.codeutilities.mixin;
 
-import io.github.codeutilities.event.KeyPressEvent;
-import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.event.EventRegister;
+import io.github.codeutilities.event.impl.system.KeyPressEvent;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.InputUtil.Key;
@@ -18,7 +18,7 @@ public class MKeyboardHandler {
         Key key = InputUtil.fromKeyCode(i,j);
 
         KeyPressEvent event = new KeyPressEvent(key, k);
-        EventManager.getInstance().dispatch(event);
+        EventRegister.getInstance().dispatch(event);
         if (event.isCancelled()) {
             ci.cancel();
         }
