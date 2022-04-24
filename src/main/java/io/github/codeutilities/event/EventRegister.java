@@ -5,6 +5,7 @@ import io.github.codeutilities.event.listening.IEventListener;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +13,14 @@ import java.util.Map;
 public class EventRegister {
     private static EventRegister instance;
 
-    private Map<String, List<Method>> listeners = new HashMap<>();
+    private Map<Class<? extends IEvent>, List<Method>> listeners = new HashMap<>();
 
     private EventRegister() {
         instance = this;
     }
 
+
+    @SuppressWarnings("unchecked")
     public void registerListener(IEventListener listener) {
         for (Method m : listener.getClass().getMethods()) {
             if (m.isAnnotationPresent(EventWatcher.class)) {
@@ -29,18 +32,19 @@ public class EventRegister {
                 if (!params[0].isAssignableFrom(IEvent.class))
                     throw new RuntimeException("Event watchers must have an event as its parameter");
 
-               var eventListeners = this.listeners.get(params[0].getSimpleName());
+               if (!this.listeners.containsKey(params[0])) {
+                   this.listeners.put((Class<? extends IEvent>) params[0], new ArrayList<>());
+               }
+               var eventListeners = this.listeners.get(params[0]);
 
                eventListeners.add(m);
-               this.listeners.put(params[0].getSimpleName(), eventListeners);
             }
         }
     }
 
     public void dispatch(IEvent event) {
-        String name = event.getClass().getSimpleName();
 
-        var eventListeners = this.listeners.get(name);
+        var eventListeners = this.listeners.get(event.getClass());
         if (eventListeners.isEmpty())
             return;
 
