@@ -1,9 +1,10 @@
 package io.github.codeutilities;
 
 import io.github.codeutilities.commands.CommandManager;
+import io.github.codeutilities.features.KeybindManager;
 import io.github.codeutilities.features.PrivateMessageManipulator;
-import io.github.codeutilities.features.afk.AfkFeature;
 import io.github.codeutilities.features.SupportMessages;
+import io.github.codeutilities.features.afk.AfkFeature;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.script.ScriptManager;
 import io.github.codeutilities.util.Scheduler;
@@ -28,6 +29,7 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new AfkFeature());
         loader.load(new PrivateMessageManipulator());
         loader.load(new Scheduler());
+        loader.load(new KeybindManager());
 
         LOGGER.info("Initialized");
     }

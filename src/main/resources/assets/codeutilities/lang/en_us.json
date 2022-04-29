@@ -1,0 +1,23 @@
+{
+  "key.category.codeutilities": "CodeUtilities",
+
+  "key.codeutilities.spawn": "/spawn",
+  "key.codeutilities.play": "/play",
+  "key.codeutilities.build": "/build",
+  "key.codeutilities.dev": "/dev",
+  "key.codeutilities.fs100": "/fs 100",
+  "key.codeutilities.fs500": "/fs 500",
+  "key.codeutilities.node1": "/server node1",
+  "key.codeutilities.node2": "/server node2",
+  "key.codeutilities.node3": "/server node3",
+  "key.codeutilities.node4": "/server node4",
+  "key.codeutilities.node5": "/server node5",
+  "key.codeutilities.node6": "/server node6",
+  "key.codeutilities.node7": "/server node7",
+  "key.codeutilities.nodeBeta": "/server beta",
+  "key.codeutilities.chatLocal": "/chat local",
+  "key.codeutilities.chatGlobal": "/chat global",
+  "key.codeutilities.chatNone": "/chat none",
+  "key.codeutilities.resetInv": "/rs",
+  "key.codeutilities.compactInv": "/rc"
+}
