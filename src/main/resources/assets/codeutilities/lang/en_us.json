@@ -19,5 +19,25 @@
   "key.codeutilities.chatGlobal": "/chat global",
   "key.codeutilities.chatNone": "/chat none",
   "key.codeutilities.resetInv": "/rs",
-  "key.codeutilities.compactInv": "/rc"
+  "key.codeutilities.compactInv": "/rc",
+
+  "config.codeutilities.category.commands": "Commands",
+    "config.codeutilities.subcategory.commands_autoafk": "/afk",
+
+    "config.codeutilities.option.autoafk": "Auto AFK",
+    "config.codeutilities.option.autoafk.tooltip": "Enable or disable the mod automatically marking you\nas afk after a certain amount of time.",
+
+    "config.codeutilities.option.autoafk_time": "Auto AFK Time",
+    "config.codeutilities.option.autoafk_time.tooltip": "The time till you are marked afk automatically (ticks)",
+
+    "config.codeutilities.option.autoafk_response": "AFK Response",
+    "config.codeutilities.option.autoafk_response.tooltip": "The response you will send if someone tries to message\nyou while you are afk.",
+
+  "config.codeutilities.category.support": "Support",
+    "config.codeutilities.option.support_queuemessages": "Queue Messages",
+    "config.codeutilities.option.support_queuemessages.tooltip": "Toggle where queue join/leave messages are displayed.",
+      "config.codeutilities.option.support_queuemessages.main_chat": "Main Chat",
+      "config.codeutilities.option.support_queuemessages.side_chat": "Side Chat",
+      "config.codeutilities.option.support_queuemessages.toast": "Toast",
+      "config.codeutilities.option.support_queuemessages.hidden": "Off"
 }

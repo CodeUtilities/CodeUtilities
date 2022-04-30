@@ -89,15 +89,13 @@ public class HypercubePrivateMessage {
                         .withColor(Formatting.GRAY));
 
         List<MutableText> textList = List.of(text, part1, part2, part3, part4, part5);
-        if (Config.getConfig().json().get("Fast Message Response").getAsBoolean()) {
-            for (MutableText t : textList) {
-                t.setStyle(t.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + getUser() + " ")));
-                t.setStyle(t.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        new LiteralText("Click to reply!")
-                                .setStyle(Style.EMPTY
-                                        .withColor(Formatting.GRAY)))));
+        for (MutableText t : textList) {
+            t.setStyle(t.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + getUser() + " ")));
+            t.setStyle(t.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    new LiteralText("Click to reply!")
+                            .setStyle(Style.EMPTY
+                                    .withColor(Formatting.GRAY)))));
 
-            }
         }
 
         text.append(part1);

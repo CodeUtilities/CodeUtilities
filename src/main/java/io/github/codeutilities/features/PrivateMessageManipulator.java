@@ -17,7 +17,6 @@ public class PrivateMessageManipulator implements Loadable {
         EventManager.getInstance().register(ReceiveChatEvent.class, (event -> {
             String message = event.getMessage().getString();
 
-            //Afk Reply
             try {
                 Pattern pattern = Pattern.compile("^\\[(.+) → You\\] (.+)$");
                 Matcher matcher = pattern.matcher(message);

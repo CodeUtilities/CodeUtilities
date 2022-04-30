@@ -22,7 +22,7 @@ public class AfkFeature implements Loadable {
     @Override
     public void load() {
         EventManager.getInstance().register(KeyPressEvent.class, (event -> {
-            if (Config.getConfig().json().get("Auto AFK").getAsBoolean()) {
+            if (Config.getBoolean("autoafk")) {
                 afkTick = 0;
 
                 if (afk) {
@@ -32,10 +32,10 @@ public class AfkFeature implements Loadable {
         }));
 
         EventManager.getInstance().register(TickEvent.class, (event -> {
-            if (Config.getConfig().json().get("Auto AFK").getAsBoolean()) {
+            if (Config.getBoolean("autoafk")) {
                 afkTick += 1;
 
-                if (afkTick >= Config.getConfig().json().get("Auto AFK Time").getAsInt()) {
+                if (afkTick >= Config.getInteger("autoafk_time")) {
                     if (!afk) {
                         CodeUtilities.MC.player.sendChatMessage("/afk");
                     }
@@ -55,8 +55,7 @@ public class AfkFeature implements Loadable {
                     if (matcher.find()) {
 
                         CodeUtilities.MC.player.sendChatMessage("/msg " + matcher.group(1) + " "
-                                + Config.getConfig().json().get("AFK Response").getAsString()
-                                .replace("%player", matcher.group(1)));
+                                + Config.getString("autoafk_response").replace("%player", matcher.group(1)));
 
                         afkMessages.add(new HypercubePrivateMessage(matcher.group(1), matcher.group(2)));
                     }

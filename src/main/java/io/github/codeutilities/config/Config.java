@@ -1,96 +1,83 @@
 package io.github.codeutilities.config;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import io.github.codeutilities.CodeUtilities;
-import io.github.codeutilities.event.ShutdownEvent;
-import io.github.codeutilities.event.system.EventManager;
-import io.github.codeutilities.util.FileUtil;
+import io.github.codeutilities.config.structure.ConfigManager;
+import io.github.codeutilities.config.structure.ConfigSetting;
+import io.github.codeutilities.config.types.list.ListSetting;
+import net.minecraft.sound.SoundEvent;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 public class Config {
-    private static Config instance = null;
-    public static String[] infoPrefixes = {"desc:","options:"};
+    private static final ConfigManager CONFIG = ConfigManager.getInstance();
 
-    private JsonObject data;
-
-    private Config() {
-        instance = this;
-        data = new JsonObject();
-
-        this.loadFromFile();
-        this.merge(ConfigDefaults.getDefaults());
-
-        EventManager.getInstance().register(ShutdownEvent.class, (e) -> {
-            this.saveToFile();
-        });
+    public static String getString(String key) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        return getValue(setting, String.class);
     }
 
-    public static Config getConfig() {
-        return instance == null ? new Config() : instance;
-    }
+    public static String getDynamicString(String key, HashMap<String, String> vars) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        String value = getValue(setting, String.class);
 
-    private void loadFromFile() {
-        if (FileUtil.cuFolder("config.json").toFile().exists()) {
-            try {
-                data = JsonParser.parseString(FileUtil.readFile(FileUtil.cuFolder("config.json"))).getAsJsonObject();
-                CodeUtilities.LOGGER.info("Loaded config!");
-            } catch (Exception err) {
-                CodeUtilities.LOGGER.error("Failed to load config!");
-                err.printStackTrace();
-            }
+        for (String var : vars.keySet()) {
+            String val = vars.get(var);
+            value = value.replaceAll("\\$\\{" + var.replaceAll("\\.", "\\.") + "}", val);
         }
+
+        return value;
     }
 
-    public void saveToFile() {
-        JsonObject saveData = new JsonObject();
-        save(saveData, this.data);
+    public static <T extends Enum<T>> T getEnum(String key, Class<T> enumType) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        return getValue(setting, enumType);
+    }
 
-        try {
-            FileUtil.writeFile(FileUtil.cuFolder("config.json"), saveData.toString());
-            CodeUtilities.LOGGER.info("Saved config!");
-        } catch (Exception err) {
-            CodeUtilities.LOGGER.error("Failed to save config!");
-            err.printStackTrace();
+    public static Double getDouble(String key) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        return getValue(setting, Double.class);
+    }
+
+    public static Integer getInteger(String key) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        return getValue(setting, Integer.class);
+    }
+
+    public static Float getFloat(String key) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        return getValue(setting, Float.class);
+    }
+
+    public static Boolean getBoolean(String key) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        return getValue(setting, Boolean.class);
+    }
+
+    public static Long getLong(String key) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        return getValue(setting, Long.class);
+    }
+
+    public static SoundEvent getSound(String key) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        ListSetting<String> list = setting.cast();
+        return ConfigSounds.getByName(list.getSelected());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getStringList(String key) {
+        ConfigSetting<?> setting = CONFIG.find(key);
+        return (List<String>) getValue(setting, List.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <Value> Value getValue(ConfigSetting<?> setting, Class<Value> valueClass) {
+        Objects.requireNonNull(setting, "Could not find the setting");
+        Object value = setting.getValue();
+        if (value.getClass().isAssignableFrom(valueClass)) {
+            return (Value) setting.getValue();
         }
-    }
-
-    private void save(JsonObject to, JsonObject from) {
-        for (String key : from.keySet()) {
-            if (Arrays.stream(Config.infoPrefixes).anyMatch(key::startsWith)) {
-                continue;
-            }
-
-            if (from.get(key).isJsonObject()) {
-                JsonObject sub = new JsonObject();
-                save(sub, from.getAsJsonObject(key));
-                to.add(key, sub);
-            } else {
-                to.add(key, from.get(key));
-            }
-        }
-    }
-
-    private void merge(JsonObject other) {
-        subMerge(this.data, other);
-    }
-
-    private void subMerge(JsonObject a, JsonObject b) {
-        for (String key : b.keySet()) {
-            if (!a.has(key)) {
-                if (b.get(key).isJsonObject()) {
-                    JsonObject sub = new JsonObject();
-                    subMerge(sub, b.getAsJsonObject(key));
-                    a.add(key, sub);
-                } else {
-                    a.add(key, b.get(key));
-                }
-            }
-        }
-    }
-
-    public JsonObject json() {
-        return this.data;
+        return null;
     }
 }
