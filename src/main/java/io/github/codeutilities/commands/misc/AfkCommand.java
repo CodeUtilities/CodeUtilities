@@ -12,7 +12,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 
-public class AfkCommnd implements Command {
+public class AfkCommand implements Command {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
