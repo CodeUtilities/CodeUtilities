@@ -17,6 +17,7 @@ public class CodeUtilities implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
+    public static final String MOD_NAME = "CodeUtilities";
 
     @Override
     public void onInitialize() {

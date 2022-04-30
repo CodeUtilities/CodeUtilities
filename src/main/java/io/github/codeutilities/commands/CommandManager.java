@@ -29,15 +29,40 @@ public class CommandManager implements Loadable {
 
     @Override
     public void load() {
+    	
+    	// item commands
+    	commands.add(new BreakableCommand());
         commands.add(new DfGiveCommand());
-        commands.add(new UUIDCommand());
-        commands.add(new NodeCommand());
         commands.add(new EditNbtCommand());
-        commands.add(new ScriptsCommand());
+        commands.add(new RelativeLocCommand());
+        commands.add(new UnpackCommand());
         commands.add(new WebviewCommand());
+        
+        // misc commands
+        commands.add(new AfkCommand());
+        commands.add(new CalcCommand());
         commands.add(new NBSCommand());
-        commands.add(new AfkCommnd());
+        commands.add(new NodeCommand());
+        commands.add(new PartnerBracketCommand());
         commands.add(new PingCommand());
+        commands.add(new PJoinCommand());
+        commands.add(new ScriptsCommand());
+        
+        // text commands
+        commands.add(new ActionbarCommand());
+        commands.add(new ColorCommand());
+        commands.add(new CopyTextCommand());
+        commands.add(new SubTitleCommand());
+        commands.add(new TitleCommand());
+        commands.add(new UUIDCommand());
+        
+        
+        
+        
+        
+        
+        
+        
 
         // Example of registering commands with a required df rank
         // rankedCommands.put(new TestCommand(), DFRank.JRHELPER);
