@@ -50,6 +50,7 @@ public class CodeUtilities implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Initializing");
+        Runtime.getRuntime().addShutdownHook(new Thread(this::onClose));
 
         Loader loader = Loader.getInstance();
         loader.load(new CommandManager());
@@ -65,5 +66,16 @@ public class CodeUtilities implements ModInitializer {
         initializer.add(new ConfigManager());
 
         LOGGER.info("Initialized");
+    }
+
+    public void onClose() {
+        LOGGER.info("Closing...");
+        try {
+            ConfigFile.getInstance().save();
+        } catch (Exception err) {
+            LOGGER.error("Error");
+            err.printStackTrace();
+        }
+        LOGGER.info("Closed.");
     }
 }
