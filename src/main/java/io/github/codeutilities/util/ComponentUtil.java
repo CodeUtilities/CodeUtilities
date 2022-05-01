@@ -1,14 +1,13 @@
 package io.github.codeutilities.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ComponentUtil {
 
@@ -26,8 +25,8 @@ public class ComponentUtil {
                 int start = matcher.start();
                 String text = message.substring(lastIndex, start);
                 if (text.length() != 0) {
-                    Text t = new LiteralText(text);
-                    t.getWithStyle(s);
+                    LiteralText t = new LiteralText(text);
+                    t.setStyle(s);
                     result.append(t);
                 }
                 String col = matcher.group();
@@ -85,7 +84,59 @@ public class ComponentUtil {
         result.append(message.asString());
 
         for (Text sibling : message.getSiblings()) {
-            result.append(toFormattedString(new LiteralText(sibling.toString())));
+            result.append(toFormattedString(sibling));
+        }
+
+        return result.toString();
+    }
+
+    public static String sectionSignsToAnds(String msg) {
+        StringBuilder result = new StringBuilder();
+
+        Pattern p = Regex.of("(§[a-f0-9lonmkrA-FLONMRK]|§x(§[a-f0-9A-F]){6})").getPattern();
+        Matcher m = p.matcher(msg);
+
+        int lastIndex = 0;
+        while (m.find()) {
+            int start = m.start();
+            String between = msg.substring(lastIndex, start);
+            if (between.length() != 0) {
+                result.append(between);
+            }
+            String replace = m.group().replaceAll("§", "&");
+            result.append(replace);
+            lastIndex = m.end();
+        }
+
+        String between = msg.substring(lastIndex);
+        if (between.length() != 0) {
+            result.append(between);
+        }
+
+        return result.toString();
+    }
+
+    public static String andsToSectionSigns(String msg) {
+        StringBuilder result = new StringBuilder();
+
+        Pattern p = Regex.of("(&[a-f0-9lonmkrA-FLONMRK]|&x(&[a-f0-9A-F]){6})").getPattern();
+        Matcher m = p.matcher(msg);
+
+        int lastIndex = 0;
+        while (m.find()) {
+            int start = m.start();
+            String between = msg.substring(lastIndex, start);
+            if (between.length() != 0) {
+                result.append(between);
+            }
+            String replace = m.group().replaceAll("&", "§");
+            result.append(replace);
+            lastIndex = m.end();
+        }
+
+        String between = msg.substring(lastIndex);
+        if (between.length() != 0) {
+            result.append(between);
         }
 
         return result.toString();
