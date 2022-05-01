@@ -43,6 +43,9 @@
   "config.codeutilities.option.autoafk_response": "AFK Response",
   "config.codeutilities.option.autoafk_response.tooltip": "The response you will send if someone tries to message\nyou while you are afk.",
 
+  "config.codeutilities.option.autoafk_sound": "AFK Sound",
+  "config.codeutilities.option.autoafk_sound.tooltip": "The sound that gets played when you get marked as afk automatically.",
+
   "config.codeutilities.option.sidechat_width": "Sidechat Width",
   "config.codeutilities.option.sidechat_width.tooltip": "The width to be used by the second chat.\nIf set to 0, the width will be calculated from the\\nlower of main chat width & window space remaining.",
   "config.codeutilities.option.sidedchat_messages.tooltip": "Filter that matches text that comes from the /msg command.",

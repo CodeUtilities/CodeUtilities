@@ -28,6 +28,7 @@ public class ConfigManager implements IManager<ConfigGroup> {
         this.register(new AutomationGroup("automation"));
         this.register(new CommandsGroup("commands"));
         this.register(new ScreenGroup("screen"));
+        this.register(new MiscGroup("misc"));
 
         ConfigGroup supportGroup = new SupportGroup("support");
         supportGroup.setRank(HypercubeRank.JRHELPER);
@@ -44,8 +45,6 @@ public class ConfigManager implements IManager<ConfigGroup> {
         ConfigGroup streamerGroup = new StreamerModeGroup("streamer");
         streamerGroup.setRank(HypercubeRank.OWNER);
         this.register(streamerGroup);
-
-        this.register(new MiscGroup("misc"));
 
         // Ignore this
         this.getRegistered().forEach(IManager::initialize);
