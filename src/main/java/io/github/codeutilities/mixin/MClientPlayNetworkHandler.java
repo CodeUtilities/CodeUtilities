@@ -3,9 +3,7 @@ package io.github.codeutilities.mixin;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.config.Config;
-import io.github.codeutilities.event.ReceiveChatEvent;
-import io.github.codeutilities.event.RecieveSoundEvent;
-import io.github.codeutilities.event.ServerJoinEvent;
+import io.github.codeutilities.event.*;
 import io.github.codeutilities.event.system.EventManager;
 import io.github.codeutilities.features.LagslayerHUD;
 import io.github.codeutilities.features.streamermode.message.Message;
@@ -40,6 +38,21 @@ public class MClientPlayNetworkHandler {
             EventManager.getInstance().dispatch(event);
             if (event.isCancelled()) {
                 ci.cancel();
+            }
+
+            if (packet.getMessage().getString().equals("» You are now in dev mode.")) {
+                DevModeEvent modeEvent = new DevModeEvent();
+                EventManager.getInstance().dispatch(modeEvent);
+            }
+
+            if (packet.getMessage().getString().equals("» You are now in build mode.")) {
+                BuildModeEvent modeEvent = new BuildModeEvent();
+                EventManager.getInstance().dispatch(modeEvent);
+            }
+
+            if (packet.getMessage().getString().startsWith("» Joined plot")) {
+                PlayModeEvent modeEvent = new PlayModeEvent();
+                EventManager.getInstance().dispatch(modeEvent);
             }
         }
     }

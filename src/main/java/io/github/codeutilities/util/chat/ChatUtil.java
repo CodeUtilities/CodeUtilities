@@ -35,6 +35,15 @@ public class ChatUtil {
         chat("/" + command.replaceFirst("^/", ""));
     }
 
+    public static void executeCommandSilently(String command, int messageAmount) {
+        executeCommand(command);
+        MessageGrabber.hide(messageAmount);
+    }
+
+    public static void executeCommandSilently(String command) {
+        executeCommandSilently(command, 1);
+    }
+
     public static void sendMessage(String text) {
         sendMessage(new LiteralText(text), null);
     }

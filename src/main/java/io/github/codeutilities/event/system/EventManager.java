@@ -1,5 +1,10 @@
 package io.github.codeutilities.event.system;
 
+import io.github.codeutilities.config.Config;
+import io.github.codeutilities.event.TickEvent;
+import io.github.codeutilities.util.chat.ChatType;
+import io.github.codeutilities.util.chat.ChatUtil;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +35,12 @@ public class EventManager {
     }
 
     public void dispatch(Event event) {
+        if (Config.getBoolean("debug")) {
+            if (!(event instanceof TickEvent)) {
+                ChatUtil.sendMessage(String.format("Event '%s' has been dispatched.", event.getClass()), ChatType.INFO_BLUE);
+            }
+        }
+
         for (Consumer<Event> consumer : listeners.getOrDefault(event.getClass(), new ArrayList<>())) {
             consumer.accept(event);
         }

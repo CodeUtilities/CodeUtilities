@@ -7,10 +7,12 @@
     "MChatHud",
     "MChatScreen",
     "MClientPlayNetworkHandler",
+    "MInGameHUD",
     "MKeyboardHandler",
     "MLocalPlayer",
     "MMinecraftClient",
     "MOptionsScreen",
+    "MPlayerListHUD",
     "MWindow"
   ],
   "client": [

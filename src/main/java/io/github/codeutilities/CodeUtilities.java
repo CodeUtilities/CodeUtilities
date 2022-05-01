@@ -12,11 +12,9 @@ import io.github.codeutilities.config.internal.gson.types.list.*;
 import io.github.codeutilities.config.structure.ConfigManager;
 import io.github.codeutilities.config.types.*;
 import io.github.codeutilities.config.types.list.*;
-import io.github.codeutilities.features.KeybindManager;
-import io.github.codeutilities.features.PrivateMessageManipulator;
-import io.github.codeutilities.features.SupportMessages;
-import io.github.codeutilities.features.UpdateAlerts;
+import io.github.codeutilities.features.*;
 import io.github.codeutilities.features.commands.afk.AfkFeature;
+import io.github.codeutilities.features.tab.Client;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.loader.v2.CodeInitializer;
 import io.github.codeutilities.script.ScriptManager;
@@ -37,6 +35,7 @@ public class CodeUtilities implements ModInitializer {
     public static String MOD_VERSION;
 
     public static String PLAYER_UUID = null;
+    public static String PLAYER_NAME = null;
 
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(ConfigInstruction.class, new ConfigSerializer())
@@ -58,7 +57,10 @@ public class CodeUtilities implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Initializing");
         Runtime.getRuntime().addShutdownHook(new Thread(this::onClose));
+
         PLAYER_UUID = MC.getSession().getUuid();
+        PLAYER_NAME = MC.getSession().getUsername();
+
         MOD_VERSION = FabricLoader.getInstance().getModContainer(MOD_ID).get().getMetadata().getVersion().getFriendlyString();
 
         Loader loader = Loader.getInstance();
@@ -70,6 +72,8 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new Scheduler());
         loader.load(new KeybindManager());
         loader.load(new UpdateAlerts());
+        loader.load(new AutomationFeature());
+        loader.load(new Client());
 
         CodeInitializer initializer = new CodeInitializer();
         initializer.add(new ConfigFile());

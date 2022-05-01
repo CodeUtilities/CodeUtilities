@@ -1,5 +1,6 @@
 package io.github.codeutilities.util.hypercube.rank;
 
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.commands.CommandManager;
 import io.github.codeutilities.util.chat.ChatType;

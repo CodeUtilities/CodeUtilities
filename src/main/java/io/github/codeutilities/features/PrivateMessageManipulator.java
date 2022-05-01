@@ -26,14 +26,10 @@ public class PrivateMessageManipulator implements Loadable {
                 Matcher matcher = pattern.matcher(message);
 
                 if (matcher.find()) {
-                    // TODO: Fix this from breaking sided chat
-                    /*
                     event.setCancelled(true);
 
                     Text msg = new HypercubePrivateMessage(matcher.group(1), matcher.group(2)).getText();
                     CodeUtilities.MC.player.sendSystemMessage(msg, CodeUtilities.MC.player.getUuid());
-
-                     */
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -1,5 +1,6 @@
 package io.github.codeutilities.config.structure;
 
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.config.impl.*;
 import io.github.codeutilities.config.internal.ConfigFile;
 import io.github.codeutilities.config.internal.ConfigInstruction;
@@ -24,6 +25,7 @@ public class ConfigManager implements IManager<ConfigGroup> {
     @Override
     public void initialize() {
         // Initial settings and creation of memory placements
+        this.register(new AutomationGroup("automation"));
         this.register(new CommandsGroup("commands"));
         this.register(new ScreenGroup("screen"));
 
@@ -42,6 +44,8 @@ public class ConfigManager implements IManager<ConfigGroup> {
         ConfigGroup streamerGroup = new StreamerModeGroup("streamer");
         streamerGroup.setRank(HypercubeRank.OWNER);
         this.register(streamerGroup);
+
+        this.register(new MiscGroup("misc"));
 
         // Ignore this
         this.getRegistered().forEach(IManager::initialize);

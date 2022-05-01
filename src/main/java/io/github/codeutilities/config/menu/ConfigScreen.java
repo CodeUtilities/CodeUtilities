@@ -1,6 +1,7 @@
 package io.github.codeutilities.config.menu;
 
 import io.github.codeutilities.CodeUtilities;
+import io.github.codeutilities.config.Config;
 import io.github.codeutilities.config.internal.ITranslatable;
 import io.github.codeutilities.config.structure.ConfigGroup;
 import io.github.codeutilities.config.structure.ConfigManager;
@@ -45,7 +46,7 @@ public class ConfigScreen implements ITranslatable {
         List<ConfigGroup> groups = CONFIG.getRegistered();
         // Optimized loop
         for (ConfigGroup group : groups) {
-            if (!CodeUtilities.PLAYER_UUID.equals("45e89639-1fb6-4f73-9456-7fee19f42da9")) {
+            if (!Config.getBoolean("debug")) {
                 if (!(HypercubeUtil.getRank().ordinal() >= group.getRank().ordinal())) {
                     continue;
                 }
