@@ -19,6 +19,8 @@ public class NodeCommand implements Command {
         nodes.put("3", "node3");
         nodes.put("4", "node4");
         nodes.put("5", "node5");
+        nodes.put("6", "node6");
+        nodes.put("7", "node7");
         nodes.put("beta", "beta");
 
         LiteralArgumentBuilder<FabricClientCommandSource> cmd = literal("node");
