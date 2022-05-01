@@ -1,6 +1,7 @@
 package io.github.codeutilities.config.impl;
 
 import io.github.codeutilities.config.ConfigSounds;
+import io.github.codeutilities.config.internal.DfButtonTextLocations;
 import io.github.codeutilities.config.structure.ConfigGroup;
 import io.github.codeutilities.config.structure.ConfigSubGroup;
 import io.github.codeutilities.config.types.*;
@@ -15,6 +16,12 @@ public class ScreenGroup extends ConfigGroup {
     public void initialize() {
         this.register(new IntegerSetting("sidechat_width",0));
         this.register(new BooleanSetting("cpuOnScreen",true));
+
+        ConfigSubGroup dfButtonSubGroup = new ConfigSubGroup("dfButton");
+        dfButtonSubGroup.register(new BooleanSetting("dfButton", true));
+        dfButtonSubGroup.register(new BooleanSetting("dfNodeButtons", true));
+        dfButtonSubGroup.register(new EnumSetting<>("dfButtonsLocation", DfButtonTextLocations.class, DfButtonTextLocations.TOP_LEFT));
+        this.register(dfButtonSubGroup);
 
         for (ChatRule chatRule : ChatRule.getChatRules()) {
             if (chatRule.getChatRuleType().equals(ChatRule.ChatRuleType.MESSAGE) || chatRule.getChatRuleType().equals(ChatRule.ChatRuleType.CUSTOM)) {

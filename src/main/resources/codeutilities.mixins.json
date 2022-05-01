@@ -4,16 +4,15 @@
   "package": "io.github.codeutilities.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MChatHud",
-    "MChatScreen",
-    "MClientPlayNetworkHandler",
-    "MInGameHUD",
-    "MKeyboardHandler",
-    "MLocalPlayer",
-    "MMinecraftClient",
-    "MOptionsScreen",
-    "MPlayerListHUD",
-    "MWindow"
+    "game.MClientPlayNetworkHandler",
+    "game.MKeyboardHandler",
+    "game.MMinecraftClient",
+    "player.MLocalPlayer",
+    "render.MChatHud",
+    "render.MChatScreen",
+    "render.MInGameHUD",
+    "render.MOptionsScreen",
+    "render.MPlayerListHUD"
   ],
   "client": [
   ],

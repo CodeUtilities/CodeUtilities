@@ -1,4 +1,4 @@
-package io.github.codeutilities.mixin;
+package io.github.codeutilities.mixin.player;
 
 import io.github.codeutilities.event.TickEvent;
 import io.github.codeutilities.event.system.EventManager;

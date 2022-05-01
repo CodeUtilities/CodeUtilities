@@ -1,7 +1,11 @@
 plugins {
     id 'fabric-loom' version '0.11-SNAPSHOT'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
+
+apply plugin: 'idea'
+
 
 //version = project.mod_version -> set version by doing gradlew build '-Pversion=HERE'
 group = project.maven_group
@@ -11,6 +15,12 @@ sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
+    jcenter()
+
+    maven {
+        name = 'CottonMC'
+        url = 'https://server.bbkr.space/artifactory/libs-release'
+    }
 
     // Cloth Config API
     maven {
@@ -21,6 +31,12 @@ repositories {
     maven {
         name = 'Jitpack'
         url = "https://jitpack.io"
+    }
+
+    // Databreaker
+    maven {
+        name = "Gegy's Maven"
+        url = "https://maven.gegy.dev/"
     }
 }
 

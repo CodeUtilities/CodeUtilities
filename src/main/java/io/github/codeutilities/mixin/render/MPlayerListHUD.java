@@ -1,4 +1,4 @@
-package io.github.codeutilities.mixin;
+package io.github.codeutilities.mixin.render;
 
 import io.github.codeutilities.config.Config;
 import io.github.codeutilities.features.tab.CodeUtilitiesServer;

@@ -1,4 +1,4 @@
-package io.github.codeutilities.mixin;
+package io.github.codeutilities.mixin.render;
 
 import static net.minecraft.client.gui.DrawableHelper.fill;
 

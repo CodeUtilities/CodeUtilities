@@ -1,15 +1,10 @@
 package io.github.codeutilities.features;
 
 import io.github.codeutilities.CodeUtilities;
-import io.github.codeutilities.config.Config;
 import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.system.EventManager;
-import io.github.codeutilities.features.sidedchat.ChatRule;
 import io.github.codeutilities.loader.Loadable;
-import io.github.codeutilities.mixin.MChatHud;
-import io.github.codeutilities.util.chat.ChatUtil;
 import io.github.codeutilities.util.hypercube.HypercubePrivateMessage;
-import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.Text;
 
 import java.util.regex.Matcher;

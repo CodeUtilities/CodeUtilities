@@ -1,6 +1,5 @@
 package io.github.codeutilities.commands.misc;
 
-import java.awt.TextComponent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,7 +22,7 @@ import io.github.codeutilities.features.commands.schem.loaders.MSpongeSchematicR
 import io.github.codeutilities.features.commands.schem.sk89q.jnbt.NBTInputStream;
 import io.github.codeutilities.features.commands.schem.utils.DFUtils;
 import io.github.codeutilities.util.ItemUtil;
-import io.github.codeutilities.util.ToasterUtil;
+import io.github.codeutilities.util.render.ToasterUtil;
 import io.github.codeutilities.util.chat.ChatUtil;
 import io.github.codeutilities.util.template.TemplateUtils;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;

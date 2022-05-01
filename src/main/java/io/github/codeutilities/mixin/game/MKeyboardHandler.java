@@ -1,4 +1,4 @@
-package io.github.codeutilities.mixin;
+package io.github.codeutilities.mixin.game;
 
 import io.github.codeutilities.event.KeyPressEvent;
 import io.github.codeutilities.event.system.EventManager;
