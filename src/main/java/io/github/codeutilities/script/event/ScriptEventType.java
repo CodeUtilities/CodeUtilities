@@ -1,6 +1,9 @@
 package io.github.codeutilities.script.event;
 
+import io.github.codeutilities.event.BuildModeEvent;
+import io.github.codeutilities.event.DevModeEvent;
 import io.github.codeutilities.event.KeyPressEvent;
+import io.github.codeutilities.event.PlayModeEvent;
 import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.SendChatEvent;
 import io.github.codeutilities.event.TickEvent;
@@ -23,7 +26,13 @@ public enum ScriptEventType {
 
     RECEIVE_CHAT(ReceiveChatEvent.class, "OnReceiveChat", "Executed when a player receives a chat message.", Items.BOOK),
 
-    TICK_EVENT(TickEvent.class, "OnTick", "Executed every tick.", Items.CLOCK);
+    TICK_EVENT(TickEvent.class, "OnTick", "Executed every tick.", Items.CLOCK),
+
+    PLAY_MODE_EVENT(PlayModeEvent.class, "OnPlayMode", "Executed when a player enters play mode.", Items.DIAMOND),
+
+    BUILD_MODE(BuildModeEvent.class, "OnBuildMode", "Executed when a player enters build mode.", Items.DIAMOND_PICKAXE),
+
+    DEV_MODE(DevModeEvent.class, "OnDevMode", "Executed when a player enters dev mode.", Items.DIAMOND_SWORD);
 
     private final String name;
     private final ItemStack icon;
