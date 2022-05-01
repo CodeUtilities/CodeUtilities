@@ -3,7 +3,7 @@ package io.github.codeutilities.commands.misc;
 import com.mojang.brigadier.CommandDispatcher;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
-import io.github.codeutilities.features.afk.AfkFeature;
+import io.github.codeutilities.features.commands.afk.AfkFeature;
 import io.github.codeutilities.util.hypercube.HypercubePrivateMessage;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
