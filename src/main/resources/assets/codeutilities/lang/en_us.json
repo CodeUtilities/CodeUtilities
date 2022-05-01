@@ -172,5 +172,7 @@
   "config.codeutilities.option.dfButtonsLocation.tooltip": "The location the button text is shown at.",
 
   "config.codeutilities.option.dfButtonsLocation.top_left": "Top Left",
-  "config.codeutilities.option.dfButtonsLocation.bottom_right": "Bottom Right"
+  "config.codeutilities.option.dfButtonsLocation.bottom_right": "Bottom Right",
+  "config.codeutilities.option.dfButtonsLocation.none": "None"
+
 }
