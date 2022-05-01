@@ -16,10 +16,18 @@ import net.minecraft.util.Formatting;
 
 public class AfkCommand implements Command {
 
+    public static long cooldown = 0;
+
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
         cd.register(
                 literal("afk").executes(ctx -> {
+                    long time = (System.currentTimeMillis() / 1000L) - cooldown;
+                    if (!(time >= 2)) {
+                        return 0;
+                    }
+
+                    cooldown = System.currentTimeMillis() / 1000L;
                     SoundUtil.playSound(Config.getSound("autoafk_sound"));
 
                     if (AfkFeature.afk) {
