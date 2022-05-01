@@ -1,5 +1,6 @@
 package io.github.codeutilities.script.action;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.event.system.CancellableEvent;
 import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
@@ -18,11 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -646,6 +650,18 @@ public enum ScriptActionType {
         .action(ctx -> {
             double number = ctx.value("Number").asNumber();
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(Math.ceil(number)));
+        })),
+
+    REGISTER_CMD(builder -> builder.name("Register Command")
+        .description("Registers a /cmd completion.")
+        .icon(Items.COMMAND_BLOCK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Command", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            ClientCommandManager.DISPATCHER.register(LiteralArgumentBuilder.literal(ctx.value("Command").asText()));
+
+            ClientPlayNetworkHandler nh = CodeUtilities.MC.getNetworkHandler();
+            nh.onCommandTree(new CommandTreeS2CPacket(nh.getCommandDispatcher().getRoot()));
         })),
 
     IF_GUI_OPEN(builder -> builder.name("If GUI Open")
