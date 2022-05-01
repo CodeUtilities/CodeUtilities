@@ -10,6 +10,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 
 import io.github.codeutilities.commands.Command;
+import io.github.codeutilities.util.Regex;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
@@ -70,15 +71,15 @@ public class CalcCommand implements Command {
         while (!Objects.equals(old, texp)) {
             old = texp;
 
-            Matcher powm = Pattern.compile(
+            Matcher powm = Regex.of(
                 "(?<n1>-?(\\.\\d+|\\d+\\.\\d+|\\d+))\\^(?<n2>-?(\\.\\d+|\\d+\\.\\d+|\\d+))"
-            ).matcher(texp);
-            Matcher mulm = Pattern.compile(
+            ).getMatcher(texp);
+            Matcher mulm = Regex.of(
                 "(?<n1>-?(\\.\\d+|\\d+\\.\\d+|\\d+))(?<e>\\*|\\/|%)(?<n2>-?(\\.\\d+|\\d+\\.\\d+|\\d+))"
-            ).matcher(texp);
-            Matcher addm = Pattern.compile(
+            ).getMatcher(texp);
+            Matcher addm = Regex.of(
                 "(?<n1>-?(\\.\\d+|\\d+\\.\\d+|\\d+))(?<e>\\+|\\-)(?<n2>-?(\\.\\d+|\\d+\\.\\d+|\\d+))"
-            ).matcher(texp);
+            ).getMatcher(texp);
 
             if (powm.find()) {
                 double num1 = Double.parseDouble(powm.group("n1"));

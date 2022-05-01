@@ -10,6 +10,7 @@ import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.commands.arguments.PlayerArgumentType;
 import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.util.Regex;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
@@ -36,8 +37,8 @@ public class PJoinCommand implements Command {
                         ChatUtil.sendMessage("This player is not in a plot.", ChatType.FAIL);
                     } else {
                         // PLOT ID
-                        Pattern pattern = Pattern.compile("\\[[0-9]+]\n");
-                        Matcher matcher = pattern.matcher(msg);
+                        Regex pattern = Regex.of("\\[[0-9]+]\n");
+                        Matcher matcher = pattern.getMatcher(msg);
                         String id = "";
                         while (matcher.find()) {
                             id = matcher.group();

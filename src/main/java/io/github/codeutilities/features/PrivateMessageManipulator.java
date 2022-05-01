@@ -4,11 +4,11 @@ import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.system.EventManager;
 import io.github.codeutilities.loader.Loadable;
+import io.github.codeutilities.util.Regex;
 import io.github.codeutilities.util.hypercube.HypercubePrivateMessage;
 import net.minecraft.text.Text;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PrivateMessageManipulator implements Loadable {
     @Override
@@ -20,8 +20,8 @@ public class PrivateMessageManipulator implements Loadable {
             String message = event.getMessage().getString();
 
             try {
-                Pattern pattern = Pattern.compile("^\\[(.+) → You\\] (.+)$");
-                Matcher matcher = pattern.matcher(message);
+                Regex pattern = Regex.of("^\\[(.+) → You\\] (.+)$");
+                Matcher matcher = pattern.getMatcher(message);
 
                 if (matcher.find()) {
                     event.setCancelled(true);

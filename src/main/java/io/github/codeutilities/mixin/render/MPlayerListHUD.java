@@ -33,7 +33,7 @@ public class MPlayerListHUD {
         User user = CodeUtilitiesServer.getUser(id.toString());
 
         if (user != null) {
-            LiteralText star = new LiteralText(StringUtil.STRIP_CHARS_PATTERN.matcher(user.getStar()).replaceAll(""));
+            LiteralText star = new LiteralText(user.getStar());
             if (Config.getBoolean("relocateTabStars")) {
                 name = name.shallowCopy().append(SPACE).append(star);
             } else {

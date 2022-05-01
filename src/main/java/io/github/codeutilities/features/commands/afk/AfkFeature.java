@@ -7,6 +7,7 @@ import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.TickEvent;
 import io.github.codeutilities.event.system.EventManager;
 import io.github.codeutilities.loader.Loadable;
+import io.github.codeutilities.util.Regex;
 import io.github.codeutilities.util.hypercube.HypercubePrivateMessage;
 
 import java.util.ArrayList;
@@ -49,8 +50,8 @@ public class AfkFeature implements Loadable {
             //Afk Reply
             try {
                 if (afk) {
-                    Pattern pattern = Pattern.compile("^\\[(.+) → You\\] (.+)$");
-                    Matcher matcher = pattern.matcher(message);
+                    Regex pattern = Regex.of("^\\[(.+) → You\\] (.+)$");
+                    Matcher matcher = pattern.getMatcher(message);
 
                     if (matcher.find()) {
 

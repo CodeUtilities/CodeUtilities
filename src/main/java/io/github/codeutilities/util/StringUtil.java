@@ -20,7 +20,7 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 public class StringUtil {
-    public static final Pattern STRIP_CHARS_PATTERN = Pattern.compile("(^\\s+|\\s+$)");
+    public static final Regex STRIP_CHARS_PATTERN = Regex.of("(^\\s+|\\s+$)");
 
     public static LiteralText of(String... literalTexts) {
         int length = literalTexts.length;

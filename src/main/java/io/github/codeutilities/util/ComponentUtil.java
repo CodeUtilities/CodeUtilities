@@ -16,8 +16,8 @@ public class ComponentUtil {
         LiteralText result = new LiteralText("");
 
         try {
-            Pattern pattern = Pattern.compile("(§[a-f0-9lonmkrA-FLONMRK]|§x(§[a-f0-9A-F]){6})");
-            Matcher matcher = pattern.matcher(message);
+            Regex pattern = Regex.of("(§[a-f0-9lonmkrA-FLONMRK]|§x(§[a-f0-9A-F]){6})");
+            Matcher matcher = pattern.getMatcher(message);
 
             Style s = Style.EMPTY;
 

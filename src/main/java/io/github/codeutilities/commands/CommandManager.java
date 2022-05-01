@@ -48,6 +48,7 @@ public class CommandManager implements Loadable {
         commands.add(new PJoinCommand());
         commands.add(new SchemCommand());
         commands.add(new ScriptsCommand());
+        commands.add(new QueueCommand());
         
         // text commands
         commands.add(new ActionbarCommand());

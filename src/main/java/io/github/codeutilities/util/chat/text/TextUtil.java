@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.github.codeutilities.util.Regex;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -73,8 +75,8 @@ public class TextUtil {
         MutableText result = new LiteralText("");
 
         try {
-            Pattern pattern = Pattern.compile("(§[a-f0-9lonmkrA-FLONMRK]|§x(§[a-f0-9A-F]){6})");
-            Matcher matcher = pattern.matcher(message);
+            Regex pattern = Regex.of("(§[a-f0-9lonmkrA-FLONMRK]|§x(§[a-f0-9A-F]){6})");
+            Matcher matcher = pattern.getMatcher(message);
 
             Style s = Style.EMPTY;
 
@@ -122,8 +124,8 @@ public class TextUtil {
 //        char literalColorCode;
 //        int lastColorOccurrence;
 //
-//        Pattern pattern = Pattern.compile("(§x(§[^§]){6}([^§]|§[lomnk])+)|(§([^§]|§[lomnk])+)");
-//        Matcher matcher = pattern.matcher(message);
+//        Regex pattern = Regex.of("(§x(§[^§]){6}([^§]|§[lomnk])+)|(§([^§]|§[lomnk])+)");
+//        Matcher matcher = pattern.getMatcher("message");
 //        while (matcher.find()) sections.add(matcher.group());
 //
 //        for (String section : sections) {
@@ -140,8 +142,8 @@ public class TextUtil {
 //            text = sibling.replaceAll("^(§.)+", "");
 //
 //            // color
-//            pattern = Pattern.compile("(§x(§([0-f]|r)){6})|(§([0-f]|r))");
-//            matcher = pattern.matcher(sibling);
+//            pattern = Regex.of("(§x(§([0-f]|r)){6})|(§([0-f]|r))");
+//            matcher = pattern.getMatcher(sibling);
 //            while (matcher.find()) literalColorSections.add(matcher.group());
 //            literalColorCodes = literalColorSections.get(literalColorSections.size() - 1);
 //            if (literalColorSections.size() - 1 != 0) {
