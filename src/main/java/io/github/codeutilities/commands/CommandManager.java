@@ -46,6 +46,7 @@ public class CommandManager implements Loadable {
         commands.add(new PartnerBracketCommand());
         commands.add(new PingCommand());
         commands.add(new PJoinCommand());
+        commands.add(new SchemCommand());
         commands.add(new ScriptsCommand());
         
         // text commands

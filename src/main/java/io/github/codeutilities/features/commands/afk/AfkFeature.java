@@ -1,4 +1,4 @@
-package io.github.codeutilities.features.afk;
+package io.github.codeutilities.features.commands.afk;
 
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.config.Config;

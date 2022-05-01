@@ -15,7 +15,7 @@ import io.github.codeutilities.config.types.list.*;
 import io.github.codeutilities.features.KeybindManager;
 import io.github.codeutilities.features.PrivateMessageManipulator;
 import io.github.codeutilities.features.SupportMessages;
-import io.github.codeutilities.features.afk.AfkFeature;
+import io.github.codeutilities.features.commands.afk.AfkFeature;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.loader.v2.CodeInitializer;
 import io.github.codeutilities.script.ScriptManager;

@@ -9,8 +9,10 @@ public class FileArgumentType {
         return new StringFuncArgumentType(v -> {
             List<String> files = new ArrayList<>();
 
-            for (File f : folder.listFiles()) {
-                files.add(f.getName());
+            if (folder.exists()) {
+                for (File f : folder.listFiles()) {
+                    files.add(f.getName());
+                }
             }
 
             return files;
