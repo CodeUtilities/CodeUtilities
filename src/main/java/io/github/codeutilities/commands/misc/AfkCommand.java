@@ -3,7 +3,9 @@ package io.github.codeutilities.commands.misc;
 import com.mojang.brigadier.CommandDispatcher;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
+import io.github.codeutilities.config.Config;
 import io.github.codeutilities.features.commands.afk.AfkFeature;
+import io.github.codeutilities.util.SoundUtil;
 import io.github.codeutilities.util.hypercube.HypercubePrivateMessage;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
@@ -18,6 +20,8 @@ public class AfkCommand implements Command {
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
         cd.register(
                 literal("afk").executes(ctx -> {
+                    SoundUtil.playSound(Config.getSound("autoafk_sound"));
+
                     if (AfkFeature.afk) {
                         ChatUtil.sendMessage("You are no longer afk!", ChatType.SUCCESS);
                         for (HypercubePrivateMessage message : AfkFeature.afkMessages) {

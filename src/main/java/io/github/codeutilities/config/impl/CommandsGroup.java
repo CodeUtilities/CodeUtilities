@@ -17,7 +17,7 @@ public class CommandsGroup extends ConfigGroup {
         autoMessage.register(new BooleanSetting("autoafk", true));
         autoMessage.register(new IntegerSetting("autoafk_time", 2400));
         autoMessage.register(new StringSetting("autoafk_response", "I am currently AFK (Automated Message)"));
-        autoMessage.register(new SoundSetting("autoafk_sound").setSelected(ConfigSounds.SHIELD_BLOCK));
+        autoMessage.register(new SoundSetting("autoafk_sound").setSelected(ConfigSounds.EXPERIENCE_ORB_PICKUP));
 
         this.register(autoMessage);
     }
