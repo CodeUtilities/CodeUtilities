@@ -1,11 +1,9 @@
 package io.github.codeutilities.config.impl;
 
+import io.github.codeutilities.config.ConfigSounds;
 import io.github.codeutilities.config.structure.ConfigGroup;
 import io.github.codeutilities.config.structure.ConfigSubGroup;
-import io.github.codeutilities.config.types.BooleanSetting;
-import io.github.codeutilities.config.types.IntegerSetting;
-import io.github.codeutilities.config.types.LongSetting;
-import io.github.codeutilities.config.types.StringSetting;
+import io.github.codeutilities.config.types.*;
 
 public class CommandsGroup extends ConfigGroup {
     public CommandsGroup(String name) {
@@ -19,6 +17,7 @@ public class CommandsGroup extends ConfigGroup {
         autoMessage.register(new BooleanSetting("autoafk", true));
         autoMessage.register(new IntegerSetting("autoafk_time", 2400));
         autoMessage.register(new StringSetting("autoafk_response", "I am currently AFK (Automated Message)"));
+        autoMessage.register(new SoundSetting("autoafk_sound").setSelected(ConfigSounds.EXPERIENCE_ORB_PICKUP));
 
         this.register(autoMessage);
     }
