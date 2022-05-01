@@ -13,6 +13,9 @@ import java.util.regex.Pattern;
 public class PrivateMessageManipulator implements Loadable {
     @Override
     public void load() {
+        // TODO: Fix messages going to main chat with side chat enabled
+
+        /*
         EventManager.getInstance().register(ReceiveChatEvent.class, (event -> {
             String message = event.getMessage().getString();
 
@@ -30,5 +33,7 @@ public class PrivateMessageManipulator implements Loadable {
                 e.printStackTrace();
             }
         }));
+
+         */
     }
 }
