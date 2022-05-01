@@ -4,37 +4,42 @@ import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.argument.ScriptVariableArgument;
 import io.github.codeutilities.script.values.ScriptValue;
+import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-public record ScriptActionContext(ScriptContext context, List<ScriptArgument> arguments, Event event, Runnable inner, ScriptTask task) {
+public record ScriptActionContext(ScriptContext context, List<ScriptArgument> arguments, Event event, Consumer<Runnable> inner, ScriptTask task, HashMap<String, List<ScriptArgument>> argMap) {
 
-    public ScriptValue argValue(int i) {
-        return arguments.get(i).getValue(event, context);
+    public void setArg(String name, List<ScriptArgument> args) {
+        argMap.put(name, args);
     }
 
-    public ScriptVariableArgument argVariable(int i) {
-        if (arguments.get(i) instanceof ScriptVariableArgument sva) {
-            return sva;
-        } else {
-            throw new IllegalArgumentException("Argument " + i + " is not a variable");
-        }
+    public List<ScriptArgument> pluralArg(String messages) {
+        return argMap.get(messages);
     }
 
-    public void minArguments(int count) {
-        if (arguments().size() < count) {
-            throw new IllegalArgumentException("Invalid number of arguments. Expected at least " + count + " but got " + arguments().size());
-        }
+    public ScriptArgument arg(String name) {
+        return argMap.get(name).get(0);
     }
 
-    public void maxArguments(int count) {
-        if (arguments().size() > count) {
-            throw new IllegalArgumentException("Invalid number of arguments. Expected at most " + count + " but got " + arguments().size());
-        }
+    public ScriptValue value(String name) {
+        return arg(name).getValue(event,context);
     }
 
-    public void exactArguments(int count) {
-        if (arguments().size() != count) {
-            throw new IllegalArgumentException("Invalid number of arguments. Expected " + count + " but got " + arguments().size());
-        }
+    public List<ScriptValue> pluralValue(String name) {
+        return pluralArg(name).stream().map(arg -> arg.getValue(event,context)).collect(Collectors.toList());
+    }
+
+    public ScriptVariableArgument variable(String name) {
+        return (ScriptVariableArgument) arg(name);
+    }
+
+    public void scheduleInner(Runnable runnable) {
+        inner.accept(runnable);
+    }
+
+    public void scheduleInner() {
+        inner.accept(null);
     }
 }

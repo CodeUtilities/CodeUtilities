@@ -6,16 +6,27 @@ import java.util.List;
 public class ScriptPosStack {
 
     private final List<Integer> data = new ArrayList<>();
+    private final List<Runnable> preTasks = new ArrayList<>();
 
     public ScriptPosStack(int initial) {
         data.add(initial);
     }
 
+    public void push(int value, Runnable preTask) {
+        data.add(value);
+        preTasks.add(preTask);
+    }
+
     public void push(int value) {
         data.add(value);
+        preTasks.add(null);
     }
 
     public void pop() {
+        Runnable preTask = preTasks.remove(preTasks.size() - 1);
+        if (preTask != null) {
+            preTask.run();
+        }
         data.remove(data.size() - 1);
     }
 

@@ -15,7 +15,7 @@ public class MiscGroup extends ConfigGroup {
         this.register(new BooleanSetting("relocateTabStars", false));
 
         if (CodeUtilities.PLAYER_NAME.equals("TechStreet") ||
-                CodeUtilities.PLAYER_NAME.equals("BlazeMCWorld") ||
+                CodeUtilities.PLAYER_NAME.equals("BlazeMCworld") ||
                 CodeUtilities.PLAYER_NAME.equals("Reasonless") ||
                 CodeUtilities.PLAYER_NAME.equals("KabanFriends") ||
                 CodeUtilities.PLAYER_NAME.equals("tk2217") ||

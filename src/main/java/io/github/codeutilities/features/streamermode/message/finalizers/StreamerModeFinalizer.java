@@ -15,7 +15,7 @@ public class StreamerModeFinalizer extends MessageFinalizer {
             "KabanFriends",
             "TechStreet",
             "tk2217",
-            "BlazeMCWorld"
+            "BlazeMCworld"
     };
 
     @Override

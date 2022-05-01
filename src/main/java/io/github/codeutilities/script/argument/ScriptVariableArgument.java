@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
 import io.github.codeutilities.script.execution.ScriptContext;
 import io.github.codeutilities.script.values.ScriptValue;
 import java.lang.reflect.Type;
@@ -14,6 +15,11 @@ public record ScriptVariableArgument(String name) implements ScriptArgument{
     @Override
     public ScriptValue getValue(Event event, ScriptContext context) {
         return context.getVariable(name);
+    }
+
+    @Override
+    public boolean is(ScriptActionArgumentType type) {
+        return true;
     }
 
     public static class Serializer implements JsonSerializer<ScriptVariableArgument> {

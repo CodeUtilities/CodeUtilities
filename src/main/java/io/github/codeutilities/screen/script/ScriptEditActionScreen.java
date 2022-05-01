@@ -72,7 +72,7 @@ public class ScriptEditActionScreen extends CScreen {
             });
             widgets.add(delete);
 
-            if (index != action.getArguments().size() - 1) {
+            if (index != action.getArguments().size()) {
                 CItem add = new CItem(70, y-5, addIcon);
                 add.setClickListener((btn) ->
                     CodeUtilities.MC.setScreen(new ScriptAddArgumentScreen(script, action, currentIndex))

@@ -21,6 +21,7 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -70,10 +71,10 @@ public class Script {
             if (part instanceof ScriptEvent) {
                 return;
             } else if (part instanceof ScriptAction sa) {
-                Runnable inner = null;
+                Consumer<Runnable> inner = null;
                 if (sa.getType().hasChildren()) {
                     int posCopy = task.stack().peek();
-                    inner = () -> task.stack().push(posCopy);
+                    inner = (preTask) -> task.schedule(posCopy, preTask);
                     int depth = 0;
                     while (task.stack().peek() < parts.size()) {
                         ScriptPart nextPart = parts.get(task.stack().peek());
@@ -98,7 +99,6 @@ public class Script {
                             return;
                         }
                     }
-                    System.out.println("Skipped from: " + posCopy + " to: " + task.stack().peek());
                 }
                 sa.invoke(task.event(), context, inner,task);
                 if (!task.isRunning()) {

@@ -37,4 +37,8 @@ public class ScriptTask {
     public boolean isRunning() {
         return running;
     }
+
+    public void schedule(int posCopy, Runnable preTask) {
+        stack.push(posCopy, preTask);
+    }
 }

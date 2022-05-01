@@ -8,6 +8,7 @@ import io.github.codeutilities.event.KeyPressEvent;
 import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.SendChatEvent;
 import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
 import io.github.codeutilities.script.execution.ScriptContext;
 import io.github.codeutilities.script.values.ScriptNumberValue;
 import io.github.codeutilities.script.values.ScriptTextValue;
@@ -45,7 +46,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
 
     EVENT_MESSAGE("ReceivedMessage","The message received. (ReceiveChatEvent)", Items.WRITTEN_BOOK, (event,context) -> {
         if (event instanceof ReceiveChatEvent e) {
-            return new ScriptTextValue(e.getMessage().getString());
+            return new ScriptTextValue(ComponentUtil.toFormattedString(e.getMessage()));
         } else {
             throw new IllegalStateException("Event is not a ReceiveChatEvent");
         }
@@ -92,6 +93,11 @@ public enum ScriptClientValueArgument implements ScriptArgument {
     @Override
     public ScriptValue getValue(Event event, ScriptContext context) {
         return consumer.apply(event, context);
+    }
+
+    @Override
+    public boolean is(ScriptActionArgumentType type) {
+        return true;//TODO check if type matches
     }
 
     public static class Serializer implements JsonSerializer<ScriptClientValueArgument> {
