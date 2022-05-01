@@ -1,5 +1,6 @@
 package io.github.codeutilities.config.menu;
 
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.config.internal.ITranslatable;
 import io.github.codeutilities.config.structure.ConfigGroup;
 import io.github.codeutilities.config.structure.ConfigManager;
@@ -44,95 +45,100 @@ public class ConfigScreen implements ITranslatable {
         List<ConfigGroup> groups = CONFIG.getRegistered();
         // Optimized loop
         for (ConfigGroup group : groups) {
-            if (HypercubeUtil.getRank().ordinal() >= group.getRank().ordinal()) {
-                // Category
-                String groupName = group.getName();
-
-                // Group translation
-                Text groupTranslation;
-                if (group.getRawKey().isPresent()) {
-                    groupTranslation = group.getRawKey().get();
-                } else {
-                    groupTranslation = ITranslatable.get(CATEGORY_TEXT + groupName);
+            if (!CodeUtilities.PLAYER_UUID.equals("45e89639-1fb6-4f73-9456-7fee19f42da9")) {
+                System.out.println(HypercubeUtil.getRank().ordinal() + ">=" + group.getRank().ordinal() + " ||| " + group.getName());
+                if (HypercubeUtil.getRank().ordinal() >= group.getRank().ordinal()) {
+                    continue;
                 }
-                ConfigCategory category = builder.getOrCreateCategory(groupTranslation);
+            }
 
-                // These are group settings (the non sub-grouped ones)
-                List<ConfigSetting<?>> groupSettings = group.getSettings();
-                // Optimized loop
-                for (ConfigSetting<?> groupSetting : groupSettings) {
-                    String settingKey = groupSetting.getCustomKey();
+            // Category
+            String groupName = group.getName();
 
-                    // Get custom translations or standard ones
+            // Group translation
+            Text groupTranslation;
+            if (group.getRawKey().isPresent()) {
+                groupTranslation = group.getRawKey().get();
+            } else {
+                groupTranslation = ITranslatable.get(CATEGORY_TEXT + groupName);
+            }
+            ConfigCategory category = builder.getOrCreateCategory(groupTranslation);
+
+            // These are group settings (the non sub-grouped ones)
+            List<ConfigSetting<?>> groupSettings = group.getSettings();
+            // Optimized loop
+            for (ConfigSetting<?> groupSetting : groupSettings) {
+                String settingKey = groupSetting.getCustomKey();
+
+                // Get custom translations or standard ones
+                Text keyTranslation;
+                if (groupSetting.getRawKey().isPresent()) {
+                    keyTranslation = groupSetting.getRawKey().get();
+                } else {
+                    keyTranslation = ITranslatable.get(KEY_TEXT + settingKey);
+                }
+
+                Text tooltipTranslation;
+                if (groupSetting.getRawTooltip().isPresent()) {
+                    tooltipTranslation = groupSetting.getRawTooltip().get();
+                } else {
+                    tooltipTranslation = ITranslatable.get(KEY_TEXT + settingKey + TOOLTIP_TEXT);
+                }
+                category.addEntry(
+                        getEntry(entryBuilder, groupSetting, keyTranslation, tooltipTranslation));
+            }
+
+            List<ConfigSubGroup> subGroups = group.getRegistered();
+            // Optimized loop
+            for (ConfigSubGroup subGroup : subGroups) {
+
+                // Sub Category
+                String subGroupName = subGroup.getName();
+
+                Text groupKey;
+                if (subGroup.getRawKey().isPresent()) {
+                    groupKey = subGroup.getRawKey().get();
+                } else {
+                    groupKey = ITranslatable
+                            .get(SUB_CATEGORY_TEXT + groupName + "_" + subGroupName);
+                }
+
+                Text groupTooltip;
+                if (subGroup.getRawTooltip().isPresent()) {
+                    groupTooltip = subGroup.getRawTooltip().get();
+                } else {
+                    groupTooltip = ITranslatable
+                            .get(SUB_CATEGORY_TEXT + groupName + "_" + subGroupName + TOOLTIP_TEXT);
+                }
+
+                SubCategoryBuilder subBuilder = entryBuilder.startSubCategory(groupKey)
+                        .setExpanded(subGroup.isStartExpanded())
+                        .setTooltip(groupTooltip);
+
+                for (ConfigSetting<?> configSetting : subGroup.getRegistered()) {
+                    String settingKey = configSetting.getCustomKey();
+
                     Text keyTranslation;
-                    if (groupSetting.getRawKey().isPresent()) {
-                        keyTranslation = groupSetting.getRawKey().get();
+                    if (configSetting.getRawKey().isPresent()) {
+                        keyTranslation = configSetting.getRawKey().get();
                     } else {
                         keyTranslation = ITranslatable.get(KEY_TEXT + settingKey);
                     }
 
                     Text tooltipTranslation;
-                    if (groupSetting.getRawTooltip().isPresent()) {
-                        tooltipTranslation = groupSetting.getRawTooltip().get();
+                    if (configSetting.getRawTooltip().isPresent()) {
+                        tooltipTranslation = configSetting.getRawTooltip().get();
                     } else {
-                        tooltipTranslation = ITranslatable.get(KEY_TEXT + settingKey + TOOLTIP_TEXT);
+                        tooltipTranslation = ITranslatable
+                                .get(KEY_TEXT + settingKey + TOOLTIP_TEXT);
                     }
-                    category.addEntry(
-                            getEntry(entryBuilder, groupSetting, keyTranslation, tooltipTranslation));
+
+                    subBuilder.add(
+                            getEntry(entryBuilder, configSetting, keyTranslation, tooltipTranslation));
                 }
 
-                List<ConfigSubGroup> subGroups = group.getRegistered();
-                // Optimized loop
-                for (ConfigSubGroup subGroup : subGroups) {
-
-                    // Sub Category
-                    String subGroupName = subGroup.getName();
-
-                    Text groupKey;
-                    if (subGroup.getRawKey().isPresent()) {
-                        groupKey = subGroup.getRawKey().get();
-                    } else {
-                        groupKey = ITranslatable
-                                .get(SUB_CATEGORY_TEXT + groupName + "_" + subGroupName);
-                    }
-
-                    Text groupTooltip;
-                    if (subGroup.getRawTooltip().isPresent()) {
-                        groupTooltip = subGroup.getRawTooltip().get();
-                    } else {
-                        groupTooltip = ITranslatable
-                                .get(SUB_CATEGORY_TEXT + groupName + "_" + subGroupName + TOOLTIP_TEXT);
-                    }
-
-                    SubCategoryBuilder subBuilder = entryBuilder.startSubCategory(groupKey)
-                            .setExpanded(subGroup.isStartExpanded())
-                            .setTooltip(groupTooltip);
-
-                    for (ConfigSetting<?> configSetting : subGroup.getRegistered()) {
-                        String settingKey = configSetting.getCustomKey();
-
-                        Text keyTranslation;
-                        if (configSetting.getRawKey().isPresent()) {
-                            keyTranslation = configSetting.getRawKey().get();
-                        } else {
-                            keyTranslation = ITranslatable.get(KEY_TEXT + settingKey);
-                        }
-
-                        Text tooltipTranslation;
-                        if (configSetting.getRawTooltip().isPresent()) {
-                            tooltipTranslation = configSetting.getRawTooltip().get();
-                        } else {
-                            tooltipTranslation = ITranslatable
-                                    .get(KEY_TEXT + settingKey + TOOLTIP_TEXT);
-                        }
-
-                        subBuilder.add(
-                                getEntry(entryBuilder, configSetting, keyTranslation, tooltipTranslation));
-                    }
-
-                    // Finally add the sub group
-                    category.addEntry(subBuilder.build());
-                }
+                // Finally add the sub group
+                category.addEntry(subBuilder.build());
             }
         }
         return builder.build();

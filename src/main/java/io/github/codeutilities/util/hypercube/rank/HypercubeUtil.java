@@ -2,6 +2,8 @@ package io.github.codeutilities.util.hypercube.rank;
 
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.commands.CommandManager;
+import io.github.codeutilities.util.chat.ChatType;
+import io.github.codeutilities.util.chat.ChatUtil;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.minecraft.util.Identifier;
 
@@ -17,15 +19,17 @@ public class HypercubeUtil {
     }
 
     public static void setRank(HypercubeRank rank) {
-        HypercubeUtil.rank = rank;
+        if (!(HypercubeUtil.rank.ordinal() >= rank.ordinal())) {
+            HypercubeUtil.rank = rank;
 
-        for (Command command : CommandManager.rankedCommands.keySet()) {
-            HypercubeRank r = CommandManager.rankedCommands.get(command);
+            for (Command command : CommandManager.rankedCommands.keySet()) {
+                HypercubeRank r = CommandManager.rankedCommands.get(command);
 
-            if (rank.hasPermission(r)) {
-                if (!regCommands.contains(command)) {
-                    regCommands.add(command);
-                    command.register(ClientCommandManager.DISPATCHER);
+                if (rank.hasPermission(r)) {
+                    if (!regCommands.contains(command)) {
+                        regCommands.add(command);
+                        command.register(ClientCommandManager.DISPATCHER);
+                    }
                 }
             }
         }

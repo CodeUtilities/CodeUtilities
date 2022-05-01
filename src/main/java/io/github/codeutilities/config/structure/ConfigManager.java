@@ -25,10 +25,23 @@ public class ConfigManager implements IManager<ConfigGroup> {
     public void initialize() {
         // Initial settings and creation of memory placements
         this.register(new CommandsGroup("commands"));
+        this.register(new ScreenGroup("screen"));
 
-        ConfigGroup group = new SupportGroup("support");
-        group.setRank(HypercubeRank.JRHELPER);
-        this.register(group);
+        ConfigGroup supportGroup = new SupportGroup("support");
+        supportGroup.setRank(HypercubeRank.JRHELPER);
+        this.register(supportGroup);
+
+        ConfigGroup modGroup = new ModGroup("mod");
+        modGroup.setRank(HypercubeRank.JRMOD);
+        this.register(modGroup);
+
+        ConfigGroup adminGroup = new AdminGroup("admin");
+        adminGroup.setRank(HypercubeRank.DEV);
+        this.register(adminGroup);
+
+        ConfigGroup streamerGroup = new StreamerModeGroup("streamer");
+        streamerGroup.setRank(HypercubeRank.OWNER);
+        this.register(streamerGroup);
 
         // Ignore this
         this.getRegistered().forEach(IManager::initialize);

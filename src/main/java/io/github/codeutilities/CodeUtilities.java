@@ -15,12 +15,14 @@ import io.github.codeutilities.config.types.list.*;
 import io.github.codeutilities.features.KeybindManager;
 import io.github.codeutilities.features.PrivateMessageManipulator;
 import io.github.codeutilities.features.SupportMessages;
+import io.github.codeutilities.features.UpdateAlerts;
 import io.github.codeutilities.features.commands.afk.AfkFeature;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.loader.v2.CodeInitializer;
 import io.github.codeutilities.script.ScriptManager;
 import io.github.codeutilities.util.Scheduler;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +31,12 @@ public class CodeUtilities implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
+
     public static final String MOD_NAME = "CodeUtilities";
+    public static final String MOD_ID = "codeutilities";
+    public static String MOD_VERSION;
+
+    public static String PLAYER_UUID = null;
 
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(ConfigInstruction.class, new ConfigSerializer())
@@ -51,6 +58,8 @@ public class CodeUtilities implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Initializing");
         Runtime.getRuntime().addShutdownHook(new Thread(this::onClose));
+        PLAYER_UUID = MC.getSession().getUuid();
+        MOD_VERSION = FabricLoader.getInstance().getModContainer(MOD_ID).get().getMetadata().getVersion().getFriendlyString();
 
         Loader loader = Loader.getInstance();
         loader.load(new CommandManager());
@@ -60,6 +69,7 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new PrivateMessageManipulator());
         loader.load(new Scheduler());
         loader.load(new KeybindManager());
+        loader.load(new UpdateAlerts());
 
         CodeInitializer initializer = new CodeInitializer();
         initializer.add(new ConfigFile());
