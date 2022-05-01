@@ -32,10 +32,12 @@ public class Script {
     private final Logger LOGGER;
     private final ScriptContext context = new ScriptContext();
     private File file;
+    private boolean disabled;
 
-    public Script(String name, List<ScriptPart> parts) {
+    public Script(String name, List<ScriptPart> parts, boolean disabled) {
         this.name = name;
         this.parts = parts;
+        this.disabled = disabled;
         LOGGER = LogManager.getLogger("Script." + name);
     }
 
@@ -66,6 +68,9 @@ public class Script {
     }
 
     public void execute(ScriptTask task) {
+        if (disabled) {
+            return;
+        }
         while (task.stack().peek() < parts.size()) {
             ScriptPart part = parts.get(task.stack().peek());
             if (part instanceof ScriptEvent) {
@@ -130,6 +135,14 @@ public class Script {
         return name;
     }
 
+    public boolean disabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean b) {
+        disabled = b;
+    }
+
     public static class Serializer implements JsonSerializer<Script>, JsonDeserializer<Script> {
 
         @Override
@@ -141,7 +154,8 @@ public class Script {
                 ScriptPart part = context.deserialize(element, ScriptPart.class);
                 parts.add(part);
             }
-            return new Script(name, parts);
+            boolean disabled = object.has("disabled") && object.get("disabled").getAsBoolean();
+            return new Script(name, parts,disabled);
         }
 
         @Override
@@ -153,6 +167,7 @@ public class Script {
                 array.add(context.serialize(part));
             }
             object.add("actions", array);
+            object.addProperty("disabled", src.disabled);
             return object;
         }
     }
