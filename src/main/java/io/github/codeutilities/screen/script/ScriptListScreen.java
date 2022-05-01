@@ -37,20 +37,49 @@ public class ScriptListScreen extends CScreen {
         editIcon.setCustomName(new LiteralText("Edit")
             .fillStyle(Style.EMPTY.withItalic(false)));
 
+        ItemStack disableIcon = new ItemStack(Items.GRAY_DYE);
+        disableIcon.setCustomName(new LiteralText("Disable")
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.GRAY)
+                .withItalic(false)));
+
+        ItemStack enableIcon = new ItemStack(Items.LIGHT_GRAY_DYE);
+        enableIcon.setCustomName(new LiteralText("Enable")
+            .fillStyle(Style.EMPTY
+                .withColor(Formatting.GRAY)
+                .withItalic(false)));
+
+
         int y = 5;
         for (Script s : ScriptManager.getInstance().getScripts()) {
             panel.add(new CText(5, y + 5, new LiteralText(s.getName())));
 
-            CItem editButton = new CItem(70, y + 3, editIcon);
+            CItem editButton = new CItem(60, y + 3, editIcon);
             panel.add(editButton);
             editButton.setClickListener((btn) -> {
                 CodeUtilities.MC.setScreen(new ScriptEditScreen(s));
             });
-            CItem deleteButton = new CItem(80, y + 3, deleteIcon);
+            CItem deleteButton = new CItem(70, y + 3, deleteIcon);
             deleteButton.setClickListener((btn) -> {
                 CodeUtilities.MC.setScreen(new ScriptDeletionScreen(s));
             });
             panel.add(deleteButton);
+
+            if (s.disabled()) {
+                CItem enableButton = new CItem(80, y + 3, enableIcon);
+                enableButton.setClickListener((btn) -> {
+                    s.setDisabled(false);
+                    CodeUtilities.MC.setScreen(new ScriptListScreen());
+                });
+                panel.add(enableButton);
+            } else {
+                CItem disableButton = new CItem(80, y + 3, disableIcon);
+                disableButton.setClickListener((btn) -> {
+                    s.setDisabled(true);
+                    CodeUtilities.MC.setScreen(new ScriptListScreen());
+                });
+                panel.add(disableButton);
+            }
 
             y += 12;
         }

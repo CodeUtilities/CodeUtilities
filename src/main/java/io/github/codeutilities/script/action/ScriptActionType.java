@@ -646,6 +646,26 @@ public enum ScriptActionType {
         .action(ctx -> {
             double number = ctx.value("Number").asNumber();
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(Math.ceil(number)));
+        })),
+
+    IF_GUI_OPEN(builder -> builder.name("If GUI Open")
+        .description("Executes if a gui is open.")
+        .icon(Items.BOOK)
+        .hasChildren(true)
+        .action(ctx -> {
+            if (CodeUtilities.MC.currentScreen != null) {
+                ctx.scheduleInner();
+            }
+        })),
+
+    IF_GUI_CLOSED(builder -> builder.name("If GUI Not Open")
+        .description("Executes if no gui is open.")
+        .icon(Items.BOOK)
+        .hasChildren(true)
+        .action(ctx -> {
+            if (CodeUtilities.MC.currentScreen == null) {
+                ctx.scheduleInner();
+            }
         }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {

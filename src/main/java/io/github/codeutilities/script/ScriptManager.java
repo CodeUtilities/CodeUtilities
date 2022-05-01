@@ -133,7 +133,7 @@ public class ScriptManager implements Loadable {
     }
 
     public void createScript(String name) {
-        Script script = new Script(name, new ArrayList<>());
+        Script script = new Script(name, new ArrayList<>(),false);
         scripts.add(script);
         File file = FileUtil.cuFolder("Scripts").resolve(name + ".json").toFile();
         script.setFile(file);
