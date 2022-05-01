@@ -46,8 +46,7 @@ public class ConfigScreen implements ITranslatable {
         // Optimized loop
         for (ConfigGroup group : groups) {
             if (!CodeUtilities.PLAYER_UUID.equals("45e89639-1fb6-4f73-9456-7fee19f42da9")) {
-                System.out.println(HypercubeUtil.getRank().ordinal() + ">=" + group.getRank().ordinal() + " ||| " + group.getName());
-                if (HypercubeUtil.getRank().ordinal() >= group.getRank().ordinal()) {
+                if (!(HypercubeUtil.getRank().ordinal() >= group.getRank().ordinal())) {
                     continue;
                 }
             }
