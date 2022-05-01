@@ -14,6 +14,7 @@ import io.github.codeutilities.config.types.*;
 import io.github.codeutilities.config.types.list.*;
 import io.github.codeutilities.features.*;
 import io.github.codeutilities.features.commands.afk.AfkFeature;
+import io.github.codeutilities.features.streamermode.StreamerModeListeners;
 import io.github.codeutilities.features.tab.Client;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.loader.v2.CodeInitializer;
@@ -74,6 +75,8 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new UpdateAlerts());
         loader.load(new AutomationFeature());
         loader.load(new Client());
+        loader.load(new Client());
+        loader.load(new StreamerModeListeners());
 
         CodeInitializer initializer = new CodeInitializer();
         initializer.add(new ConfigFile());
