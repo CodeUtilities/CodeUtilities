@@ -3,6 +3,7 @@ package io.github.codeutilities.features.streamermode.message;
 import io.github.codeutilities.config.Config;
 import io.github.codeutilities.event.RecieveSoundEvent;
 import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.features.streamermode.StreamerModeListeners;
 import io.github.codeutilities.util.chat.MessageGrabber;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.text.Text;
@@ -71,7 +72,7 @@ public class Message {
         callback.cancel();
 
         if (type.hasSound()) {
-            EventManager.getInstance().register(RecieveSoundEvent.class, (event -> event.setCancelled(true)));
+            StreamerModeListeners.canceledSounds += 1;
         }
 
         MessageGrabber.hide(type.getMessageAmount() - 1);
