@@ -50,6 +50,15 @@ public class Config {
     }
 
     public static Boolean getBoolean(String key) {
+        if (Objects.equals(key, "debug")) {
+            try {
+                ConfigSetting<?> setting = CONFIG.find(key);
+                return getValue(setting, Boolean.class);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
         ConfigSetting<?> setting = CONFIG.find(key);
         return getValue(setting, Boolean.class);
     }
