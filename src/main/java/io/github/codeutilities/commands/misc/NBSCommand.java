@@ -15,15 +15,14 @@ import io.github.codeutilities.util.nbs.NBSToTemplate;
 import io.github.codeutilities.util.nbs.OutdatedNBSException;
 import io.github.codeutilities.util.nbs.SongData;
 import io.github.codeutilities.util.template.TemplateUtils;
+import java.io.File;
+import java.io.IOException;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
-
-import java.io.File;
-import java.io.IOException;
 
 public class NBSCommand implements Command {
     @Override
@@ -39,24 +38,24 @@ public class NBSCommand implements Command {
 
         LiteralArgumentBuilder<FabricClientCommandSource> cmd = literal("nbs");
 
-        cmd.then(literal("load").executes(ctx -> {
-            cmd.then(argument("filename",  FileArgumentType.folder(dir, true)).executes(context -> {
-                if (CodeUtilities.MC.player.isCreative()) {
-                    String filename = StringArgumentType.getString(ctx, "filename");
-                    String childName = filename + (filename.endsWith(".nbs") ? "" : ".nbs");
-                    File file = new File(dir, childName);
+        cmd.then(literal("load")
+            .then(argument("filename", FileArgumentType.folder(dir, true))
+                .executes(ctx -> {
+                    if (CodeUtilities.MC.player.isCreative()) {
+                        String filename = StringArgumentType.getString(ctx, "filename");
+                        String childName = filename + (filename.endsWith(".nbs") ? "" : ".nbs");
+                        File file = new File(dir, childName);
 
-                    if (file.exists()) {
-                        loadNbs(file, childName);
-                    } else {
-                        ChatUtil.error("The file '" + childName + "' was not found.");
+                        if (file.exists()) {
+                            loadNbs(file, childName);
+                        } else {
+                            ChatUtil.error("The file '" + childName + "' was not found.");
+                        }
                     }
-                }
-                return 1;
-            }));
-
-            return 1;
-        }));
+                    return 1;
+                })
+            )
+        );
 
         cmd.then(literal("player")
             .executes(ctx -> {
