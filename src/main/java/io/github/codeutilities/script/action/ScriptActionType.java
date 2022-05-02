@@ -20,18 +20,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public enum ScriptActionType {
 
@@ -500,6 +505,50 @@ public enum ScriptActionType {
             }
         })),
 
+    IF_LIST_DOESNT_CONTAIN(builder -> builder.name("If List Doesnt Contain")
+        .description("Checks if a list contains a value.")
+        .icon(Items.BOOKSHELF)
+        .category(ScriptActionCategory.LISTS)
+        .arg("List", ScriptActionArgumentType.LIST)
+        .arg("Value", ScriptActionArgumentType.ANY)
+        .hasChildren(true)
+        .action(ctx -> {
+            List<ScriptValue> list = ctx.value("List").asList();
+            if (list.stream().noneMatch(value -> value.valueEquals(ctx.value("Value")))) {
+                ctx.scheduleInner();
+            }
+        })),
+
+    IF_TEXT_DOESNT_CONTAIN(builder -> builder.name("If Text Doesnt Contain")
+        .description("Checks if a text doesnt contain a value.")
+        .icon(Items.NAME_TAG)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Subtext", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            String subtext = ctx.value("Subtext").asText();
+            if (!text.contains(subtext)) {
+                ctx.scheduleInner();
+            }
+        })),
+
+    IF_DOESNT_START_WITH(builder -> builder.name("If Doesnt Start With")
+        .description("Checks if a text doesnt start with an other.")
+        .icon(Items.FEATHER)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Subtext", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            String subtext = ctx.value("Subtext").asText();
+            if (!text.startsWith(subtext)) {
+                ctx.scheduleInner();
+            }
+        })),
+
     WAIT(builder -> builder.name("Wait")
         .description("Waits for a given amount of time.")
         .icon(Items.CLOCK)
@@ -726,6 +775,92 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.MISC)
         .action(ctx -> {
             ctx.task().stop();
+        })),
+
+    PLAY_SOUND(builder -> builder.name("Play Sound")
+        .description("Plays a sound.")
+        .icon(Items.NAUTILUS_SHELL)
+        .category(ScriptActionCategory.VISUALS)
+        .arg("Sound", ScriptActionArgumentType.TEXT)
+        .arg("Volume", ScriptActionArgumentType.NUMBER, b -> b.optional(true))
+        .arg("Pitch", ScriptActionArgumentType.NUMBER, b -> b.optional(true))
+        .action(ctx -> {
+            String sound = ctx.value("Sound").asText();
+            double volume = 1;
+            double pitch = 1;
+
+            if (ctx.argMap().containsKey("Volume")) {
+                volume = ctx.value("Volume").asNumber();
+            }
+
+            if (ctx.argMap().containsKey("Pitch")) {
+                pitch = ctx.value("Pitch").asNumber();
+            }
+
+            SoundEvent snd = Registry.SOUND_EVENT.get(new Identifier(sound));
+
+            if (snd != null) {
+                CodeUtilities.MC.getSoundManager().play(PositionedSoundInstance.master(snd, (float) volume, (float) pitch));
+            }
+        })),
+
+    DISPLAY_TITLE(builder -> builder.name("Display Title")
+        .description("Displays a title.")
+        .icon(Items.WARPED_SIGN)
+        .category(ScriptActionCategory.VISUALS)
+        .arg("Title", ScriptActionArgumentType.TEXT)
+        .arg("Subtitle", ScriptActionArgumentType.TEXT, b -> b.optional(true))
+        .arg("Fade In", ScriptActionArgumentType.NUMBER, b -> b.optional(true))
+        .arg("Stay", ScriptActionArgumentType.NUMBER, b -> b.optional(true))
+        .arg("Fade Out", ScriptActionArgumentType.NUMBER, b -> b.optional(true))
+        .action(ctx -> {
+            String title = ctx.value("Title").asText();
+            String subtitle = "";
+            int fadeIn = 20;
+            int stay = 60;
+            int fadeOut = 20;
+
+            if (ctx.argMap().containsKey("Subtitle")) {
+                subtitle = ctx.value("Subtitle").asText();
+            }
+
+            if (ctx.argMap().containsKey("Fade In")) {
+                fadeIn = (int) ctx.value("Fade In").asNumber();
+            }
+
+            if (ctx.argMap().containsKey("Stay")) {
+                stay = (int) ctx.value("Stay").asNumber();
+            }
+
+            if (ctx.argMap().containsKey("Fade Out")) {
+                fadeOut = (int) ctx.value("Fade Out").asNumber();
+            }
+
+            CodeUtilities.MC.inGameHud.setTitle(ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(title)));
+            CodeUtilities.MC.inGameHud.setSubtitle(ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(subtitle)));
+            CodeUtilities.MC.inGameHud.setTitleTicks(fadeIn, stay, fadeOut);
+        })),
+
+    JOIN_LIST_TO_TEXT(builder -> builder.name("Join List to Text")
+        .description("Joins a list into a single text.")
+        .icon(Items.SLIME_BALL)
+        .category(ScriptActionCategory.LISTS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("List", ScriptActionArgumentType.LIST)
+        .arg("Separator", ScriptActionArgumentType.TEXT, b -> b.optional(true))
+        .action(ctx -> {
+            String separator = ", ";
+
+            if (ctx.argMap().containsKey("Separator")) {
+                separator = ctx.value("Separator").asText();
+            }
+
+            String result = ctx.value("List")
+                .asList().stream()
+                .map(ScriptValue::asText)
+                .collect(Collectors.joining(separator));
+
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptTextValue(result));
         }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
@@ -828,6 +963,7 @@ public enum ScriptActionType {
         search:
         for (List<ScriptActionArgument> possibility : possibilities) {
             int pos = 0;
+            ctx.argMap().clear();
             for (ScriptActionArgument arg : possibility) {
                 List<ScriptArgument> args = new ArrayList<>();
                 if (pos >= ctx.arguments().size()) {

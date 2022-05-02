@@ -32,7 +32,9 @@ public enum ScriptEventType {
 
     BUILD_MODE(BuildModeEvent.class, "OnBuildMode", "Executed when a player enters build mode.", Items.DIAMOND_PICKAXE),
 
-    DEV_MODE(DevModeEvent.class, "OnDevMode", "Executed when a player enters dev mode.", Items.DIAMOND_SWORD);
+    DEV_MODE(DevModeEvent.class, "OnDevMode", "Executed when a player enters dev mode.", Items.DIAMOND_SWORD),
+
+    START_UP(ScriptStartUpEvent.class, "OnStartUp", "Executed when all scripts are being loaded.", Items.FIREWORK_ROCKET);
 
     private final String name;
     private final ItemStack icon;
