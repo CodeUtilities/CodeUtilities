@@ -1,10 +1,13 @@
 package io.github.codeutilities.features;
 
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.event.TickEvent;
 import io.github.codeutilities.event.system.EventManager;
+import io.github.codeutilities.features.sidedchat.ChatShortcut;
 import io.github.codeutilities.loader.Loadable;
 import io.github.codeutilities.util.chat.ChatUtil;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
@@ -13,7 +16,9 @@ public class KeybindManager implements Loadable {
     private static final String CATEGORY = "key.category.codeutilities";
     private static final String PREFIX = "key.codeutilities.";
 
-    private KeyBinding spawn, play, build, dev, fs100, fs500, node1, node2, node3, node4, node5, node6, node7, nodeBeta, chatGlobal, chatLocal, chatNone, resetInv, compactInv;
+    private KeyBinding spawn, play, build, dev, fs100, fs500, node1, node2, node3, node4, node5, node6, node7,
+            nodeBeta, chatGlobal, chatLocal, chatNone, resetInv, compactInv,
+            supportAccept, supportQueue, supportchat, modv, modchat, adminchat;
 
     @Override
     public void load() {
@@ -36,6 +41,16 @@ public class KeybindManager implements Loadable {
         chatNone = keybind("chatNone");
         resetInv = keybind("resetInv");
         compactInv = keybind("compactInv");
+
+        // Staff Keybinds
+        supportAccept = keybind("support.accept");
+        supportQueue = keybind("support.queue");
+        supportchat = keybind("support.chat");
+
+        modv = keybind("mod.vanish");
+        modchat = keybind("mod.chat");
+
+        adminchat = keybind("admin.chat");
 
         EventManager.getInstance().register(TickEvent.class, this::onTick);
     }
@@ -97,6 +112,33 @@ public class KeybindManager implements Loadable {
         }
         if (compactInv.wasPressed()) {
             ChatUtil.executeCommand("rc");
+        }
+        if (supportAccept.wasPressed()) {
+            ChatUtil.executeCommand("support accept");
+        }
+        if (supportQueue.wasPressed()) {
+            ChatUtil.executeCommand("support queue");
+        }
+        if (modv.wasPressed()) {
+            ChatUtil.executeCommand("mod vanish");
+        }
+        if (supportchat.wasPressed()) {
+            ChatShortcut chatShortcut = ChatShortcut.SUPPORT_CHAT;
+
+            ChatShortcut.setCurrentChatShortcut(chatShortcut);
+            CodeUtilities.MC.setScreen(new ChatScreen(""));
+        }
+        if (modchat.wasPressed()) {
+            ChatShortcut chatShortcut = ChatShortcut.MOD_CHAT;
+
+            ChatShortcut.setCurrentChatShortcut(chatShortcut);
+            CodeUtilities.MC.setScreen(new ChatScreen(""));
+        }
+        if (adminchat.wasPressed()) {
+            ChatShortcut chatShortcut = ChatShortcut.ADMIN_CHAT;
+
+            ChatShortcut.setCurrentChatShortcut(chatShortcut);
+            CodeUtilities.MC.setScreen(new ChatScreen(""));
         }
     }
 

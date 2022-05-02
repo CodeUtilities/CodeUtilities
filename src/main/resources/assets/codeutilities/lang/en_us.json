@@ -19,7 +19,12 @@
   "key.codeutilities.chatGlobal": "/chat global",
   "key.codeutilities.chatNone": "/chat none",
   "key.codeutilities.resetInv": "/rs",
-  "key.codeutilities.compactInv": "/rc",
+  "key.codeutilities.admin.chat": "Admin Chat",
+  "key.codeutilities.modv": "/mod vanish",
+  "key.codeutilities.mod.chat": "Mod Chat",
+  "key.codeutilities.support.accept": "/support accept",
+  "key.codeutilities.support.queue": "/support queue",
+  "key.codeutilities.support.chat": "Support Chat",
 
   "config.codeutilities.title": "CodeUtilities Config",
 
