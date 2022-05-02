@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "codeutilities",
-  "version": "3.0",
+  "version": "${project.version}",
   "name": "Codeutilities",
   "description": "",
   "authors": [],
