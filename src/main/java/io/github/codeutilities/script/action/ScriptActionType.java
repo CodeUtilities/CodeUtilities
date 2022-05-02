@@ -272,6 +272,7 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.VARIABLES)
         .arg("Value", ScriptActionArgumentType.ANY)
         .arg("Other", ScriptActionArgumentType.ANY)
+        .hasChildren(true)
         .action(ctx -> {
             if (!ctx.value("Value").valueEquals(ctx.value("Other"))) {
                 ctx.scheduleInner();
@@ -284,6 +285,7 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.NUMBERS)
         .arg("Value", ScriptActionArgumentType.NUMBER)
         .arg("Other", ScriptActionArgumentType.NUMBER)
+        .hasChildren(true)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() > ctx.value("Other").asNumber()) {
                 ctx.scheduleInner();
@@ -296,6 +298,7 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.NUMBERS)
         .arg("Value", ScriptActionArgumentType.NUMBER)
         .arg("Other", ScriptActionArgumentType.NUMBER)
+        .hasChildren(true)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() >= ctx.value("Other").asNumber()) {
                 ctx.scheduleInner();
@@ -308,6 +311,7 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.NUMBERS)
         .arg("Value", ScriptActionArgumentType.NUMBER)
         .arg("Other", ScriptActionArgumentType.NUMBER)
+        .hasChildren(true)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() < ctx.value("Other").asNumber()) {
                 ctx.scheduleInner();
@@ -320,6 +324,7 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.NUMBERS)
         .arg("Value", ScriptActionArgumentType.NUMBER)
         .arg("Other", ScriptActionArgumentType.NUMBER)
+        .hasChildren(true)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() <= ctx.value("Other").asNumber()) {
                 ctx.scheduleInner();
