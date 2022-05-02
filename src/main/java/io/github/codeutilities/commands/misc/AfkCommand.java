@@ -5,12 +5,15 @@ import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.config.Config;
 import io.github.codeutilities.features.commands.afk.AfkFeature;
+import io.github.codeutilities.mixin.render.MChatHud;
 import io.github.codeutilities.util.SoundUtil;
 import io.github.codeutilities.util.hypercube.HypercubePrivateMessage;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
+import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 
@@ -32,18 +35,22 @@ public class AfkCommand implements Command {
 
                     if (AfkFeature.afk) {
                         ChatUtil.sendMessage("You are no longer afk!", ChatType.SUCCESS);
+                        ChatUtil.sendMessage("Here are the messages you were sent while afk.", ChatType.SUCCESS);
                         for (HypercubePrivateMessage message : AfkFeature.afkMessages) {
-                            ChatUtil.sendMessage(message.getText()
-                                    .append(new LiteralText("(" + message.getDateFormat() + ")")
-                                            .setStyle(Style.EMPTY.withColor(Formatting.GRAY))));
+                            MutableText text = new LiteralText("(" + message.getDateFormat() + ") ")
+                                    .setStyle(Style.EMPTY.withColor(Formatting.GRAY));
+                            text.append(message.getText());
+                            CodeUtilities.MC.inGameHud.getChatHud().addMessage(text);
                         }
 
                         AfkFeature.afk = false;
                         AfkFeature.afkMessages.clear();
+                        AfkFeature.players.clear();
                     } else {
                         ChatUtil.sendMessage("You are now afk!", ChatType.SUCCESS);
                         AfkFeature.afk = true;
                         AfkFeature.afkMessages.clear();
+                        AfkFeature.players.clear();
                     }
 
                     return 0;
