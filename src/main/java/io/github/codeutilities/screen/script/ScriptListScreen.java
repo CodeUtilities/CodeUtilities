@@ -69,6 +69,7 @@ public class ScriptListScreen extends CScreen {
                 CItem enableButton = new CItem(80, y + 3, enableIcon);
                 enableButton.setClickListener((btn) -> {
                     s.setDisabled(false);
+                    ScriptManager.getInstance().saveScript(s);
                     CodeUtilities.MC.setScreen(new ScriptListScreen());
                 });
                 panel.add(enableButton);
@@ -76,6 +77,7 @@ public class ScriptListScreen extends CScreen {
                 CItem disableButton = new CItem(80, y + 3, disableIcon);
                 disableButton.setClickListener((btn) -> {
                     s.setDisabled(true);
+                    ScriptManager.getInstance().saveScript(s);
                     CodeUtilities.MC.setScreen(new ScriptListScreen());
                 });
                 panel.add(disableButton);
