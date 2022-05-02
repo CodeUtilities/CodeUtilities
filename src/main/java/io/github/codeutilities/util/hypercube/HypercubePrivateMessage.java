@@ -79,6 +79,11 @@ public class HypercubePrivateMessage {
         MutableText part1 = new LiteralText(getUser())
                 .setStyle(Style.EMPTY
                         .withColor(Formatting.AQUA));
+        if (getUser().equals("You")) {
+            part1 = new LiteralText(getUser())
+                    .setStyle(Style.EMPTY
+                            .withColor(TextColor.fromRgb(0xFFD47F)));
+        }
 
         MutableText part2 = new LiteralText(" → ")
                 .setStyle(Style.EMPTY
@@ -87,6 +92,11 @@ public class HypercubePrivateMessage {
         MutableText part3 = new LiteralText(getUser2())
                 .setStyle(Style.EMPTY
                         .withColor(TextColor.fromRgb(0xFFD47F)));
+        if (getUser().equals("You")) {
+            part3 = new LiteralText(getUser2())
+                    .setStyle(Style.EMPTY
+                            .withColor(Formatting.AQUA));
+        }
 
         MutableText part4 = new LiteralText("] ")
                 .setStyle(Style.EMPTY
@@ -98,7 +108,12 @@ public class HypercubePrivateMessage {
 
         List<MutableText> textList = List.of(text, part1, part2, part3, part4, part5);
         for (MutableText t : textList) {
-            t.setStyle(t.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + getUser() + " ")));
+            if (getUser().equals("You")) {
+                t.setStyle(t.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + getUser2() + " ")));
+            } else {
+                t.setStyle(t.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + getUser() + " ")));
+            }
+
             t.setStyle(t.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                     new LiteralText("Click to reply!")
                             .setStyle(Style.EMPTY
