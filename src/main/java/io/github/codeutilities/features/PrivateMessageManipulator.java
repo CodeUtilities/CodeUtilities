@@ -37,7 +37,7 @@ public class PrivateMessageManipulator implements Loadable {
                     if (matcher.find()) {
                         event.setCancelled(true);
 
-                        Text msg = new HypercubePrivateMessage(matcher.group(1), matcher.group(2)).getText();
+                        Text msg = new HypercubePrivateMessage("You", matcher.group(1), matcher.group(2)).getText();
                         CodeUtilities.MC.inGameHud.getChatHud().addMessage(msg);
                     }
                 } catch (Exception e) {

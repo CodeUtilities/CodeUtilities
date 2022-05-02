@@ -1,6 +1,5 @@
 package io.github.codeutilities.util.hypercube;
 
-import io.github.codeutilities.config.Config;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 
@@ -8,12 +7,21 @@ import java.util.Date;
 import java.util.List;
 
 public class HypercubePrivateMessage {
-    private String user;
+    private final String user;
+    private final String user2;
     private String message;
     private Date date;
 
     public HypercubePrivateMessage(String user, String message) {
         this.user = user;
+        this.user2 = "You";
+        this.message = message;
+        this.date = new Date();
+    }
+
+    public HypercubePrivateMessage(String user, String user2, String message) {
+        this.user = user;
+        this.user2 = user2;
         this.message = message;
         this.date = new Date();
     }
@@ -22,8 +30,8 @@ public class HypercubePrivateMessage {
         return user;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public String getUser2() {
+        return user2;
     }
 
     public String getMessage() {
@@ -76,7 +84,7 @@ public class HypercubePrivateMessage {
                 .setStyle(Style.EMPTY
                         .withColor(TextColor.fromRgb(0xFF7F55)));
 
-        MutableText part3 = new LiteralText("You")
+        MutableText part3 = new LiteralText(getUser2())
                 .setStyle(Style.EMPTY
                         .withColor(TextColor.fromRgb(0xFFD47F)));
 
