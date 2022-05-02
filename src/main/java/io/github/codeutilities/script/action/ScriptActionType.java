@@ -652,6 +652,7 @@ public enum ScriptActionType {
         .description("Executes if a gui is open.")
         .icon(Items.BOOK)
         .hasChildren(true)
+        .category(ScriptActionCategory.MISC)
         .action(ctx -> {
             if (CodeUtilities.MC.currentScreen != null) {
                 ctx.scheduleInner();
@@ -662,10 +663,47 @@ public enum ScriptActionType {
         .description("Executes if no gui is open.")
         .icon(Items.BOOK)
         .hasChildren(true)
+        .category(ScriptActionCategory.MISC)
         .action(ctx -> {
             if (CodeUtilities.MC.currentScreen == null) {
                 ctx.scheduleInner();
             }
+        })),
+
+    COPY_TEXT(builder -> builder.name("Copy Text")
+        .description("Copies the text to the clipboard.")
+        .icon(Items.PAPER)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            CodeUtilities.MC.keyboard.setClipboard(ctx.value("Text").asText());
+        })),
+
+    SPLIT_TEXT(builder -> builder.name("Split Text")
+        .description("Splits a text into a list of texts.")
+        .icon(Items.SHEARS)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Separator", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            String separator = ctx.value("Separator").asText();
+            List<ScriptValue> split = new ArrayList<>();
+
+            for (String s : text.split(separator)) {
+                split.add(new ScriptTextValue(s));
+            }
+
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptListValue(split));
+        })),
+
+    STOP(builder -> builder.name("Stop")
+        .description("Stops the current codeline.")
+        .icon(Items.BARRIER)
+        .category(ScriptActionCategory.MISC)
+        .action(ctx -> {
+            ctx.task().stop();
         }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
