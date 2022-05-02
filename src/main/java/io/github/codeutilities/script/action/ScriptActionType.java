@@ -12,6 +12,7 @@ import io.github.codeutilities.script.values.ScriptNumberValue;
 import io.github.codeutilities.script.values.ScriptTextValue;
 import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
+import io.github.codeutilities.util.ComponentUtil;
 import io.github.codeutilities.util.Scheduler;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public enum ScriptActionType {
                     .append(" ");
             }
             sb.deleteCharAt(sb.length() - 1);
-            ChatUtil.sendMessage(sb.toString());
+            ChatUtil.sendMessage(ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(sb.toString())));
         })),
 
     ACTIONBAR(builder -> builder.name("ActionBar")
@@ -61,7 +62,7 @@ public enum ScriptActionType {
                     .append(" ");
             }
             sb.deleteCharAt(sb.length() - 1);
-            ChatUtil.sendActionBar(new LiteralText(sb.toString()));
+            ChatUtil.sendActionBar(ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(sb.toString())));
         })),
 
     SEND_CHAT(builder -> builder.name("SendChat")
