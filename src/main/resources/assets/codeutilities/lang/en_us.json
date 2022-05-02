@@ -20,6 +20,12 @@
   "key.codeutilities.chatNone": "/chat none",
   "key.codeutilities.resetInv": "/rs",
   "key.codeutilities.compactInv": "/rc",
+  "key.codeutilities.admin.chat": "Admin Chat",
+  "key.codeutilities.mod.vanish": "/mod vanish",
+  "key.codeutilities.mod.chat": "Mod Chat",
+  "key.codeutilities.support.accept": "/support accept",
+  "key.codeutilities.support.queue": "/support queue",
+  "key.codeutilities.support.chat": "Support Chat",
 
   "config.codeutilities.title": "CodeUtilities Config",
 
@@ -167,5 +173,8 @@
   "config.codeutilities.option.dfButton": "Menu Button",
   "config.codeutilities.option.dfButton.tooltip": "Adds a button in the title screen to join DiamondFire.",
   "config.codeutilities.option.dfNodeButtons": "Node Buttons",
-  "config.codeutilities.option.dfNodeButtons.tooltip": "Adds node specific buttons in the title screen to join DiamondFire."
+  "config.codeutilities.option.dfNodeButtons.tooltip": "Adds node specific buttons in the title screen to join DiamondFire.",
+
+  "config.codeutilities.option.clickToReply": "Click to reply",
+  "config.codeutilities.option.clickToReply.tooltip": "Makes /messages clickable so you can reply easily to players!"
 }

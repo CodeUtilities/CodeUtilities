@@ -2,12 +2,14 @@ package io.github.codeutilities.features.sidedchat;
 
 import com.google.common.collect.Lists;
 import io.github.codeutilities.config.Config;
+import io.github.codeutilities.util.Regex;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 public class ChatPredicates {
@@ -41,41 +43,14 @@ public class ChatPredicates {
     }
 
     //MESSAGE
-    private static final ChatPattern oldMessageChatPattern = new ChatPattern(
-            new ChatPattern.ChatComponent("[", TextColor.fromFormatting(Formatting.DARK_RED),0),
-            new ChatPattern.ChatComponent(null,TextColor.fromFormatting(Formatting.AQUA)),
-            new ChatPattern.ChatComponent(" -> ",TextColor.fromFormatting(Formatting.GOLD)),
-            new ChatPattern.ChatComponent(null,TextColor.fromFormatting(Formatting.AQUA)),
-            new ChatPattern.ChatComponent("] ",TextColor.fromFormatting(Formatting.DARK_RED))
-    );
-    private static final ChatPattern oldCrossNodeMessagePattern = new ChatPattern(
-            new ChatPattern.ChatComponent("[",TextColor.fromFormatting(Formatting.GOLD),0),
-            new ChatPattern.ChatComponent(null,TextColor.fromFormatting(Formatting.AQUA)),
-            new ChatPattern.ChatComponent(" -> ",TextColor.fromFormatting(Formatting.DARK_RED)),
-            new ChatPattern.ChatComponent(null,TextColor.fromFormatting(Formatting.AQUA)),
-            new ChatPattern.ChatComponent("] ",TextColor.fromFormatting(Formatting.GOLD))
-    );
-    private static final ChatPattern messageChatPattern = new ChatPattern(
-            new ChatPattern.ChatComponent("[", TextColor.parse("#FF7F55"),0),
-            new ChatPattern.ChatComponent(null,TextColor.fromFormatting(Formatting.AQUA)),
-            new ChatPattern.ChatComponent(" → ",TextColor.parse("#FF7F55")),
-            new ChatPattern.ChatComponent(null,TextColor.parse("#FFD47F")),
-            new ChatPattern.ChatComponent("] ",TextColor.parse("#FF7F55"))
-    );
-    private static final ChatPattern messageChatPattern2 = new ChatPattern(
-            new ChatPattern.ChatComponent("[", TextColor.parse("#FF7F55"),0),
-            new ChatPattern.ChatComponent(null,TextColor.parse("#FFD47F")),
-            new ChatPattern.ChatComponent(" → ",TextColor.parse("#FF7F55")),
-            new ChatPattern.ChatComponent(null,TextColor.fromFormatting(Formatting.AQUA)),
-            new ChatPattern.ChatComponent("] ",TextColor.parse("#FF7F55"))
-    );
+
+    private static final Regex messageChatPattern = Regex.of("^\\[You → (.+)\\] (.+)$");
+    private static final Regex messageChatPattern2 = Regex.of("^\\[(.+) → You\\] (.+)$");
     public static Predicate<Text> getMessagePredicate() {
-        return iTextComponent -> {
-            ChatPattern chatPattern = new ChatPattern(iTextComponent);
-            return chatPattern.contains(messageChatPattern)         ||
-                    chatPattern.contains(messageChatPattern2)       ||
-                    chatPattern.contains(oldMessageChatPattern)     ||
-                    chatPattern.contains(oldCrossNodeMessagePattern);
+        return text -> {
+            Matcher matcher = messageChatPattern.getMatcher(text.getString());
+            Matcher matcher2 = messageChatPattern2.getMatcher(text.getString());
+            return matcher.find() || matcher2.find();
         };
     }
 
