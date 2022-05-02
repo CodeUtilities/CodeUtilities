@@ -18,7 +18,7 @@ public class AfkFeature implements Loadable {
     public static boolean afk = false;
     public static int afkTick = 0;
     public static ArrayList<HypercubePrivateMessage> afkMessages = new ArrayList<>();
-
+    public static ArrayList<String> players = new ArrayList<>();
 
     @Override
     public void load() {
@@ -51,12 +51,15 @@ public class AfkFeature implements Loadable {
             try {
                 if (afk) {
                     Regex pattern = Regex.of("^\\[(.+) → You\\] (.+)$");
+
                     Matcher matcher = pattern.getMatcher(message);
 
                     if (matcher.find()) {
-
-                        CodeUtilities.MC.player.sendChatMessage("/msg " + matcher.group(1) + " "
-                                + Config.getString("autoafk_response").replace("%player", matcher.group(1)));
+                        if (!players.contains(matcher.group(1))) {
+                            players.add(matcher.group(1));
+                            CodeUtilities.MC.player.sendChatMessage("/msg " + matcher.group(1) + " "
+                                    + Config.getString("autoafk_response").replace("%player", matcher.group(1)));
+                        }
 
                         afkMessages.add(new HypercubePrivateMessage(matcher.group(1), matcher.group(2)));
                     }
