@@ -28,7 +28,7 @@ import net.minecraft.util.Formatting;
 
 public enum ScriptClientValueArgument implements ScriptArgument {
 
-    EVENT_KEY("KeyPressed","The key code of the key pressed. (KeyPressEvent)", Items.STONE_BUTTON, (event, context) -> {
+    EVENT_KEY("KeyPressed","The key code of the key pressed. (KeyPressEvent)", Items.STONE_BUTTON, ScriptActionArgumentType.NUMBER, (event, context) -> {
         if (event instanceof KeyPressEvent e) {
             return new ScriptNumberValue(e.getKey().getCode());
         } else {
@@ -36,7 +36,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
         }
     }),
 
-    EVENT_KEY_ACTION("KeyAction","The code of the key action performed. (KeyPressEvent)", Items.OAK_BUTTON, (event,context) -> {
+    EVENT_KEY_ACTION("KeyAction","The code of the key action performed. (KeyPressEvent)", Items.OAK_BUTTON, ScriptActionArgumentType.NUMBER, (event,context) -> {
         if (event instanceof KeyPressEvent e) {
             return new ScriptNumberValue(e.getAction());
         } else {
@@ -44,7 +44,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
         }
     }),
 
-    EVENT_MESSAGE("ReceivedMessage","The message received. (ReceiveChatEvent)", Items.WRITTEN_BOOK, (event,context) -> {
+    EVENT_MESSAGE("ReceivedMessage","The message received. (ReceiveChatEvent)", Items.WRITTEN_BOOK, ScriptActionArgumentType.TEXT, (event,context) -> {
         if (event instanceof ReceiveChatEvent e) {
             return new ScriptTextValue(ComponentUtil.sectionSignsToAnds(ComponentUtil.toFormattedString(e.getMessage())));
         } else {
@@ -52,7 +52,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
         }
     }),
 
-    ENTERED_MESSAGE("EnteredMessage","The message entered. (SendChatEvent)", Items.WRITABLE_BOOK, (event,context) -> {
+    ENTERED_MESSAGE("EnteredMessage","The message entered. (SendChatEvent)", Items.WRITABLE_BOOK, ScriptActionArgumentType.TEXT, (event,context) -> {
         if (event instanceof SendChatEvent e) {
             return new ScriptTextValue(e.getMessage());
         } else {
@@ -60,13 +60,14 @@ public enum ScriptClientValueArgument implements ScriptArgument {
         }
     }),
 
-    TIMESTAMP("Timestamp","The current timestamp in milliseconds.", Items.CLOCK, (event,context) -> new ScriptNumberValue(System.currentTimeMillis()));
+    TIMESTAMP("Timestamp","The current timestamp in milliseconds.", Items.CLOCK, ScriptActionArgumentType.NUMBER, (event,context) -> new ScriptNumberValue(System.currentTimeMillis()));
 
     private final String name;
     private final ItemStack icon;
     private final BiFunction<Event, ScriptContext, ScriptValue> consumer;
+    private final ScriptActionArgumentType type;
 
-    ScriptClientValueArgument(String name, String description, Item type, BiFunction<Event, ScriptContext, ScriptValue> consumer) {
+    ScriptClientValueArgument(String name, String description, Item type, ScriptActionArgumentType varType, BiFunction<Event, ScriptContext, ScriptValue> consumer) {
         this.name = name;
         this.icon = new ItemStack(type);
         icon.setCustomName(new LiteralText(name)
@@ -80,6 +81,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
         icon.getSubNbt("display")
             .put("Lore", lore);
         this.consumer = consumer;
+        this.type = varType;
     }
 
     public String getName() {
@@ -97,7 +99,7 @@ public enum ScriptClientValueArgument implements ScriptArgument {
 
     @Override
     public boolean is(ScriptActionArgumentType type) {
-        return true;//TODO check if type matches
+        return type == this.type;
     }
 
     public static class Serializer implements JsonSerializer<ScriptClientValueArgument> {
