@@ -19,6 +19,7 @@ import io.github.codeutilities.script.argument.ScriptNumberArgument;
 import io.github.codeutilities.script.argument.ScriptTextArgument;
 import io.github.codeutilities.script.argument.ScriptVariableArgument;
 import io.github.codeutilities.script.event.ScriptEvent;
+import io.github.codeutilities.script.event.ScriptStartUpEvent;
 import io.github.codeutilities.util.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
@@ -90,6 +91,8 @@ public class ScriptManager implements Loadable {
         }
 
         LOGGER.info("Loaded " + scripts.size() + " script!");
+
+        handleEvent(new ScriptStartUpEvent());
     }
 
     public void saveScript(Script script) {
