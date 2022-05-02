@@ -1,6 +1,7 @@
 package io.github.codeutilities.mixin.render;
 
 import io.github.codeutilities.CodeUtilities;
+import io.github.codeutilities.config.Config;
 import io.github.codeutilities.features.LagslayerHUD;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -20,6 +21,10 @@ public class MInGameHUD {
 
         MinecraftClient mc = CodeUtilities.MC;
         TextRenderer tr = mc.textRenderer;
+
+        //if (Config.getBoolean("plotInfoOverlay")) {
+        //    StateOverlayHandler.drawStateOverlay(tr, stack);
+        //}
     }
 
     @Inject(at = @At("HEAD"), method = "renderScoreboardSidebar", cancellable = true)

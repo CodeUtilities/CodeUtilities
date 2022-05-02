@@ -12,7 +12,8 @@
     "render.MChatScreen",
     "render.MInGameHUD",
     "render.MOptionsScreen",
-    "render.MPlayerListHUD"
+    "render.MPlayerListHUD",
+    "render.MTitleScreen"
   ],
   "client": [
   ],

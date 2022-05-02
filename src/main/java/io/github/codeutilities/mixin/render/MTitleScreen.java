@@ -23,17 +23,15 @@ public class MTitleScreen extends Screen {
 
     @Inject(at = @At("RETURN"), method = "initWidgetsNormal")
     public void drawMenuButton(int y, int spacingY, CallbackInfo info) {
-        String NUM_LOCATION = Config.getEnum("dfButtonsLocation", DfButtonTextLocations.class).name().toLowerCase();
-
         Identifier identifier_main = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/df.png");
-        Identifier identifier_beta = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/" + NUM_LOCATION + "/beta.png");
-        Identifier identifier_node1 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/" + NUM_LOCATION + "/node1.png");
-        Identifier identifier_node2 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/" + NUM_LOCATION + "/node2.png");
-        Identifier identifier_node3 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/" + NUM_LOCATION + "/node3.png");
-        Identifier identifier_node4 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/" + NUM_LOCATION + "/node4.png");
-        Identifier identifier_node5 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/" + NUM_LOCATION + "/node5.png");
-        Identifier identifier_node6 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/" + NUM_LOCATION + "/node6.png");
-        Identifier identifier_node7 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/" + NUM_LOCATION + "/node7.png");
+        Identifier identifier_beta = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/beta.png");
+        Identifier identifier_node1 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/node1.png");
+        Identifier identifier_node2 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/node2.png");
+        Identifier identifier_node3 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/node3.png");
+        Identifier identifier_node4 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/node4.png");
+        Identifier identifier_node5 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/node5.png");
+        Identifier identifier_node6 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/node6.png");
+        Identifier identifier_node7 = new Identifier(CodeUtilities.MOD_ID + ":textures/gui/node7.png");
 
         if (Config.getBoolean("dfButton")) {
             if (!Config.getBoolean("dfNodeButtons")) {

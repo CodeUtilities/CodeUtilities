@@ -20,7 +20,6 @@ public class ScreenGroup extends ConfigGroup {
         ConfigSubGroup dfButtonSubGroup = new ConfigSubGroup("dfButton");
         dfButtonSubGroup.register(new BooleanSetting("dfButton", true));
         dfButtonSubGroup.register(new BooleanSetting("dfNodeButtons", true));
-        dfButtonSubGroup.register(new EnumSetting<>("dfButtonsLocation", DfButtonTextLocations.class, DfButtonTextLocations.TOP_LEFT));
         this.register(dfButtonSubGroup);
 
         for (ChatRule chatRule : ChatRule.getChatRules()) {

@@ -61,11 +61,6 @@ dependencies {
     include 'org.java-websocket:Java-WebSocket:1.5.2'
 }
 
-processResources {
-    expand(project: project)
-}
-
-
 def targetJavaVersion = 17
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is

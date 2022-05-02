@@ -167,10 +167,5 @@
   "config.codeutilities.option.dfButton": "Menu Button",
   "config.codeutilities.option.dfButton.tooltip": "Adds a button in the title screen to join DiamondFire.",
   "config.codeutilities.option.dfNodeButtons": "Node Buttons",
-  "config.codeutilities.option.dfNodeButtons.tooltip": "Adds node specific buttons in the title screen to join DiamondFire.",
-  "config.codeutilities.option.dfButtonsLocation": "Button Text Location",
-  "config.codeutilities.option.dfButtonsLocation.tooltip": "The location the button text is shown at.",
-
-  "config.codeutilities.option.dfButtonsLocation.top_left": "Top Left",
-  "config.codeutilities.option.dfButtonsLocation.bottom_right": "Bottom Right"
+  "config.codeutilities.option.dfNodeButtons.tooltip": "Adds node specific buttons in the title screen to join DiamondFire."
 }
