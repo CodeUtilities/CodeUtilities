@@ -8,6 +8,7 @@ import io.github.codeutilities.websocket.client.type.SocketItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.sound.SoundEvents;
 import io.github.codeutilities.util.ItemUtil;
@@ -18,6 +19,7 @@ public class Clients {
 
     public static String acceptData(String line) {
         JsonObject result = new JsonObject();
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
         try {
             if (line == null) {
                 return null;
@@ -40,6 +42,7 @@ public class Clients {
             if (mc.player.isCreative()) {
                 ItemUtil.giveCreativeItem(item.getItem(itemData), true);
                 RenderUtil.sendToaster("Received Item!", source, SystemToast.Type.NARRATOR_TOGGLE);
+                player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 200, 1);
                 result.addProperty("status", "success");
             } else {
                 throw new Exception("Player is not in creative!");

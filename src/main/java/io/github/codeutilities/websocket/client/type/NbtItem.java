@@ -1,6 +1,5 @@
 package io.github.codeutilities.websocket.client.type;
 
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
