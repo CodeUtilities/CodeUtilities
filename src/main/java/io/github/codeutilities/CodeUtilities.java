@@ -16,7 +16,6 @@ import io.github.codeutilities.features.*;
 import io.github.codeutilities.features.commands.afk.AfkFeature;
 import io.github.codeutilities.features.streamermode.StreamerModeListeners;
 import io.github.codeutilities.features.tab.Client;
-import io.github.codeutilities.loader.Loadable;
 import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.loader.v2.CodeInitializer;
 import io.github.codeutilities.script.ScriptManager;
