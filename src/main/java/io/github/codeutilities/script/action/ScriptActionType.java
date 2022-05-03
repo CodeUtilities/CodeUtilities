@@ -396,7 +396,8 @@ public enum ScriptActionType {
         .arg("Index", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
-            int index = (int) ctx.value("Index").asNumber() + 1;
+         // force index consistent with diamondfire indexes
+            int index = (int) ctx.value("Index").asNumber() - 1;
             if (index < 0 || index >= list.size()) {
                 ctx.context().setVariable(ctx.variable("Result").name(), new ScriptUnknownValue());
             } else {
@@ -413,7 +414,8 @@ public enum ScriptActionType {
         .arg("Value", ScriptActionArgumentType.ANY)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
-            int index = (int) ctx.value("Index").asNumber() + 1;
+            // force index consistent with diamondfire indexes
+            int index = (int) ctx.value("Index").asNumber() - 1;
             if (index < 0 || index >= list.size()) {
                 return;
             }
@@ -429,7 +431,8 @@ public enum ScriptActionType {
         .arg("Index", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
-            int index = (int) ctx.value("Index").asNumber() + 1;
+         // force index consistent with diamondfire indexes
+            int index = (int) ctx.value("Index").asNumber() - 1;
             if (index < 0 || index >= list.size()) {
                 return;
             }
