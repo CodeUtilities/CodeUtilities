@@ -105,7 +105,7 @@ public class Script {
                         }
                     }
                 }
-                sa.invoke(task.event(), context, inner,task);
+                sa.invoke(task.event(), context, inner,task, this);
                 if (!task.isRunning()) {
                     return;
                 }

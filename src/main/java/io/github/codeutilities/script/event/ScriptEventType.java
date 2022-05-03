@@ -2,6 +2,7 @@ package io.github.codeutilities.script.event;
 
 import io.github.codeutilities.event.BuildModeEvent;
 import io.github.codeutilities.event.DevModeEvent;
+import io.github.codeutilities.event.HudRenderEvent;
 import io.github.codeutilities.event.KeyPressEvent;
 import io.github.codeutilities.event.PlayModeEvent;
 import io.github.codeutilities.event.ReceiveChatEvent;
@@ -34,7 +35,9 @@ public enum ScriptEventType {
 
     DEV_MODE(DevModeEvent.class, "OnDevMode", "Executed when a player enters dev mode.", Items.DIAMOND_SWORD),
 
-    START_UP(ScriptStartUpEvent.class, "OnStartUp", "Executed when all scripts are being loaded.", Items.FIREWORK_ROCKET);
+    START_UP(ScriptStartUpEvent.class, "OnStartUp", "Executed when all scripts are being loaded.", Items.FIREWORK_ROCKET),
+
+    OVERLAY_EVENT(HudRenderEvent.class, "OnOverlay", "Executed when the overlay is being rendered.", Items.GREEN_STAINED_GLASS_PANE);
 
     private final String name;
     private final ItemStack icon;

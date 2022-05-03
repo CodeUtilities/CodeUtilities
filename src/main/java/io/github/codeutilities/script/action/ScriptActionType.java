@@ -1,11 +1,19 @@
 package io.github.codeutilities.script.action;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import io.github.codeutilities.CodeUtilities;
+import io.github.codeutilities.event.HudRenderEvent;
 import io.github.codeutilities.event.system.CancellableEvent;
 import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
+import io.github.codeutilities.script.util.ScriptValueItem;
+import io.github.codeutilities.script.util.ScriptValueJson;
 import io.github.codeutilities.script.values.ScriptDictionaryValue;
 import io.github.codeutilities.script.values.ScriptListValue;
 import io.github.codeutilities.script.values.ScriptNumberValue;
@@ -13,8 +21,13 @@ import io.github.codeutilities.script.values.ScriptTextValue;
 import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
 import io.github.codeutilities.util.ComponentUtil;
+import io.github.codeutilities.util.FileUtil;
+import io.github.codeutilities.util.ItemUtil;
 import io.github.codeutilities.util.Scheduler;
 import io.github.codeutilities.util.chat.ChatUtil;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +35,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.item.Item;
@@ -37,6 +51,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.GameMode;
 
 public enum ScriptActionType {
 
@@ -396,7 +411,7 @@ public enum ScriptActionType {
         .arg("Index", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
-         // force index consistent with diamondfire indexes
+            // force index consistent with diamondfire indexes
             int index = (int) ctx.value("Index").asNumber() - 1;
             if (index < 0 || index >= list.size()) {
                 ctx.context().setVariable(ctx.variable("Result").name(), new ScriptUnknownValue());
@@ -431,7 +446,7 @@ public enum ScriptActionType {
         .arg("Index", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
-         // force index consistent with diamondfire indexes
+            // force index consistent with diamondfire indexes
             int index = (int) ctx.value("Index").asNumber() - 1;
             if (index < 0 || index >= list.size()) {
                 return;
@@ -716,10 +731,25 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.MISC)
         .arg("Command", ScriptActionArgumentType.TEXT)
         .action(ctx -> {
-            ClientCommandManager.DISPATCHER.register(LiteralArgumentBuilder.literal(ctx.value("Command").asText()));
+            String[] args = ctx.value("Command").asText().split(" ", -1);
+            ArgumentBuilder<FabricClientCommandSource, ?> ab = RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString());
+
+            ab.executes(ctx2 -> 0);
+
+            for (int i = args.length - 1; i >= 0; i--) {
+                LiteralArgumentBuilder<FabricClientCommandSource> l = LiteralArgumentBuilder.literal(args[i]);
+                l.then(ab);
+                ab = l;
+            }
+
+            if (ab instanceof LiteralArgumentBuilder lab) {
+                ClientCommandManager.DISPATCHER.register(lab);
+            }
 
             ClientPlayNetworkHandler nh = CodeUtilities.MC.getNetworkHandler();
-            nh.onCommandTree(new CommandTreeS2CPacket(nh.getCommandDispatcher().getRoot()));
+            if (nh != null) {
+                nh.onCommandTree(new CommandTreeS2CPacket(nh.getCommandDispatcher().getRoot()));
+            }
         })),
 
     IF_GUI_OPEN(builder -> builder.name("If GUI Open")
@@ -864,6 +894,154 @@ public enum ScriptActionType {
                 .collect(Collectors.joining(separator));
 
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptTextValue(result));
+        })),
+
+    READ_FILE(builder -> builder.name("Read File")
+        .description("Reads a file from the scripts folder.")
+        .icon(Items.WRITTEN_BOOK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Filename", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String filename = ctx.value("Filename").asText();
+
+            if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
+                Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
+                if (Files.exists(f)) {
+                    try {
+                        String content = FileUtil.readFile(f);
+                        JsonElement json = JsonParser.parseString(content);
+                        ScriptValue value = ScriptValueJson.fromJson(json);
+                        ctx.context().setVariable(ctx.variable("Result").name(), value);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        ChatUtil.error("Internal error while reading file.");
+                    }
+                }
+            } else {
+                ChatUtil.error("Illegal filename: " + filename);
+            }
+        })),
+
+    WRITE_FILE(builder -> builder.name("Write File")
+        .description("Writes a file to the scripts folder.")
+        .icon(Items.WRITABLE_BOOK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Filename", ScriptActionArgumentType.TEXT)
+        .arg("Content", ScriptActionArgumentType.ANY)
+        .action(ctx -> {
+            String filename = ctx.value("Filename").asText();
+            ScriptValue value = ctx.value("Content");
+
+            if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
+                Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
+                try {
+                    f.toFile().getParentFile().mkdirs();
+                    FileUtil.writeFile(f, ScriptValueJson.toJson(value).toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    ChatUtil.error("Internal error while writing file.");
+                }
+            } else {
+                ChatUtil.error("Illegal filename: " + filename);
+            }
+        })),
+
+    IF_FILE_EXISTS(builder -> builder.name("If File Exists")
+        .description("Executes if the specified file exists.")
+        .icon(Items.BOOK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Filename", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .action(ctx -> {
+            String filename = ctx.value("Filename").asText();
+            if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
+                Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
+                if (Files.exists(f)) {
+                    ctx.scheduleInner();
+                }
+            } else {
+                ChatUtil.error("Illegal filename: " + filename);
+            }
+        })),
+
+    PARSE_NUMBER(builder -> builder.name("Parse Number")
+        .description("Parses a number from a text.")
+        .icon(Items.ANVIL)
+        .category(ScriptActionCategory.NUMBERS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            try {
+                ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(Double.parseDouble(text)));
+            } catch (NumberFormatException e) {
+                ctx.context().setVariable(ctx.variable("Result").name(), new ScriptUnknownValue());
+            }
+        })),
+
+    SET_HOTBAR_ITEM(builder -> builder.name("Set Hotbar Item")
+        .description("Sets a hotbar item. (Requires Creative)")
+        .icon(Items.IRON_AXE)
+        .category(ScriptActionCategory.ACTIONS)
+        .arg("Slot", ScriptActionArgumentType.NUMBER)
+        .arg("Item", ScriptActionArgumentType.DICTIONARY)
+        .action(ctx -> {
+            int slot = (int) ctx.value("Slot").asNumber();
+            ItemStack item = ScriptValueItem.itemFromValue(ctx.value("Item"));
+
+            if (CodeUtilities.MC.interactionManager.getCurrentGameMode() == GameMode.CREATIVE) {
+                CodeUtilities.MC.interactionManager.clickCreativeStack(item, slot + 36);
+                CodeUtilities.MC.player.getInventory().setStack(slot, item);
+            } else {
+                ChatUtil.error("Unable to set hotbar item! (Not in creative mode)");
+            }
+        })),
+
+    GIVE_ITEM(builder -> builder.name("Give Item")
+        .description("Gives the player an item. (Requires Creative)")
+        .icon(Items.CHEST)
+        .category(ScriptActionCategory.ACTIONS)
+        .arg("Item", ScriptActionArgumentType.DICTIONARY)
+        .action(ctx -> {
+            ItemStack item = ScriptValueItem.itemFromValue(ctx.value("Item"));
+
+            if (CodeUtilities.MC.interactionManager.getCurrentGameMode() == GameMode.CREATIVE) {
+                ItemUtil.giveCreativeItem(item,true);
+            } else {
+                ChatUtil.error("Unable to set hotbar item! (Not in creative mode)");
+            }
+        })),
+
+    DRAW_TEXT(builder -> builder.name("Draw Text")
+        .description("Draws text on the screen.")
+        .icon(Items.NAME_TAG)
+        .category(ScriptActionCategory.VISUALS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+
+            if (ctx.event() instanceof HudRenderEvent event) {
+                Text t = ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(text));
+                CodeUtilities.MC.textRenderer.drawWithShadow(event.stack(),t,x,y, 0xFFFFFF);
+            }
+        })),
+
+    MEASURE_TEXT(builder -> builder.name("Measure Text")
+        .description("Measures the width of a text in pixels.")
+        .icon(Items.STICK)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            Text t = ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(text));
+            int width = CodeUtilities.MC.textRenderer.getWidth(t);
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(width));
         }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
