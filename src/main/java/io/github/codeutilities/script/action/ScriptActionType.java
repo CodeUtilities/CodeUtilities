@@ -392,7 +392,7 @@ public enum ScriptActionType {
             .icon(Items.BLAST_FURNACE)
             .category(ScriptActionCategory.LISTS)
             .arg("Base List", ScriptActionArgumentType.VARIABLE)
-            .arg("Other List", ScriptActionArgumentType.VARIABLE)
+            .arg("Other List", ScriptActionArgumentType.LIST)
             .action(ctx -> {
 
                 List<ScriptValue> receiver = ctx.value("Receiving List").asList();
@@ -407,7 +407,7 @@ public enum ScriptActionType {
         .description("Gets a value from a list.")
         .icon(Items.BOOK)
         .category(ScriptActionCategory.LISTS)
-        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .aScriptActionArgumentType.LISTmentType.VARIABLE)
         .arg("List", ScriptActionArgumentType.VARIABLE)
         .arg("Index", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
@@ -610,7 +610,7 @@ public enum ScriptActionType {
                     List<ScriptValue> values = ctx.value("Values").asList();
 
                     // make sure we don't iterate past the end of a list
-                    int lowerLength = (keys.size() < values.size()) ? keys.size() : values.size();
+                    int lowerLength = Math.min(keys.size(), values.size());
 
                     for (int i = 0; i < lowerLength; i++) {
                         dict.put(keys.get(i).asText(), values.get(i));
