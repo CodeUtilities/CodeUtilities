@@ -407,7 +407,7 @@ public enum ScriptActionType {
         .description("Gets a value from a list.")
         .icon(Items.BOOK)
         .category(ScriptActionCategory.LISTS)
-        .aScriptActionArgumentType.LISTmentType.VARIABLE)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
         .arg("List", ScriptActionArgumentType.VARIABLE)
         .arg("Index", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
@@ -752,7 +752,7 @@ public enum ScriptActionType {
         .icon(Items.DARK_OAK_STAIRS)
         .category(ScriptActionCategory.NUMBERS)
         .arg("Result", ScriptActionArgumentType.VARIABLE)
-        .arg("Number", ScriptActionArgumentType.NUMBER)
+        .arg("Number", ScriptScriptActionArgume.NUMBER)
         .action(ctx -> {
             double number = ctx.value("Number").asNumber();
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(Math.ceil(number)));
