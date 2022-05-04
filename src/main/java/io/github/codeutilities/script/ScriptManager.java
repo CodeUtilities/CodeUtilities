@@ -22,6 +22,7 @@ import io.github.codeutilities.script.event.ScriptEvent;
 import io.github.codeutilities.script.event.ScriptStartUpEvent;
 import io.github.codeutilities.util.FileUtil;
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
@@ -138,7 +139,15 @@ public class ScriptManager implements Loadable {
     public void createScript(String name) {
         Script script = new Script(name, new ArrayList<>(),false);
         scripts.add(script);
-        File file = FileUtil.cuFolder("Scripts").resolve(name + ".json").toFile();
+
+        File file = null;
+        try {
+            file = FileUtil.cuFolder("Scripts").resolve(name + ".json").toFile();
+        } catch (InvalidPathException e) {
+            LOGGER.error("Failed to save script: " + script.getFile().getName());
+            e.printStackTrace();
+        }
+
         script.setFile(file);
         saveScript(script);
     }
