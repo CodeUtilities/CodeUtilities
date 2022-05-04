@@ -752,7 +752,7 @@ public enum ScriptActionType {
         .icon(Items.DARK_OAK_STAIRS)
         .category(ScriptActionCategory.NUMBERS)
         .arg("Result", ScriptActionArgumentType.VARIABLE)
-        .arg("Number", ScriptScriptActionArgume.NUMBER)
+        .arg("Number", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
             double number = ctx.value("Number").asNumber();
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(Math.ceil(number)));
