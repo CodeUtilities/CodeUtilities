@@ -1,6 +1,5 @@
 package io.github.codeutilities.screen.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.util.RenderUtil;
 import java.awt.Rectangle;
@@ -11,6 +10,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Vec3f;
 import org.lwjgl.opengl.GL11;
 
 public class CItem implements CWidget {
@@ -43,6 +43,7 @@ public class CItem implements CWidget {
             stack.translate(mouseX, mouseY, 0);
             stack.scale(0.5f, 0.5f, 1f);
             GL11.glDisable(GL11.GL_DEPTH_TEST);
+            stack.peek().getPositionMatrix().addToLastColumn(new Vec3f(0, 0, 600));
             CodeUtilities.MC.currentScreen.renderTooltip(stack, item.getTooltip(
                 CodeUtilities.MC.player, Default.NORMAL
             ), Optional.empty(), 0, 0);
@@ -56,17 +57,18 @@ public class CItem implements CWidget {
     }
 
     @Override
-    public void mouseClicked(double x, double y, int button) {
+    public boolean mouseClicked(double x, double y, int button) {
         Rectangle rect = new Rectangle(this.x, this.y, 8, 8);
 
         if (rect.contains(x, y)) {
             if (onClick != null) {
                 CodeUtilities.MC.getSoundManager().play(PositionedSoundInstance.ambient(SoundEvents.UI_BUTTON_CLICK, 1f, 1f));
                 onClick.accept(button);
+                return true;
             }
         }
 
-        CWidget.super.mouseClicked(x, y, button);
+        return false;
     }
 
     public void setClickListener(Consumer<Integer> onClick) {

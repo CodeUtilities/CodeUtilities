@@ -10,6 +10,7 @@ public class ScriptPosStack {
 
     public ScriptPosStack(int initial) {
         data.add(initial);
+        preTasks.add(null);
     }
 
     public void push(int value, Runnable preTask) {
