@@ -387,6 +387,22 @@ public enum ScriptActionType {
             ctx.context().setVariable(ctx.variable("List").name(), new ScriptListValue(list));
         })),
 
+    APPEND_LIST_VALUES(builder -> builder.name("Append List Values")
+            .description("Appends one list's contents to another.")
+            .icon(Items.BLAST_FURNACE)
+            .category(ScriptActionCategory.LISTS)
+            .arg("Base List", ScriptActionArgumentType.VARIABLE)
+            .arg("Other List", ScriptActionArgumentType.LIST)
+            .action(ctx -> {
+
+                List<ScriptValue> receiver = ctx.value("Receiving List").asList();
+                List<ScriptValue> donor = ctx.value("Other List").asList();
+
+                receiver.addAll(donor);
+
+                ctx.context().setVariable(ctx.variable("Receiving List").name(), new ScriptListValue(receiver));
+            })),
+
     GET_LIST_VALUE(builder -> builder.name("Get List Value")
         .description("Gets a value from a list.")
         .icon(Items.BOOK)
@@ -493,6 +509,21 @@ public enum ScriptActionType {
             }
         })),
 
+    IF_MATCHES_REGEX(builder -> builder.name("If Matches Regex")
+            .description("Checks if a text matches a regex.")
+            .icon(Items.ANVIL)
+            .category(ScriptActionCategory.TEXTS)
+            .arg("Text", ScriptActionArgumentType.TEXT)
+            .arg("Regex", ScriptActionArgumentType.TEXT)
+            .hasChildren(true)
+            .action(ctx -> {
+                String text = ctx.value("Text").asText();
+                String regex = ctx.value("Regex").asText();
+                if (text.matches(regex)) {
+                    ctx.scheduleInner();
+                }
+            })),
+
     IF_STARTS_WITH(builder -> builder.name("If Starts With")
         .description("Checks if a text starts with an other.")
         .icon(Items.FEATHER)
@@ -568,8 +599,25 @@ public enum ScriptActionType {
         .icon(Items.ENDER_CHEST)
         .category(ScriptActionCategory.DICTIONARIES)
         .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Keys", ScriptActionArgumentType.LIST, b -> b.optional(true))
+        .arg("Values", ScriptActionArgumentType.LIST, b -> b.optional(true))
         .action(ctx -> {
-            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptDictionaryValue(new HashMap<>()));
+
+            HashMap<String, ScriptValue> dict = new HashMap<String, ScriptValue>();
+
+                if (ctx.argMap().containsKey("Keys") && ctx.argMap().containsKey("Values")) {
+                    List<ScriptValue> keys = ctx.value("Keys").asList();
+                    List<ScriptValue> values = ctx.value("Values").asList();
+
+                    // make sure we don't iterate past the end of a list
+                    int lowerLength = Math.min(keys.size(), values.size());
+
+                    for (int i = 0; i < lowerLength; i++) {
+                        dict.put(keys.get(i).asText(), values.get(i));
+                    }
+                }
+
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptDictionaryValue(dict));
         })),
 
     GET_DICT_VALUE(builder -> builder.name("Get Dictionary Value")
