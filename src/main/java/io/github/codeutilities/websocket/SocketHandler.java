@@ -1,5 +1,6 @@
 package io.github.codeutilities.websocket;
 
+import io.github.codeutilities.loader.Loadable;
 import io.github.codeutilities.websocket.client.SocketClient;
 import io.github.codeutilities.websocket.client.WebsocketServer;
 import io.github.codeutilities.websocket.client.type.NbtItem;
@@ -15,7 +16,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SocketHandler {
+public class SocketHandler implements Loadable {
 
     private static SocketHandler instance;
 
@@ -25,44 +26,46 @@ public class SocketHandler {
     private ServerSocket serverSocket;
     private WebsocketServer webSocketServer;
 
+
+    @Override
+    public void load() {
+            instance = this;
+
+            this.addSocketItem(new NbtItem(), new TemplateItem(), new RawTemplateItem());
+            try {
+                serverSocket = new ServerSocket(31372);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (serverSocket == null) {
+                return;
+            }
+
+            ExecutorService serverService = Executors.newSingleThreadExecutor();
+            serverService.submit(() -> {
+                System.out.println("Opened socket listener");
+                while (true) {
+                    try {
+                        SocketClient client = new SocketClient(serverSocket.accept());
+                        this.register(client);
+                        System.out.println("Clients connected on local server: " + client.getSocket());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            webSocketServer = new WebsocketServer(new InetSocketAddress("localhost", 31371));
+            try {
+                new Thread(webSocketServer, "Item-API-Websocket-Thread").start();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     public static SocketHandler getInstance() {
         return instance;
-    }
-
-    public SocketHandler() {
-        instance = this;
-
-        this.addSocketItem(new NbtItem(), new TemplateItem(), new RawTemplateItem());
-        try {
-            serverSocket = new ServerSocket(31372);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (serverSocket == null) {
-            return;
-        }
-
-        ExecutorService serverService = Executors.newSingleThreadExecutor();
-        serverService.submit(() -> {
-            System.out.println("Opened socket listener");
-            while (true) {
-                try {
-                    SocketClient client = new SocketClient(serverSocket.accept());
-                    this.register(client);
-                    System.out.println("Clients connected on local server: " + client.getSocket());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        webSocketServer = new WebsocketServer(new InetSocketAddress("localhost", 31371));
-        try {
-            new Thread(webSocketServer, "Item-API-Websocket-Thread").start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void addSocketItem(SocketItem... items) {
@@ -96,4 +99,5 @@ public class SocketHandler {
             socket.send(message);
         }
     }
+
 }

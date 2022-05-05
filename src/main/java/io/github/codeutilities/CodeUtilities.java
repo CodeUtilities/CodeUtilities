@@ -77,7 +77,7 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new AutomationFeature());
         loader.load(new Client());
         loader.load(new StreamerModeListeners());
-        new SocketHandler();
+        loader.load(new SocketHandler());
 
         CodeInitializer initializer = new CodeInitializer();
         initializer.add(new ConfigFile());
