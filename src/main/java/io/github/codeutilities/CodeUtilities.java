@@ -20,6 +20,7 @@ import io.github.codeutilities.loader.Loader;
 import io.github.codeutilities.loader.v2.CodeInitializer;
 import io.github.codeutilities.script.ScriptManager;
 import io.github.codeutilities.util.Scheduler;
+import io.github.codeutilities.websocket.SocketHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -76,6 +77,7 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new AutomationFeature());
         loader.load(new Client());
         loader.load(new StreamerModeListeners());
+        loader.load(new SocketHandler());
 
         CodeInitializer initializer = new CodeInitializer();
         initializer.add(new ConfigFile());
