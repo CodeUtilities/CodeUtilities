@@ -922,7 +922,7 @@ public enum ScriptActionType {
         .arg("Text",ScriptActionArgumentType.TEXT)
         .arg("Subtext",ScriptActionArgumentType.TEXT)
         .action(ctx -> {
-            int result = ctx.value("Text").asText().indexOf(ctx.value("Subtext").asText());
+            int result = ctx.value("Text").asText().indexOf(ctx.value("Subtext").asText()) + 1;
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(result));
         })),
 
@@ -936,10 +936,21 @@ public enum ScriptActionType {
         .arg("Last Index",ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
             String text = ctx.value("Text").asText();
-            int start = (int)ctx.value("First Index").asNumber();
-            int end = (int)ctx.value("Last Index").asNumber()+1;
+            int start = (int)ctx.value("First Index").asNumber()+1;
+            int end = (int)ctx.value("Last Index").asNumber();
             String result = text.substring(start, end);
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptTextValue(result));
+        })),
+
+    TEXT_LENGTH(builder -> builder.name("Get Text Length")
+        .description("Get the length of a text value.")
+        .icon(Items.BOOKSHELF)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Result",ScriptActionArgumentType.VARIABLE)
+        .arg("Text",ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(text.length()));
         }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
