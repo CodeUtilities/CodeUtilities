@@ -157,7 +157,7 @@ public enum ScriptActionType {
                 value -= val.asNumber();
             }
             ctx.context().setVariable(
-                ctx.variable("Result").name(),
+                ctx.variable("Variable").name(),
                 new ScriptNumberValue(value)
             );
         })),
