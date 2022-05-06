@@ -912,6 +912,34 @@ public enum ScriptActionType {
                 .collect(Collectors.joining(separator));
 
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptTextValue(result));
+        })),
+
+    TEXT_INDEX_OF(builder -> builder.name("Index Of Text")
+        .description("Gets the index of the first occurrence of a text within another text.")
+        .icon(Items.FLINT)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Result",ScriptActionArgumentType.VARIABLE)
+        .arg("Text",ScriptActionArgumentType.TEXT)
+        .arg("Subtext",ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int result = ctx.value("Text").asText().indexOf(ctx.value("Subtext").asText());
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(result));
+        })),
+
+    TEXT_SUBTEXT(builder -> builder.name("Get Subtext")
+        .description("Gets a piece of text within another text.")
+        .icon(Items.KNOWLEDGE_BOOK)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Result",ScriptActionArgumentType.VARIABLE)
+        .arg("Text",ScriptActionArgumentType.TEXT)
+        .arg("First Index",ScriptActionArgumentType.NUMBER)
+        .arg("Last Index",ScriptActionArgumentType.NUMBER)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            int start = (int)ctx.value("First Index").asNumber();
+            int end = (int)ctx.value("Last Index").asNumber()+1;
+            String result = text.substring(start, end);
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptTextValue(result));
         }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
