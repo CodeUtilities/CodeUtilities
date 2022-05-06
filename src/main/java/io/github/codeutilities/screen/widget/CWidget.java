@@ -7,7 +7,8 @@ public interface CWidget {
 
     void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta);
 
-    default void mouseClicked(double x, double y, int button) {
+    default boolean mouseClicked(double x, double y, int button) {
+        return false;
     }
 
     default void charTyped(char ch, int keyCode) {
