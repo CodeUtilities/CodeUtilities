@@ -15,7 +15,7 @@ public interface ScriptArgument {
 
     ScriptValue getValue(Event event, ScriptContext context);
 
-    boolean is(ScriptActionArgumentType type);
+    boolean convertableTo(ScriptActionArgumentType type);
 
     class Serializer implements JsonDeserializer<ScriptArgument> {
 

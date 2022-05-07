@@ -34,7 +34,6 @@ public class ScriptEditScreen extends CScreen {
         this.script = script;
         panel = new CScrollPanel(0, 3, 120, 94);
         widgets.add(panel);
-        panel.setScroll(scroll);
 
         int y = 5;
         int index = 0;
@@ -172,6 +171,7 @@ public class ScriptEditScreen extends CScreen {
             CodeUtilities.MC.setScreen(new ScriptActionCategoryScreen(script, script.getParts().size()));
         });
         panel.add(add);
+        panel.setScroll(scroll);
     }
 
     @Override

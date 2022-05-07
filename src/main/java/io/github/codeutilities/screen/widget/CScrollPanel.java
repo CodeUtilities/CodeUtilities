@@ -141,7 +141,6 @@ public class CScrollPanel implements CWidget {
     }
 
     public void setScroll(int s) {
-        System.out.println("Set scroll to " + s);
         scroll = s;
 
         if (scroll < -getMaxScroll()) {

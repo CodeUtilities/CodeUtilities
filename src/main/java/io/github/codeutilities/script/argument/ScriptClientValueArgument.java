@@ -168,8 +168,8 @@ public enum ScriptClientValueArgument implements ScriptArgument {
     }
 
     @Override
-    public boolean is(ScriptActionArgumentType type) {
-        return type == this.type;
+    public boolean convertableTo(ScriptActionArgumentType type) {
+        return this.type.convertableTo(type);
     }
 
     public static class Serializer implements JsonSerializer<ScriptClientValueArgument> {

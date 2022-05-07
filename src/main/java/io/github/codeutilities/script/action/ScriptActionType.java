@@ -118,8 +118,9 @@ public enum ScriptActionType {
             if (ctx.argMap().containsKey("Current")) {
                 ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(1));
             }
-            for (int i = (int) ctx.value("Times").asNumber(); i > 1; i--) {
-                int current = i;
+            for (int i = (int) ctx.value("Times").asNumber(); i > 0; i--) {
+                int current = i+1;
+                System.out.println("Current: " + current);
                 ctx.scheduleInner(() -> {
                     if (ctx.argMap().containsKey("Current")) {
                         ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(current));
@@ -1456,13 +1457,13 @@ public enum ScriptActionType {
                 if (pos >= ctx.arguments().size()) {
                     continue search;
                 }
-                if (arg.type().is(ctx.arguments().get(pos))) {
+                if (ctx.arguments().get(pos).convertableTo(arg.type())) {
                     args.add(ctx.arguments().get(pos));
                     pos++;
                 }
                 if (arg.plural()) {
                     while (pos < ctx.arguments().size()) {
-                        if (arg.type().is(ctx.arguments().get(pos))) {
+                        if (ctx.arguments().get(pos).convertableTo(arg.type())) {
                             args.add(ctx.arguments().get(pos));
                             pos++;
                         } else {
