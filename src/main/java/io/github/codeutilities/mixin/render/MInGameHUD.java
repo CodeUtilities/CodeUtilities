@@ -1,13 +1,13 @@
 package io.github.codeutilities.mixin.render;
 
 import io.github.codeutilities.CodeUtilities;
-import io.github.codeutilities.config.Config;
+import io.github.codeutilities.event.HudRenderEvent;
+import io.github.codeutilities.event.system.EventManager;
 import io.github.codeutilities.features.LagslayerHUD;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,6 +18,7 @@ public class MInGameHUD {
     @Inject(method = "renderStatusEffectOverlay", at = @At("RETURN"))
     private void renderStatusEffectOverlay(MatrixStack stack, CallbackInfo ci) {
         LagslayerHUD.onRender(stack);
+        EventManager.getInstance().dispatch(new HudRenderEvent(stack));
 
         MinecraftClient mc = CodeUtilities.MC;
         TextRenderer tr = mc.textRenderer;

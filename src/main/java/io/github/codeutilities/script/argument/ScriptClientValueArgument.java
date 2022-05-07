@@ -4,17 +4,22 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.event.KeyPressEvent;
 import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.SendChatEvent;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
 import io.github.codeutilities.script.execution.ScriptContext;
+import io.github.codeutilities.script.util.ScriptValueItem;
+import io.github.codeutilities.script.values.ScriptListValue;
 import io.github.codeutilities.script.values.ScriptNumberValue;
 import io.github.codeutilities.script.values.ScriptTextValue;
 import io.github.codeutilities.script.values.ScriptValue;
 import io.github.codeutilities.util.ComponentUtil;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -60,7 +65,63 @@ public enum ScriptClientValueArgument implements ScriptArgument {
         }
     }),
 
-    TIMESTAMP("Timestamp","The current timestamp in milliseconds.", Items.CLOCK, ScriptActionArgumentType.NUMBER, (event,context) -> new ScriptNumberValue(System.currentTimeMillis()));
+    TIMESTAMP("Timestamp","The current timestamp in milliseconds.", Items.CLOCK, ScriptActionArgumentType.NUMBER, (event,context) -> new ScriptNumberValue(System.currentTimeMillis())),
+
+    MAIN_HAND_ITEM("MainHandItem","The item in the players main hand.", Items.STONE_BUTTON, ScriptActionArgumentType.DICTIONARY,
+        (event,context) -> ScriptValueItem.valueFromItem(CodeUtilities.MC.player.getMainHandStack())
+    ),
+
+    OFF_HAND_ITEM("OffHandItem","The item in the players off hand.", Items.OAK_BUTTON, ScriptActionArgumentType.DICTIONARY,
+        (event,context) -> ScriptValueItem.valueFromItem(CodeUtilities.MC.player.getOffHandStack())
+    ),
+
+    FULL_INVENTORY("FullInventory","The entire inventory items of the player.", Items.OAK_PLANKS, ScriptActionArgumentType.LIST, (event,context) -> {
+        List<ScriptValue> list = new ArrayList<>();
+        for (int i = 0; i < CodeUtilities.MC.player.getInventory().size(); i++) {
+            list.add(ScriptValueItem.valueFromItem(CodeUtilities.MC.player.getInventory().getStack(i)));
+        }
+        return new ScriptListValue(list);
+    }),
+
+    MAIN_INVENTORY("MainInventory", "The main inventory items of the player.", Items.BIRCH_PLANKS, ScriptActionArgumentType.LIST, (event, context) -> {
+        List<ScriptValue> list = new ArrayList<>();
+        for (ItemStack item : CodeUtilities.MC.player.getInventory().main) {
+            list.add(ScriptValueItem.valueFromItem(item));
+        }
+        return new ScriptListValue(list);
+    }),
+
+    ARMOR("Armor", "The armor items of the player.", Items.IRON_CHESTPLATE, ScriptActionArgumentType.LIST, (event, context) -> {
+        List<ScriptValue> list = new ArrayList<>();
+        for (ItemStack item : CodeUtilities.MC.player.getInventory().armor) {
+            list.add(ScriptValueItem.valueFromItem(item));
+        }
+        return new ScriptListValue(list);
+    }),
+
+    HOTBAR_ITEMS("Hotbar Items", "The hotbar items of the player.", Items.IRON_AXE, ScriptActionArgumentType.LIST, (event, context) -> {
+        List<ScriptValue> list = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            list.add(ScriptValueItem.valueFromItem(CodeUtilities.MC.player.getInventory().getStack(i)));
+        }
+        return new ScriptListValue(list);
+    }),
+
+    SELECTED_SLOT("Selected Slot", "The selected hotbar slot.", Items.LIME_DYE, ScriptActionArgumentType.NUMBER,
+        (event, context) -> new ScriptNumberValue(CodeUtilities.MC.player.getInventory().selectedSlot)
+    ),
+
+    GAME_MODE("Game Mode", "The gamemode the player is in.", Items.BEDROCK, ScriptActionArgumentType.TEXT,
+        (event, context) -> new ScriptTextValue(CodeUtilities.MC.interactionManager.getCurrentGameMode().getName())
+    ),
+
+    WINDOW_WIDTH("Window Width", "The width of the current window.", Items.STICK, ScriptActionArgumentType.NUMBER,
+        (event, context) -> new ScriptNumberValue(CodeUtilities.MC.getWindow().getScaledWidth())
+    ),
+
+    WINDOW_HEIGHT("Window Height", "The height of the current window.", Items.STICK, ScriptActionArgumentType.NUMBER,
+        (event, context) -> new ScriptNumberValue(CodeUtilities.MC.getWindow().getScaledHeight())
+    );
 
     private final String name;
     private final ItemStack icon;
