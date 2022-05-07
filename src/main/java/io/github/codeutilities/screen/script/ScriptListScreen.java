@@ -25,10 +25,10 @@ public class ScriptListScreen extends CScreen {
 
     public ScriptListScreen() {
         super(90, 100);
-        CScrollPanel panel = new CScrollPanel(0, 0, 120, 100);
+        CScrollPanel panel = new CScrollPanel(0, 5, 120, 90);
         widgets.add(panel);
 
-        int y = 5;
+        int y = 0;
         for (Script s : ScriptManager.getInstance().getScripts()) {
             MutableText text = new LiteralText(s.getName());
             if (s.disabled()) {
@@ -36,7 +36,7 @@ public class ScriptListScreen extends CScreen {
             }
             panel.add(new CText(6, y + 2, text));
 
-            widgets.add(new CButton(3, y-1, 82, 10, "",() -> {}) {
+            panel.add(new CButton(3, y-1, 82, 10, "",() -> {}) {
                 @Override
                 public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
                     Rectangle b = getBounds();
@@ -89,7 +89,7 @@ public class ScriptListScreen extends CScreen {
         CButton add = new CButton(25, y, 40, 8, "Add", () -> {
             CodeUtilities.MC.setScreen(new ScriptCreationScreen());
         });
-        widgets.add(add);
+        panel.add(add);
     }
 
     @Override

@@ -1,23 +1,20 @@
 package io.github.codeutilities.util;
 
 import com.google.gson.JsonArray;
-import io.github.codeutilities.CodeUtilities;
-import it.unimi.dsi.fastutil.Hash;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
-
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.regex.Pattern;
 
 public class StringUtil {
     public static final Regex STRIP_CHARS_PATTERN = Regex.of("(^\\s+|\\s+$)");
@@ -146,4 +143,10 @@ public class StringUtil {
         return returnval;
     }
 
+    public static String toTitleCase(String input) {
+        return Stream.of(input.split(" "))
+                .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
+
+    }
 }

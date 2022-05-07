@@ -19,8 +19,8 @@ public record ScriptNumberArgument(double value) implements ScriptArgument {
     }
 
     @Override
-    public boolean is(ScriptActionArgumentType type) {
-        return type == ScriptActionArgumentType.NUMBER || type == ScriptActionArgumentType.TEXT;
+    public boolean convertableTo(ScriptActionArgumentType type) {
+        return ScriptActionArgumentType.NUMBER.convertableTo(type);
     }
 
     public static class Serializer implements JsonSerializer<ScriptNumberArgument> {

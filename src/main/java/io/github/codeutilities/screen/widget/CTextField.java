@@ -325,4 +325,8 @@ public class CTextField implements CWidget {
     public String getText() {
         return text;
     }
+
+    public void setText(String value) {
+        text = value;
+    }
 }

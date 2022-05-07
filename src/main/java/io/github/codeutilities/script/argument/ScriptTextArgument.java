@@ -19,8 +19,8 @@ public record ScriptTextArgument(String value) implements ScriptArgument {
     }
 
     @Override
-    public boolean is(ScriptActionArgumentType type) {
-        return type == ScriptActionArgumentType.TEXT;
+    public boolean convertableTo(ScriptActionArgumentType type) {
+        return ScriptActionArgumentType.TEXT.convertableTo(type);
     }
 
     public static class Serializer implements JsonSerializer<ScriptTextArgument> {

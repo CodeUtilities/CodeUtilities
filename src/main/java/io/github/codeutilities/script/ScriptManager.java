@@ -26,12 +26,12 @@ import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.File;
 import java.nio.file.FileSystems;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
@@ -180,7 +180,7 @@ public class ScriptManager implements Loadable {
         manager.register(HudRenderEvent.class, this::handleEvent);
     }
 
-    private void handleEvent(Event event) {
+    public void handleEvent(Event event) {
         for (Script script : scripts) {
             script.invoke(event);
         }

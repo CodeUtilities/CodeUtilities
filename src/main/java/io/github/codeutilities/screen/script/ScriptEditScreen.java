@@ -34,7 +34,6 @@ public class ScriptEditScreen extends CScreen {
         this.script = script;
         panel = new CScrollPanel(0, 3, 120, 94);
         widgets.add(panel);
-        panel.setScroll(scroll);
 
         int y = 5;
         int index = 0;
@@ -69,6 +68,7 @@ public class ScriptEditScreen extends CScreen {
                                 });
                                 CButton delete = new CButton((int) x, (int) y+16, 40, 8, "Delete", () -> {
                                     script.getParts().remove(currentIndex);
+                                    scroll = panel.getScroll();
                                     CodeUtilities.MC.setScreen(new ScriptEditScreen(script));
                                 });
                                 CodeUtilities.MC.send(() -> {
@@ -126,6 +126,7 @@ public class ScriptEditScreen extends CScreen {
 
                             if (button == 0) {
                                 if (sa.getType() != ScriptActionType.CLOSE_BRACKET) {
+                                    scroll = panel.getScroll();
                                     CodeUtilities.MC.setScreen(new ScriptEditActionScreen(sa, script));
                                 }
                             } else {
@@ -137,6 +138,7 @@ public class ScriptEditScreen extends CScreen {
                                 });
                                 CButton delete = new CButton((int) x, (int) y+16, 40, 8, "Delete", () -> {
                                     script.getParts().remove(currentIndex);
+                                    scroll = panel.getScroll();
                                     CodeUtilities.MC.setScreen(new ScriptEditScreen(script));
                                 });
                                 CodeUtilities.MC.send(() -> {
@@ -169,6 +171,7 @@ public class ScriptEditScreen extends CScreen {
             CodeUtilities.MC.setScreen(new ScriptActionCategoryScreen(script, script.getParts().size()));
         });
         panel.add(add);
+        panel.setScroll(scroll);
     }
 
     @Override
