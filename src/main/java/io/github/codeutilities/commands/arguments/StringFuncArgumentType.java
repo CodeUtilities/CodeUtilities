@@ -6,11 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.command.CommandSource;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import net.minecraft.command.CommandSource;
 
 public class StringFuncArgumentType implements ArgumentType<String> {
 
@@ -42,6 +41,7 @@ public class StringFuncArgumentType implements ArgumentType<String> {
         while (reader.canRead()) {
             if (this.greedy) reader.skip();
             else if (reader.peek() != ' ') reader.skip();
+            else break;
         }
 
         return reader.getString().substring(i, reader.getCursor());

@@ -1,5 +1,6 @@
 package io.github.codeutilities.script.action;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -12,6 +13,12 @@ import io.github.codeutilities.event.system.CancellableEvent;
 import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
+import io.github.codeutilities.script.menu.ScriptMenu;
+import io.github.codeutilities.script.menu.ScriptMenuButton;
+import io.github.codeutilities.script.menu.ScriptMenuItem;
+import io.github.codeutilities.script.menu.ScriptMenuText;
+import io.github.codeutilities.script.menu.ScriptMenuTextField;
+import io.github.codeutilities.script.menu.ScriptWidget;
 import io.github.codeutilities.script.util.ScriptValueItem;
 import io.github.codeutilities.script.util.ScriptValueJson;
 import io.github.codeutilities.script.values.ScriptDictionaryValue;
@@ -105,10 +112,19 @@ public enum ScriptActionType {
         .icon(Items.REDSTONE)
         .category(ScriptActionCategory.NUMBERS)
         .arg("Times", ScriptActionArgumentType.NUMBER)
+        .arg("Current", ScriptActionArgumentType.VARIABLE, b -> b.optional(true))
         .hasChildren(true)
         .action(ctx -> {
-            for (int i = 0; i < ctx.value("Times").asNumber(); i++) {
-                ctx.scheduleInner();
+            if (ctx.argMap().containsKey("Current")) {
+                ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(1));
+            }
+            for (int i = (int) ctx.value("Times").asNumber(); i > 1; i--) {
+                int current = i;
+                ctx.scheduleInner(() -> {
+                    if (ctx.argMap().containsKey("Current")) {
+                        ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(current));
+                    }
+                });
             }
         })),
 
@@ -715,6 +731,10 @@ public enum ScriptActionType {
         .hasChildren(true)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
+            if (!list.isEmpty()) {
+                ctx.context().setVariable(ctx.variable("Variable").name(), list.get(0));
+            }
+            Lists.reverse(list);
             for (ScriptValue item : list) {
                 ctx.scheduleInner(() -> {
                     ctx.context().setVariable(ctx.variable("Variable").name(), item);
@@ -777,26 +797,28 @@ public enum ScriptActionType {
         .description("Registers a /cmd completion.")
         .icon(Items.COMMAND_BLOCK)
         .category(ScriptActionCategory.MISC)
-        .arg("Command", ScriptActionArgumentType.TEXT)
+        .arg("Commands", ScriptActionArgumentType.TEXT, b -> b.plural(true))
         .action(ctx -> {
-            String[] args = ctx.value("Command").asText().split(" ", -1);
-            ArgumentBuilder<FabricClientCommandSource, ?> ab = RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString());
+            for (ScriptValue cmd : ctx.pluralValue("Commands")) {
+                String[] args = cmd.asText().split(" ", -1);
+                ArgumentBuilder<FabricClientCommandSource, ?> ab = RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString());
 
-            ab.executes(ctx2 -> 0);
+                ab.executes(ctx2 -> 0);
 
-            for (int i = args.length - 1; i >= 0; i--) {
-                LiteralArgumentBuilder<FabricClientCommandSource> l = LiteralArgumentBuilder.literal(args[i]);
-                l.then(ab);
-                ab = l;
-            }
+                for (int i = args.length - 1; i >= 0; i--) {
+                    LiteralArgumentBuilder<FabricClientCommandSource> l = LiteralArgumentBuilder.literal(args[i]);
+                    l.then(ab);
+                    ab = l;
+                }
 
-            if (ab instanceof LiteralArgumentBuilder lab) {
-                ClientCommandManager.DISPATCHER.register(lab);
-            }
+                if (ab instanceof LiteralArgumentBuilder lab) {
+                    ClientCommandManager.DISPATCHER.register(lab);
+                }
 
-            ClientPlayNetworkHandler nh = CodeUtilities.MC.getNetworkHandler();
-            if (nh != null) {
-                nh.onCommandTree(new CommandTreeS2CPacket(nh.getCommandDispatcher().getRoot()));
+                ClientPlayNetworkHandler nh = CodeUtilities.MC.getNetworkHandler();
+                if (nh != null) {
+                    nh.onCommandTree(new CommandTreeS2CPacket(nh.getCommandDispatcher().getRoot()));
+                }
             }
         })),
 
@@ -1118,6 +1140,214 @@ public enum ScriptActionType {
             Text t = ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(text));
             int width = CodeUtilities.MC.textRenderer.getWidth(t);
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(width));
+        })),
+
+    OPEN_MENU(builder -> builder.name("Open Menu")
+        .description("Opens a custom empty menu.")
+        .icon(Items.PAINTING)
+        .category(ScriptActionCategory.MENUS)
+        .arg("Width", ScriptActionArgumentType.NUMBER)
+        .arg("Height", ScriptActionArgumentType.NUMBER)
+        .action(ctx -> {
+            int width = (int) ctx.value("Width").asNumber();
+            int height = (int) ctx.value("Height").asNumber();
+
+            CodeUtilities.MC.setScreen(new ScriptMenu(width,height,ctx.script()));
+        })),
+
+    ADD_MENU_BUTTON(builder -> builder.name("Add Menu Button")
+        .description("Adds a button to an open custom menu.")
+        .icon(Items.CHISELED_STONE_BRICKS)
+        .category(ScriptActionCategory.MENUS)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .arg("Width", ScriptActionArgumentType.NUMBER)
+        .arg("Height", ScriptActionArgumentType.NUMBER)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+            int width = (int) ctx.value("Width").asNumber();
+            int height = (int) ctx.value("Height").asNumber();
+            String text = ctx.value("Text").asText();
+            String identifier = ctx.value("Identifier").asText();
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.widgets.add(new ScriptMenuButton(x,y,width,height,text,identifier,ctx.script()));
+                } else {
+                    ChatUtil.error("Unable to add button to menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to add button to menu! (Unknown menu type)");
+            }
+        })),
+
+    ADD_MENU_ITEM(builder -> builder.name("Add Menu Item")
+        .description("Adds an item to an open custom menu.")
+        .icon(Items.ITEM_FRAME)
+        .category(ScriptActionCategory.MENUS)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .arg("Item", ScriptActionArgumentType.DICTIONARY)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+            ItemStack item = ScriptValueItem.itemFromValue(ctx.value("Item"));
+            String identifier = ctx.value("Identifier").asText();
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.widgets.add(new ScriptMenuItem(x,y,item,identifier));
+                } else {
+                    ChatUtil.error("Unable to add item to menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to add item to menu! (Unknown menu type)");
+            }
+        })),
+
+    ADD_MENU_TEXT(builder -> builder.name("Add Menu Text")
+        .description("Adds text to an open custom menu.")
+        .icon(Items.WRITTEN_BOOK)
+        .category(ScriptActionCategory.MENUS)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+            String rawText = ctx.value("Text").asText();
+            String identifier = ctx.value("Identifier").asText();
+            Text text = ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(rawText));
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.widgets.add(new ScriptMenuText(x,y,text,0x333333, 1, false, false,identifier));
+                } else {
+                    ChatUtil.error("Unable to add text to menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to add text to menu! (Unknown menu type)");
+            }
+        })),
+
+    ADD_MENU_TEXT_FIELD(builder -> builder.name("Add Menu Text Field")
+        .description("Adds a text field to an open custom menu.")
+        .icon(Items.WRITABLE_BOOK)
+        .category(ScriptActionCategory.MENUS)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .arg("Width", ScriptActionArgumentType.NUMBER)
+        .arg("Height", ScriptActionArgumentType.NUMBER)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+            int width = (int) ctx.value("Width").asNumber();
+            int height = (int) ctx.value("Height").asNumber();
+            String identifier = ctx.value("Identifier").asText();
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.widgets.add(new ScriptMenuTextField("",x,y,width,height,false,identifier));
+                } else {
+                    ChatUtil.error("Unable to add text field to menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to add text field to menu! (Unknown menu type)");
+            }
+        })),
+
+    REMOVE_MENU_ELEMENT(builder -> builder.name("Remove Menu Element")
+        .description("Removes an element from an open custom menu.")
+        .icon(Items.TNT_MINECART)
+        .category(ScriptActionCategory.MENUS)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String identifier = ctx.value("Identifier").asText();
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.removeChild(identifier);
+                } else {
+                    ChatUtil.error("Unable to remove element from menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to remove element from menu! (Unknown menu type)");
+            }
+        })),
+
+    GET_MENU_TEXT_FIELD_VALUE(builder -> builder.name("Get Menu Text Field Value")
+        .description("Gets the text inside a text field in an open custom menu.")
+        .icon(Items.BOOKSHELF)
+        .category(ScriptActionCategory.MENUS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String identifier = ctx.value("Identifier").asText();
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    ScriptWidget w = menu.getWidget(identifier);
+
+                    if (w instanceof ScriptMenuTextField field) {
+                        ctx.context().setVariable(
+                            ctx.variable("Result").name(),
+                            new ScriptTextValue(field.getText())
+                        );
+                    } else {
+                        ChatUtil.error("Unable to get text field value! (Unknown widget type)");
+                    }
+                } else {
+                    ChatUtil.error("Unable to get text field value! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to get text field value! (Unknown menu type)");
+            }
+        })),
+
+    SET_MENU_TEXT_FIELD_VALUE(builder -> builder.name("Set Menu Text Field Value")
+        .description("Sets the text inside a text field in an open custom menu.")
+        .icon(Items.KNOWLEDGE_BOOK)
+        .category(ScriptActionCategory.MENUS)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .arg("Value", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String identifier = ctx.value("Identifier").asText();
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    ScriptWidget w = menu.getWidget(identifier);
+                    if (w instanceof ScriptMenuTextField field) {
+                        field.setText(ctx.value("Value").asText());
+                    } else {
+                        ChatUtil.error("Unable to set text field value! (Unknown widget type)");
+                    }
+                } else {
+                    ChatUtil.error("Unable to set text field value! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to set text field value! (Unknown menu type)");
+            }
+        })),
+    
+    RANDOM_NUMBER(builder -> builder.name("Random Number")
+        .description("Generates a random number between two other numbers.")
+        .icon(Items.HOPPER)
+        .category(ScriptActionCategory.NUMBERS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Min", ScriptActionArgumentType.NUMBER)
+        .arg("Max", ScriptActionArgumentType.NUMBER)
+        .action(ctx -> {
+            double min = ctx.value("Min").asNumber();
+            double max = ctx.value("Max").asNumber();
+            double result = Math.random() * (max - min) + min;
+            ctx.context().setVariable(
+                ctx.variable("Result").name(),
+                new ScriptNumberValue(result)
+            );
         }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {

@@ -11,6 +11,7 @@ import io.github.codeutilities.event.SendChatEvent;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
 import io.github.codeutilities.script.execution.ScriptContext;
+import io.github.codeutilities.script.menu.ScriptMenuClickButtonEvent;
 import io.github.codeutilities.script.util.ScriptValueItem;
 import io.github.codeutilities.script.values.ScriptListValue;
 import io.github.codeutilities.script.values.ScriptNumberValue;
@@ -121,7 +122,15 @@ public enum ScriptClientValueArgument implements ScriptArgument {
 
     WINDOW_HEIGHT("Window Height", "The height of the current window.", Items.STICK, ScriptActionArgumentType.NUMBER,
         (event, context) -> new ScriptNumberValue(CodeUtilities.MC.getWindow().getScaledHeight())
-    );
+    ),
+
+    MENU_ELEMENT_IDENTIFIER("Menu Element Identifier", "The identifier of the menu element that triggered the event.", Items.NAME_TAG, ScriptActionArgumentType.TEXT,(event, scriptContext) -> {
+        if (event instanceof ScriptMenuClickButtonEvent e) {
+            return new ScriptTextValue(e.identifier());
+        } else {
+            throw new IllegalStateException("The event is not a menu click event.");
+        }
+    });
 
     private final String name;
     private final ItemStack icon;

@@ -69,6 +69,7 @@ public class ScriptEditScreen extends CScreen {
                                 });
                                 CButton delete = new CButton((int) x, (int) y+16, 40, 8, "Delete", () -> {
                                     script.getParts().remove(currentIndex);
+                                    scroll = panel.getScroll();
                                     CodeUtilities.MC.setScreen(new ScriptEditScreen(script));
                                 });
                                 CodeUtilities.MC.send(() -> {
@@ -126,6 +127,7 @@ public class ScriptEditScreen extends CScreen {
 
                             if (button == 0) {
                                 if (sa.getType() != ScriptActionType.CLOSE_BRACKET) {
+                                    scroll = panel.getScroll();
                                     CodeUtilities.MC.setScreen(new ScriptEditActionScreen(sa, script));
                                 }
                             } else {
@@ -137,6 +139,7 @@ public class ScriptEditScreen extends CScreen {
                                 });
                                 CButton delete = new CButton((int) x, (int) y+16, 40, 8, "Delete", () -> {
                                     script.getParts().remove(currentIndex);
+                                    scroll = panel.getScroll();
                                     CodeUtilities.MC.setScreen(new ScriptEditScreen(script));
                                 });
                                 CodeUtilities.MC.send(() -> {

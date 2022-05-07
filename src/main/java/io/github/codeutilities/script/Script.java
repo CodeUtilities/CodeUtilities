@@ -143,6 +143,10 @@ public class Script {
         disabled = b;
     }
 
+    public ScriptContext getContext() {
+        return context;
+    }
+
     public static class Serializer implements JsonSerializer<Script>, JsonDeserializer<Script> {
 
         @Override

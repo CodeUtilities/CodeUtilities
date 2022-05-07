@@ -9,6 +9,7 @@ import io.github.codeutilities.event.ReceiveChatEvent;
 import io.github.codeutilities.event.SendChatEvent;
 import io.github.codeutilities.event.TickEvent;
 import io.github.codeutilities.event.system.Event;
+import io.github.codeutilities.script.menu.ScriptMenuClickButtonEvent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -37,7 +38,9 @@ public enum ScriptEventType {
 
     START_UP(ScriptStartUpEvent.class, "OnStartUp", "Executed when all scripts are being loaded.", Items.FIREWORK_ROCKET),
 
-    OVERLAY_EVENT(HudRenderEvent.class, "OnOverlay", "Executed when the overlay is being rendered.", Items.GREEN_STAINED_GLASS_PANE);
+    OVERLAY_EVENT(HudRenderEvent.class, "OnOverlay", "Executed when the overlay is being rendered.", Items.GREEN_STAINED_GLASS_PANE),
+
+    MENU_BUTTON_EVENT(ScriptMenuClickButtonEvent.class, "OnMenuButtonClick", "Executed when a player clicks a button inside a custom menu.", Items.CHISELED_STONE_BRICKS);
 
     private final String name;
     private final ItemStack icon;
