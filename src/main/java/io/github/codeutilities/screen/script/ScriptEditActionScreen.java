@@ -2,8 +2,10 @@ package io.github.codeutilities.screen.script;
 
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.screen.CScreen;
+import io.github.codeutilities.screen.widget.CButton;
 import io.github.codeutilities.screen.widget.CItem;
 import io.github.codeutilities.screen.widget.CText;
+import io.github.codeutilities.screen.widget.CWidget;
 import io.github.codeutilities.script.Script;
 import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.argument.ScriptArgument;
@@ -11,31 +13,25 @@ import io.github.codeutilities.script.argument.ScriptClientValueArgument;
 import io.github.codeutilities.script.argument.ScriptNumberArgument;
 import io.github.codeutilities.script.argument.ScriptTextArgument;
 import io.github.codeutilities.script.argument.ScriptVariableArgument;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
-import net.minecraft.util.Formatting;
 
 public class ScriptEditActionScreen extends CScreen {
 
     private final Script script;
+    private final List<CWidget> contextMenu = new ArrayList<>();
 
     public ScriptEditActionScreen(ScriptAction action, Script script) {
         super(90, 100);
         this.script = script;
-
-        ItemStack deleteIcon = new ItemStack(Items.RED_DYE);
-        deleteIcon.setCustomName(new LiteralText("Delete")
-            .fillStyle(Style.EMPTY
-                .withColor(Formatting.RED)
-                .withItalic(false)));
-
-        ItemStack addIcon = new ItemStack(Items.LIME_DYE);
-        addIcon.setCustomName(new LiteralText("Add")
-            .fillStyle(Style.EMPTY
-                .withColor(Formatting.GREEN)
-                .withItalic(false)));
 
         int y = 5;
         int index = 0;
@@ -64,35 +60,76 @@ public class ScriptEditActionScreen extends CScreen {
             widgets.add(new CItem(5, y, icon));
             widgets.add(new CText(15, y + 2, new LiteralText(text)));
 
-            CItem delete = new CItem(80, y, deleteIcon);
             int currentIndex = index;
-            delete.setClickListener((btn) -> {
-                action.getArguments().remove(currentIndex);
-                CodeUtilities.MC.setScreen(new ScriptEditActionScreen(action, script));
-            });
-            widgets.add(delete);
 
-            if (index != action.getArguments().size()) {
-                CItem add = new CItem(70, y-5, addIcon);
-                add.setClickListener((btn) ->
-                    CodeUtilities.MC.setScreen(new ScriptAddArgumentScreen(script, action, currentIndex))
-                );
-                widgets.add(add);
-            }
+
+            widgets.add(new CButton(5, y-1, 85, 10, "",() -> {}) {
+                @Override
+                public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
+                    Rectangle b = getBounds();
+                    if (b.contains(mouseX, mouseY)) {
+                        DrawableHelper.fill(stack, b.x, b.y, b.x + b.width, b.y + b.height, 0x33000000);
+                    }
+                }
+
+                @Override
+                public boolean mouseClicked(double x, double y, int button) {
+                    if (getBounds().contains(x, y)) {
+                        CodeUtilities.MC.getSoundManager().play(PositionedSoundInstance.ambient(SoundEvents.UI_BUTTON_CLICK, 1f,1f));
+
+                        if (button != 0) {
+                            CButton insertBefore = new CButton((int) x, (int) y, 40, 8, "Insert Before", () -> {
+                                CodeUtilities.MC.setScreen(new ScriptAddArgumentScreen(script, action, currentIndex));
+                            });
+                            CButton insertAfter = new CButton((int) x, (int) y+8, 40, 8, "Insert After", () -> {
+                                CodeUtilities.MC.setScreen(new ScriptAddArgumentScreen(script, action, currentIndex+1));
+                            });
+                            CButton delete = new CButton((int) x, (int) y + 16, 40, 8, "Delete", () -> {
+                                action.getArguments().remove(currentIndex);
+                                CodeUtilities.MC.setScreen(new ScriptEditActionScreen(action, script));
+                            });
+                            CodeUtilities.MC.send(() -> {
+                                widgets.add(insertBefore);
+                                widgets.add(insertAfter);
+                                widgets.add(delete);
+                                contextMenu.add(insertBefore);
+                                contextMenu.add(insertAfter);
+                                contextMenu.add(delete);
+                            });
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
 
             y += 10;
             index++;
+
         }
 
-        CItem add = new CItem(5, y, addIcon);
-        add.setClickListener((btn) ->
-            CodeUtilities.MC.setScreen(new ScriptAddArgumentScreen(script, action, action.getArguments().size()))
-        );
+        CButton add = new CButton(25, y, 40, 8, "Add", () -> {
+            CodeUtilities.MC.setScreen(new ScriptAddArgumentScreen(script, action, action.getArguments().size()));
+        });
         widgets.add(add);
     }
 
     @Override
     public void close() {
         CodeUtilities.MC.setScreen(new ScriptEditScreen(script));
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean b = super.mouseClicked(mouseX, mouseY, button);
+        clearContextMenu();
+        return b;
+    }
+
+    private void clearContextMenu() {
+        for (CWidget w : contextMenu) {
+            widgets.remove(w);
+        }
+        contextMenu.clear();
     }
 }

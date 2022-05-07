@@ -77,8 +77,10 @@ public class CScreen extends Screen {
         mouseX = translateMouseX(mouseX);
         mouseY = translateMouseY(mouseY);
 
-        for (CWidget cWidget : widgets) {
-            cWidget.mouseClicked(mouseX, mouseY, button);
+        for (int i = widgets.size() - 1; i >= 0; i--) {
+            if (widgets.get(i).mouseClicked(mouseX, mouseY, button)) {
+                break;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
