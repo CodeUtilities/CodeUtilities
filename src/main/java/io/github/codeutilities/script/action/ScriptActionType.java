@@ -31,8 +31,10 @@ import io.github.codeutilities.util.ComponentUtil;
 import io.github.codeutilities.util.FileUtil;
 import io.github.codeutilities.util.ItemUtil;
 import io.github.codeutilities.util.Scheduler;
+import io.github.codeutilities.util.StringUtil;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -120,7 +123,6 @@ public enum ScriptActionType {
             }
             for (int i = (int) ctx.value("Times").asNumber(); i > 0; i--) {
                 int current = i+1;
-                System.out.println("Current: " + current);
                 ctx.scheduleInner(() -> {
                     if (ctx.argMap().containsKey("Current")) {
                         ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(current));
@@ -901,10 +903,53 @@ public enum ScriptActionType {
                 pitch = ctx.value("Pitch").asNumber();
             }
 
-            SoundEvent snd = Registry.SOUND_EVENT.get(new Identifier(sound));
+            SoundEvent snd = null;
+
+            try {
+                snd = Registry.SOUND_EVENT.get(new Identifier(sound));
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+
+            String jname = sound.toUpperCase().replaceAll("\\.", "_").replaceAll(" ", "_").toUpperCase();
+            if (snd == null) {
+                try {
+                    Class<SoundEvents> clazz = SoundEvents.class;
+                    Field field = clazz.getField(jname);
+                    snd = (SoundEvent) field.get(null);
+                } catch (Exception err) {
+                    err.printStackTrace();
+                }
+            }
 
             if (snd != null) {
                 CodeUtilities.MC.getSoundManager().play(PositionedSoundInstance.master(snd, (float) volume, (float) pitch));
+            } else {
+                ChatUtil.error("Unknown sound: " + sound);
+
+                try {
+                    Class<SoundEvents> clazz = SoundEvents.class;
+
+                    List<String> similiar = new ArrayList<>();
+
+                    int counter = 0;
+                    for (Field field : clazz.getFields()) {
+                        String name = field.getName();
+                        if (name.contains(jname)) {
+                            similiar.add(StringUtil.toTitleCase(name.replaceAll("_", " ")));
+                            counter++;
+                            if (counter > 5) {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (similiar.size() > 0) {
+                        ChatUtil.error("Did you mean: " + String.join(", ", similiar));
+                    }
+                } catch (Exception err) {
+                    err.printStackTrace();
+                }
             }
         })),
 
