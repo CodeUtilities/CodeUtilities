@@ -16,6 +16,8 @@ public enum ScriptActionCategory {
     LISTS("Lists", Items.BOOKSHELF),
     TEXTS("Texts", Items.BOOK),
     DICTIONARIES("Dictionaries", Items.ENDER_CHEST),
+
+    MENUS("Menus", Items.PAINTING),
     ;
 
     private final ItemStack icon;

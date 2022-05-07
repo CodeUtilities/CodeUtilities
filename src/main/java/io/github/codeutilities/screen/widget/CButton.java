@@ -51,15 +51,16 @@ public class CButton implements CWidget {
     }
 
     @Override
-    public void mouseClicked(double x, double y, int button) {
+    public boolean mouseClicked(double x, double y, int button) {
         Rectangle rect = new Rectangle(this.x, this.y, width, height);
 
         if (rect.contains(x, y)) {
             CodeUtilities.MC.getSoundManager().play(PositionedSoundInstance.ambient(SoundEvents.UI_BUTTON_CLICK, 1f,1f));
             onClick.run();
+            return true;
         }
 
-        CWidget.super.mouseClicked(x, y, button);
+        return false;
     }
 
     @Override

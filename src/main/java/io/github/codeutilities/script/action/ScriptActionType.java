@@ -1,11 +1,26 @@
 package io.github.codeutilities.script.action;
 
+import com.google.common.collect.Lists;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import io.github.codeutilities.CodeUtilities;
+import io.github.codeutilities.event.HudRenderEvent;
 import io.github.codeutilities.event.system.CancellableEvent;
 import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
+import io.github.codeutilities.script.menu.ScriptMenu;
+import io.github.codeutilities.script.menu.ScriptMenuButton;
+import io.github.codeutilities.script.menu.ScriptMenuItem;
+import io.github.codeutilities.script.menu.ScriptMenuText;
+import io.github.codeutilities.script.menu.ScriptMenuTextField;
+import io.github.codeutilities.script.menu.ScriptWidget;
+import io.github.codeutilities.script.util.ScriptValueItem;
+import io.github.codeutilities.script.util.ScriptValueJson;
 import io.github.codeutilities.script.values.ScriptDictionaryValue;
 import io.github.codeutilities.script.values.ScriptListValue;
 import io.github.codeutilities.script.values.ScriptNumberValue;
@@ -13,8 +28,15 @@ import io.github.codeutilities.script.values.ScriptTextValue;
 import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
 import io.github.codeutilities.util.ComponentUtil;
+import io.github.codeutilities.util.FileUtil;
+import io.github.codeutilities.util.ItemUtil;
 import io.github.codeutilities.util.Scheduler;
+import io.github.codeutilities.util.StringUtil;
 import io.github.codeutilities.util.chat.ChatUtil;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +44,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.item.Item;
@@ -31,12 +54,14 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.GameMode;
 
 public enum ScriptActionType {
 
@@ -90,10 +115,19 @@ public enum ScriptActionType {
         .icon(Items.REDSTONE)
         .category(ScriptActionCategory.NUMBERS)
         .arg("Times", ScriptActionArgumentType.NUMBER)
+        .arg("Current", ScriptActionArgumentType.VARIABLE, b -> b.optional(true))
         .hasChildren(true)
         .action(ctx -> {
-            for (int i = 0; i < ctx.value("Times").asNumber(); i++) {
-                ctx.scheduleInner();
+            if (ctx.argMap().containsKey("Current")) {
+                ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(1));
+            }
+            for (int i = (int) ctx.value("Times").asNumber(); i > 0; i--) {
+                int current = i+1;
+                ctx.scheduleInner(() -> {
+                    if (ctx.argMap().containsKey("Current")) {
+                        ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(current));
+                    }
+                });
             }
         })),
 
@@ -142,7 +176,7 @@ public enum ScriptActionType {
                 value -= val.asNumber();
             }
             ctx.context().setVariable(
-                ctx.variable("Result").name(),
+                ctx.variable("Variable").name(),
                 new ScriptNumberValue(value)
             );
         })),
@@ -447,7 +481,7 @@ public enum ScriptActionType {
         .arg("Index", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
-         // force index consistent with diamondfire indexes
+            // force index consistent with diamondfire indexes
             int index = (int) ctx.value("Index").asNumber() - 1;
             if (index < 0 || index >= list.size()) {
                 return;
@@ -700,6 +734,10 @@ public enum ScriptActionType {
         .hasChildren(true)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
+            if (!list.isEmpty()) {
+                ctx.context().setVariable(ctx.variable("Variable").name(), list.get(0));
+            }
+            Lists.reverse(list);
             for (ScriptValue item : list) {
                 ctx.scheduleInner(() -> {
                     ctx.context().setVariable(ctx.variable("Variable").name(), item);
@@ -762,12 +800,29 @@ public enum ScriptActionType {
         .description("Registers a /cmd completion.")
         .icon(Items.COMMAND_BLOCK)
         .category(ScriptActionCategory.MISC)
-        .arg("Command", ScriptActionArgumentType.TEXT)
+        .arg("Commands", ScriptActionArgumentType.TEXT, b -> b.plural(true))
         .action(ctx -> {
-            ClientCommandManager.DISPATCHER.register(LiteralArgumentBuilder.literal(ctx.value("Command").asText()));
+            for (ScriptValue cmd : ctx.pluralValue("Commands")) {
+                String[] args = cmd.asText().split(" ", -1);
+                ArgumentBuilder<FabricClientCommandSource, ?> ab = RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString());
 
-            ClientPlayNetworkHandler nh = CodeUtilities.MC.getNetworkHandler();
-            nh.onCommandTree(new CommandTreeS2CPacket(nh.getCommandDispatcher().getRoot()));
+                ab.executes(ctx2 -> 0);
+
+                for (int i = args.length - 1; i >= 0; i--) {
+                    LiteralArgumentBuilder<FabricClientCommandSource> l = LiteralArgumentBuilder.literal(args[i]);
+                    l.then(ab);
+                    ab = l;
+                }
+
+                if (ab instanceof LiteralArgumentBuilder lab) {
+                    ClientCommandManager.DISPATCHER.register(lab);
+                }
+
+                ClientPlayNetworkHandler nh = CodeUtilities.MC.getNetworkHandler();
+                if (nh != null) {
+                    nh.onCommandTree(new CommandTreeS2CPacket(nh.getCommandDispatcher().getRoot()));
+                }
+            }
         })),
 
     IF_GUI_OPEN(builder -> builder.name("If GUI Open")
@@ -848,10 +903,53 @@ public enum ScriptActionType {
                 pitch = ctx.value("Pitch").asNumber();
             }
 
-            SoundEvent snd = Registry.SOUND_EVENT.get(new Identifier(sound));
+            SoundEvent snd = null;
+
+            try {
+                snd = Registry.SOUND_EVENT.get(new Identifier(sound));
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+
+            String jname = sound.toUpperCase().replaceAll("\\.", "_").replaceAll(" ", "_").toUpperCase();
+            if (snd == null) {
+                try {
+                    Class<SoundEvents> clazz = SoundEvents.class;
+                    Field field = clazz.getField(jname);
+                    snd = (SoundEvent) field.get(null);
+                } catch (Exception err) {
+                    err.printStackTrace();
+                }
+            }
 
             if (snd != null) {
                 CodeUtilities.MC.getSoundManager().play(PositionedSoundInstance.master(snd, (float) volume, (float) pitch));
+            } else {
+                ChatUtil.error("Unknown sound: " + sound);
+
+                try {
+                    Class<SoundEvents> clazz = SoundEvents.class;
+
+                    List<String> similiar = new ArrayList<>();
+
+                    int counter = 0;
+                    for (Field field : clazz.getFields()) {
+                        String name = field.getName();
+                        if (name.contains(jname)) {
+                            similiar.add(StringUtil.toTitleCase(name.replaceAll("_", " ")));
+                            counter++;
+                            if (counter > 5) {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (similiar.size() > 0) {
+                        ChatUtil.error("Did you mean: " + String.join(", ", similiar));
+                    }
+                } catch (Exception err) {
+                    err.printStackTrace();
+                }
             }
         })),
 
@@ -951,6 +1049,362 @@ public enum ScriptActionType {
         .action(ctx -> {
             String text = ctx.value("Text").asText();
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(text.length()));
+        })),
+          
+    READ_FILE(builder -> builder.name("Read File")
+        .description("Reads a file from the scripts folder.")
+        .icon(Items.WRITTEN_BOOK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Filename", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String filename = ctx.value("Filename").asText();
+
+            if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
+                Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
+                if (Files.exists(f)) {
+                    try {
+                        String content = FileUtil.readFile(f);
+                        JsonElement json = JsonParser.parseString(content);
+                        ScriptValue value = ScriptValueJson.fromJson(json);
+                        ctx.context().setVariable(ctx.variable("Result").name(), value);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        ChatUtil.error("Internal error while reading file.");
+                    }
+                }
+            } else {
+                ChatUtil.error("Illegal filename: " + filename);
+            }
+        })),
+
+    WRITE_FILE(builder -> builder.name("Write File")
+        .description("Writes a file to the scripts folder.")
+        .icon(Items.WRITABLE_BOOK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Filename", ScriptActionArgumentType.TEXT)
+        .arg("Content", ScriptActionArgumentType.ANY)
+        .action(ctx -> {
+            String filename = ctx.value("Filename").asText();
+            ScriptValue value = ctx.value("Content");
+
+            if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
+                Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
+                try {
+                    f.toFile().getParentFile().mkdirs();
+                    FileUtil.writeFile(f, ScriptValueJson.toJson(value).toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    ChatUtil.error("Internal error while writing file.");
+                }
+            } else {
+                ChatUtil.error("Illegal filename: " + filename);
+            }
+        })),
+
+    IF_FILE_EXISTS(builder -> builder.name("If File Exists")
+        .description("Executes if the specified file exists.")
+        .icon(Items.BOOK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Filename", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .action(ctx -> {
+            String filename = ctx.value("Filename").asText();
+            if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
+                Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
+                if (Files.exists(f)) {
+                    ctx.scheduleInner();
+                }
+            } else {
+                ChatUtil.error("Illegal filename: " + filename);
+            }
+        })),
+
+    PARSE_NUMBER(builder -> builder.name("Parse Number")
+        .description("Parses a number from a text.")
+        .icon(Items.ANVIL)
+        .category(ScriptActionCategory.NUMBERS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            try {
+                ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(Double.parseDouble(text)));
+            } catch (NumberFormatException e) {
+                ctx.context().setVariable(ctx.variable("Result").name(), new ScriptUnknownValue());
+            }
+        })),
+
+    SET_HOTBAR_ITEM(builder -> builder.name("Set Hotbar Item")
+        .description("Sets a hotbar item. (Requires Creative)")
+        .icon(Items.IRON_AXE)
+        .category(ScriptActionCategory.ACTIONS)
+        .arg("Slot", ScriptActionArgumentType.NUMBER)
+        .arg("Item", ScriptActionArgumentType.DICTIONARY)
+        .action(ctx -> {
+            int slot = (int) ctx.value("Slot").asNumber();
+            ItemStack item = ScriptValueItem.itemFromValue(ctx.value("Item"));
+
+            if (CodeUtilities.MC.interactionManager.getCurrentGameMode() == GameMode.CREATIVE) {
+                CodeUtilities.MC.interactionManager.clickCreativeStack(item, slot + 36);
+                CodeUtilities.MC.player.getInventory().setStack(slot, item);
+            } else {
+                ChatUtil.error("Unable to set hotbar item! (Not in creative mode)");
+            }
+        })),
+
+    GIVE_ITEM(builder -> builder.name("Give Item")
+        .description("Gives the player an item. (Requires Creative)")
+        .icon(Items.CHEST)
+        .category(ScriptActionCategory.ACTIONS)
+        .arg("Item", ScriptActionArgumentType.DICTIONARY)
+        .action(ctx -> {
+            ItemStack item = ScriptValueItem.itemFromValue(ctx.value("Item"));
+
+            if (CodeUtilities.MC.interactionManager.getCurrentGameMode() == GameMode.CREATIVE) {
+                ItemUtil.giveCreativeItem(item,true);
+            } else {
+                ChatUtil.error("Unable to set hotbar item! (Not in creative mode)");
+            }
+        })),
+
+    DRAW_TEXT(builder -> builder.name("Draw Text")
+        .description("Draws text on the screen.")
+        .icon(Items.NAME_TAG)
+        .category(ScriptActionCategory.VISUALS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+
+            if (ctx.event() instanceof HudRenderEvent event) {
+                Text t = ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(text));
+                CodeUtilities.MC.textRenderer.drawWithShadow(event.stack(),t,x,y, 0xFFFFFF);
+            }
+        })),
+
+    MEASURE_TEXT(builder -> builder.name("Measure Text")
+        .description("Measures the width of a text in pixels.")
+        .icon(Items.STICK)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            Text t = ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(text));
+            int width = CodeUtilities.MC.textRenderer.getWidth(t);
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(width));
+        })),
+
+    OPEN_MENU(builder -> builder.name("Open Menu")
+        .description("Opens a custom empty menu.")
+        .icon(Items.PAINTING)
+        .category(ScriptActionCategory.MENUS)
+        .arg("Width", ScriptActionArgumentType.NUMBER)
+        .arg("Height", ScriptActionArgumentType.NUMBER)
+        .action(ctx -> {
+            int width = (int) ctx.value("Width").asNumber();
+            int height = (int) ctx.value("Height").asNumber();
+
+            CodeUtilities.MC.setScreen(new ScriptMenu(width,height,ctx.script()));
+        })),
+
+    ADD_MENU_BUTTON(builder -> builder.name("Add Menu Button")
+        .description("Adds a button to an open custom menu.")
+        .icon(Items.CHISELED_STONE_BRICKS)
+        .category(ScriptActionCategory.MENUS)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .arg("Width", ScriptActionArgumentType.NUMBER)
+        .arg("Height", ScriptActionArgumentType.NUMBER)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+            int width = (int) ctx.value("Width").asNumber();
+            int height = (int) ctx.value("Height").asNumber();
+            String text = ctx.value("Text").asText();
+            String identifier = ctx.value("Identifier").asText();
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.widgets.add(new ScriptMenuButton(x,y,width,height,text,identifier,ctx.script()));
+                } else {
+                    ChatUtil.error("Unable to add button to menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to add button to menu! (Unknown menu type)");
+            }
+        })),
+
+    ADD_MENU_ITEM(builder -> builder.name("Add Menu Item")
+        .description("Adds an item to an open custom menu.")
+        .icon(Items.ITEM_FRAME)
+        .category(ScriptActionCategory.MENUS)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .arg("Item", ScriptActionArgumentType.DICTIONARY)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+            ItemStack item = ScriptValueItem.itemFromValue(ctx.value("Item"));
+            String identifier = ctx.value("Identifier").asText();
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.widgets.add(new ScriptMenuItem(x,y,item,identifier));
+                } else {
+                    ChatUtil.error("Unable to add item to menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to add item to menu! (Unknown menu type)");
+            }
+        })),
+
+    ADD_MENU_TEXT(builder -> builder.name("Add Menu Text")
+        .description("Adds text to an open custom menu.")
+        .icon(Items.WRITTEN_BOOK)
+        .category(ScriptActionCategory.MENUS)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+            String rawText = ctx.value("Text").asText();
+            String identifier = ctx.value("Identifier").asText();
+            Text text = ComponentUtil.fromString(ComponentUtil.andsToSectionSigns(rawText));
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.widgets.add(new ScriptMenuText(x,y,text,0x333333, 1, false, false,identifier));
+                } else {
+                    ChatUtil.error("Unable to add text to menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to add text to menu! (Unknown menu type)");
+            }
+        })),
+
+    ADD_MENU_TEXT_FIELD(builder -> builder.name("Add Menu Text Field")
+        .description("Adds a text field to an open custom menu.")
+        .icon(Items.WRITABLE_BOOK)
+        .category(ScriptActionCategory.MENUS)
+        .arg("X", ScriptActionArgumentType.NUMBER)
+        .arg("Y", ScriptActionArgumentType.NUMBER)
+        .arg("Width", ScriptActionArgumentType.NUMBER)
+        .arg("Height", ScriptActionArgumentType.NUMBER)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            int x = (int) ctx.value("X").asNumber();
+            int y = (int) ctx.value("Y").asNumber();
+            int width = (int) ctx.value("Width").asNumber();
+            int height = (int) ctx.value("Height").asNumber();
+            String identifier = ctx.value("Identifier").asText();
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.widgets.add(new ScriptMenuTextField("",x,y,width,height,false,identifier));
+                } else {
+                    ChatUtil.error("Unable to add text field to menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to add text field to menu! (Unknown menu type)");
+            }
+        })),
+
+    REMOVE_MENU_ELEMENT(builder -> builder.name("Remove Menu Element")
+        .description("Removes an element from an open custom menu.")
+        .icon(Items.TNT_MINECART)
+        .category(ScriptActionCategory.MENUS)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String identifier = ctx.value("Identifier").asText();
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    menu.removeChild(identifier);
+                } else {
+                    ChatUtil.error("Unable to remove element from menu! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to remove element from menu! (Unknown menu type)");
+            }
+        })),
+
+    GET_MENU_TEXT_FIELD_VALUE(builder -> builder.name("Get Menu Text Field Value")
+        .description("Gets the text inside a text field in an open custom menu.")
+        .icon(Items.BOOKSHELF)
+        .category(ScriptActionCategory.MENUS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String identifier = ctx.value("Identifier").asText();
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    ScriptWidget w = menu.getWidget(identifier);
+
+                    if (w instanceof ScriptMenuTextField field) {
+                        ctx.context().setVariable(
+                            ctx.variable("Result").name(),
+                            new ScriptTextValue(field.getText())
+                        );
+                    } else {
+                        ChatUtil.error("Unable to get text field value! (Unknown widget type)");
+                    }
+                } else {
+                    ChatUtil.error("Unable to get text field value! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to get text field value! (Unknown menu type)");
+            }
+        })),
+
+    SET_MENU_TEXT_FIELD_VALUE(builder -> builder.name("Set Menu Text Field Value")
+        .description("Sets the text inside a text field in an open custom menu.")
+        .icon(Items.KNOWLEDGE_BOOK)
+        .category(ScriptActionCategory.MENUS)
+        .arg("Identifier", ScriptActionArgumentType.TEXT)
+        .arg("Value", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            String identifier = ctx.value("Identifier").asText();
+
+            if (CodeUtilities.MC.currentScreen instanceof ScriptMenu menu) {
+                if (menu.ownedBy(ctx.script())) {
+                    ScriptWidget w = menu.getWidget(identifier);
+                    if (w instanceof ScriptMenuTextField field) {
+                        field.setText(ctx.value("Value").asText());
+                    } else {
+                        ChatUtil.error("Unable to set text field value! (Unknown widget type)");
+                    }
+                } else {
+                    ChatUtil.error("Unable to set text field value! (Not owned by script)");
+                }
+            } else {
+                ChatUtil.error("Unable to set text field value! (Unknown menu type)");
+            }
+        })),
+    
+    RANDOM_NUMBER(builder -> builder.name("Random Number")
+        .description("Generates a random number between two other numbers.")
+        .icon(Items.HOPPER)
+        .category(ScriptActionCategory.NUMBERS)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Min", ScriptActionArgumentType.NUMBER)
+        .arg("Max", ScriptActionArgumentType.NUMBER)
+        .action(ctx -> {
+            double min = ctx.value("Min").asNumber();
+            double max = ctx.value("Max").asNumber();
+            double result = Math.random() * (max - min) + min;
+            ctx.context().setVariable(
+                ctx.variable("Result").name(),
+                new ScriptNumberValue(result)
+            );
         }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
@@ -1059,13 +1513,13 @@ public enum ScriptActionType {
                 if (pos >= ctx.arguments().size()) {
                     continue search;
                 }
-                if (arg.type().is(ctx.arguments().get(pos))) {
+                if (ctx.arguments().get(pos).convertableTo(arg.type())) {
                     args.add(ctx.arguments().get(pos));
                     pos++;
                 }
                 if (arg.plural()) {
                     while (pos < ctx.arguments().size()) {
-                        if (arg.type().is(ctx.arguments().get(pos))) {
+                        if (ctx.arguments().get(pos).convertableTo(arg.type())) {
                             args.add(ctx.arguments().get(pos));
                             pos++;
                         } else {

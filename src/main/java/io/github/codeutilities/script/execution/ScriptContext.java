@@ -3,6 +3,9 @@ package io.github.codeutilities.script.execution;
 import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class ScriptContext {
 
@@ -19,4 +22,11 @@ public class ScriptContext {
         variables.put(name, value);
     }
 
+    public List<Entry<String, ScriptValue>> listVariables(String filter) {
+        return variables.entrySet().stream().filter(entry -> entry.getKey().contains(filter)).collect(Collectors.toList());
+    }
+
+    public int getVariableCount() {
+        return variables.size();
+    }
 }

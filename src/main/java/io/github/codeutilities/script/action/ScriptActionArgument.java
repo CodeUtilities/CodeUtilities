@@ -1,6 +1,5 @@
 package io.github.codeutilities.script.action;
 
-import io.github.codeutilities.script.argument.ScriptArgument;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -65,13 +64,6 @@ public class ScriptActionArgument {
         DICTIONARY,
         ANY;
 
-        public boolean is(ScriptArgument arg) {
-            if (this == ANY) {
-                return true;
-            }
-            return arg.is(this);
-        }
-
         public MutableText text() {
             MutableText val = new LiteralText(switch (this) {
                 case VARIABLE -> "Variable";
@@ -82,6 +74,12 @@ public class ScriptActionArgument {
                 case ANY -> "Any";
             });
             return val.fillStyle(Style.EMPTY.withItalic(false).withColor(Formatting.WHITE));
+        }
+        public boolean convertableTo(ScriptActionArgumentType to) {
+            return to == ANY
+                || to == TEXT
+                || this == VARIABLE
+                || this == to;
         }
     }
 }

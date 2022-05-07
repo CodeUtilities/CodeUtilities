@@ -17,9 +17,10 @@ public record ScriptVariableArgument(String name) implements ScriptArgument{
         return context.getVariable(name);
     }
 
+
     @Override
-    public boolean is(ScriptActionArgumentType type) {
-        return true;
+    public boolean convertableTo(ScriptActionArgumentType type) {
+        return ScriptActionArgumentType.VARIABLE.convertableTo(type);
     }
 
     public static class Serializer implements JsonSerializer<ScriptVariableArgument> {

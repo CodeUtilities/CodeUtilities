@@ -26,6 +26,9 @@ public class CScrollPanel implements CWidget {
         stack.push();
         stack.translate(x, y, 0);
 
+        mouseX -= x;
+        mouseY -= y;
+
         Vector4f begin = new Vector4f(0, 0, 1, 1);
         Vector4f end = new Vector4f(width, height, 1, 1);
         begin.transform(stack.peek().getPositionMatrix());
@@ -51,11 +54,16 @@ public class CScrollPanel implements CWidget {
     }
 
     @Override
-    public void mouseClicked(double x, double y, int button) {
+    public boolean mouseClicked(double x, double y, int button) {
         y -= scroll;
-        for (CWidget child : children) {
-            child.mouseClicked(x, y, button);
+        x -= this.x;
+        y -= this.y;
+        for (int i = children.size() - 1; i >= 0; i--) {
+            if (children.get(i).mouseClicked(x, y, button)) {
+                return true;
+            }
         }
+        return false;
     }
 
     @Override
@@ -74,6 +82,8 @@ public class CScrollPanel implements CWidget {
 
     @Override
     public void mouseScrolled(double mouseX, double mouseY, double amount) {
+        mouseX -= x;
+        mouseY -= y;
         for (CWidget child : children) {
             child.mouseScrolled(mouseX, mouseY, amount);
         }
@@ -104,6 +114,9 @@ public class CScrollPanel implements CWidget {
     @Override
     public void renderOverlay(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
         mouseY -= scroll;
+
+        mouseX -= x;
+        mouseY -= y;
 
         stack.push();
         stack.translate(x, y, 0);
@@ -137,5 +150,9 @@ public class CScrollPanel implements CWidget {
         if (scroll > 0) {
             scroll = 0;
         }
+    }
+
+    public void remove(CWidget w) {
+        children.remove(w);
     }
 }

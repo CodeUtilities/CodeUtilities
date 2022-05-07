@@ -105,7 +105,7 @@ public class Script {
                         }
                     }
                 }
-                sa.invoke(task.event(), context, inner,task);
+                sa.invoke(task.event(), context, inner,task, this);
                 if (!task.isRunning()) {
                     return;
                 }
@@ -141,6 +141,10 @@ public class Script {
 
     public void setDisabled(boolean b) {
         disabled = b;
+    }
+
+    public ScriptContext getContext() {
+        return context;
     }
 
     public static class Serializer implements JsonSerializer<Script>, JsonDeserializer<Script> {

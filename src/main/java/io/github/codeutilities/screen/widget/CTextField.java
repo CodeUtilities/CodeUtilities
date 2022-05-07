@@ -3,7 +3,6 @@ package io.github.codeutilities.screen.widget;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.util.RenderUtil;
 import java.awt.Rectangle;
-import java.nio.FloatBuffer;
 import java.util.List;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
@@ -255,28 +254,32 @@ public class CTextField implements CWidget {
 
 
     @Override
-    public void mouseClicked(double x, double y, int button) {
+    public boolean mouseClicked(double x, double y, int button) {
         if (editable) {
             if (button == 0) {
-                TextRenderer f = CodeUtilities.MC.textRenderer;
+                if (x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height) {
+                    TextRenderer f = CodeUtilities.MC.textRenderer;
 
-                x -= 1 + this.x;
-                y -= 1 + this.y + scroll;
+                    x -= 1 + this.x;
+                    y -= 1 + this.y + scroll;
 
-                x *= 2;
-                y *= 2;
+                    x *= 2;
+                    y *= 2;
 
-                int line = (int) (y / f.fontHeight);
-                int pixelX = (int) (x);
-                line = Math.max(0, Math.min(line, getLines().length - 1));
-                int lineIndex = f.trimToWidth(getLine(line), pixelX, true).length();
-                setCursor(line, lineIndex);
+                    int line = (int) (y / f.fontHeight);
+                    int pixelX = (int) (x);
+                    line = Math.max(0, Math.min(line, getLines().length - 1));
+                    int lineIndex = f.trimToWidth(getLine(line), pixelX, true).length();
+                    setCursor(line, lineIndex);
 
-                if (hasSelection) {
-                    hasSelection = false;
+                    if (hasSelection) {
+                        hasSelection = false;
+                    }
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @Override
@@ -321,5 +324,9 @@ public class CTextField implements CWidget {
 
     public String getText() {
         return text;
+    }
+
+    public void setText(String value) {
+        text = value;
     }
 }
