@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.Script;
+import io.github.codeutilities.script.ScriptGroup;
 import io.github.codeutilities.script.ScriptPart;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
@@ -38,6 +39,11 @@ public class ScriptAction implements ScriptPart {
 
     public List<ScriptArgument> getArguments() {
         return arguments;
+    }
+
+    @Override
+    public ScriptGroup getGroup() {
+        return getType().getGroup();
     }
 
     public static class Serializer implements JsonSerializer<ScriptAction> {

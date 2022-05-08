@@ -2,6 +2,9 @@ package io.github.codeutilities.script.execution;
 
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.Script;
+import org.jetbrains.annotations.Debug;
+
+import static io.github.codeutilities.CodeUtilities.LOGGER;
 
 public class ScriptTask {
 

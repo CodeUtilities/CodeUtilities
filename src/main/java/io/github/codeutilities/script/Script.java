@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
@@ -15,6 +16,7 @@ import io.github.codeutilities.script.event.ScriptEvent;
 import io.github.codeutilities.script.execution.ScriptContext;
 import io.github.codeutilities.script.execution.ScriptPosStack;
 import io.github.codeutilities.script.execution.ScriptTask;
+import io.github.codeutilities.util.ComponentUtil;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.File;
@@ -114,6 +116,29 @@ public class Script {
                         return;
                     } else {
                         task.stack().pop();
+                    }
+                }
+                while(context.isForcedToEndScope())
+                {
+                    context.forceEndScope(-1);
+                    if (task.stack().isEmpty()) {
+                        return;
+                    } else {
+                        task.stack().pop();
+                    }
+                }
+                if(context.isLoopBroken())
+                {
+                    context.breakLoop(-1);
+                    int originalPos = task.stack().peekOriginal();
+                    while((task.stack().peekOriginal(1) == originalPos))
+                    {
+                        if(!task.stack().isEmpty())
+                            task.stack().pop();
+                    }
+                    if(task.stack().isEmpty())
+                    {
+                        return;
                     }
                 }
             } else {
