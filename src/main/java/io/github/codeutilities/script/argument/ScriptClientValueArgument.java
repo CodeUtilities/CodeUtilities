@@ -124,6 +124,14 @@ public enum ScriptClientValueArgument implements ScriptArgument {
         (event, context) -> new ScriptNumberValue(CodeUtilities.MC.getWindow().getScaledHeight())
     ),
 
+    PLAYER_NAME("Player Name", "The players name that is logged in.", Items.ENCHANTED_BOOK, ScriptActionArgumentType.TEXT,
+            (event, context) -> new ScriptTextValue(CodeUtilities.PLAYER_NAME)
+    ),
+
+    PLAYER_UUID("Player UUID", "The players uuid that is logged in.", Items.WRITABLE_BOOK, ScriptActionArgumentType.TEXT,
+            (event, context) -> new ScriptTextValue(CodeUtilities.PLAYER_UUID)
+    ),
+
     MENU_ELEMENT_IDENTIFIER("Menu Element Identifier", "The identifier of the menu element that triggered the event.", Items.NAME_TAG, ScriptActionArgumentType.TEXT,(event, scriptContext) -> {
         if (event instanceof ScriptMenuClickButtonEvent e) {
             return new ScriptTextValue(e.identifier());
