@@ -18,7 +18,7 @@ import java.util.List;
 
 public interface ScriptPart {
 
-    public ScriptGroup getGroup();
+    ScriptGroup getGroup();
 
     class Serializer implements JsonDeserializer<ScriptPart> {
 

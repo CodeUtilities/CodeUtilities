@@ -105,16 +105,13 @@ public class Script {
                         }
                     }
                 }
-                if(sa.getGroup() == ScriptGroup.CONDITION)
-                {
-                    if(sa.getType() != ScriptActionType.ELSE)
-                    {
+                if(sa.getGroup() == ScriptGroup.CONDITION) {
+                    if(sa.getType() != ScriptActionType.ELSE) {
                         context.setLastIfResult(false);
                     }
                     context.setScheduleInnerHandler(ctx -> { ctx.context().setLastIfResult(true); });
                 }
-                else
-                {
+                else {
                     context.setScheduleInnerHandler(null);
                 }
                 sa.invoke(task.event(), context, inner,task, this);
@@ -128,8 +125,7 @@ public class Script {
                         task.stack().pop();
                     }
                 }
-                while(context.isForcedToEndScope())
-                {
+                while(context.isForcedToEndScope()) {
                     context.forceEndScope(-1);
                     if (task.stack().isEmpty()) {
                         return;
@@ -137,17 +133,14 @@ public class Script {
                         task.stack().pop();
                     }
                 }
-                if(context.isLoopBroken())
-                {
+                if(context.isLoopBroken()) {
                     context.breakLoop(-1);
                     int originalPos = task.stack().peekOriginal();
-                    while((task.stack().peekOriginal(1) == originalPos))
-                    {
+                    while((task.stack().peekOriginal(1) == originalPos)) {
                         if(!task.stack().isEmpty())
                             task.stack().pop();
                     }
-                    if(task.stack().isEmpty())
-                    {
+                    if(task.stack().isEmpty()) {
                         return;
                     }
                 }
