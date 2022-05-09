@@ -37,10 +37,12 @@ public record ScriptActionContext(ScriptContext context, List<ScriptArgument> ar
     }
 
     public void scheduleInner(Runnable runnable) {
+        context.invokeScheduleInnerHandler(this);
         inner.accept(runnable);
     }
 
     public void scheduleInner() {
+        context.invokeScheduleInnerHandler(this);
         inner.accept(null);
     }
 }

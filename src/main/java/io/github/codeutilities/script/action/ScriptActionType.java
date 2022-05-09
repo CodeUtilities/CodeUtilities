@@ -1516,7 +1516,24 @@ public enum ScriptActionType {
                 ctx.variable("Result").name(),
                 new ScriptNumberValue(result)
             );
-        }));
+        })),
+
+    ELSE(builder -> builder.name("Else")
+            .description("Executes if the last IF statement failed.")
+        .icon(Items.END_STONE)
+        .category(ScriptActionCategory.MISC)
+        .group(ScriptGroup.CONDITION)
+        .hasChildren(true)
+        .action(ctx -> {
+            if(ctx.context().lastIfResult())
+            {
+                ctx.context().setLastIfResult(false);
+            }
+            else
+            {
+                ctx.scheduleInner();
+            }
+    }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
     };

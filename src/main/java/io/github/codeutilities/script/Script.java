@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
@@ -16,7 +15,6 @@ import io.github.codeutilities.script.event.ScriptEvent;
 import io.github.codeutilities.script.execution.ScriptContext;
 import io.github.codeutilities.script.execution.ScriptPosStack;
 import io.github.codeutilities.script.execution.ScriptTask;
-import io.github.codeutilities.util.ComponentUtil;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.File;
@@ -106,6 +104,18 @@ public class Script {
                             return;
                         }
                     }
+                }
+                if(sa.getGroup() == ScriptGroup.CONDITION)
+                {
+                    if(sa.getType() != ScriptActionType.ELSE)
+                    {
+                        context.setLastIfResult(false);
+                    }
+                    context.setScheduleInnerHandler(ctx -> { ctx.context().setLastIfResult(true); });
+                }
+                else
+                {
+                    context.setScheduleInnerHandler(null);
                 }
                 sa.invoke(task.event(), context, inner,task, this);
                 if (!task.isRunning()) {

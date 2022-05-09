@@ -2,19 +2,19 @@ package io.github.codeutilities.script.execution;
 
 import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
-import org.lwjgl.system.CallbackI;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import static io.github.codeutilities.CodeUtilities.LOGGER;
 
 public class ScriptContext {
 
     private int isForcedToEnd = 0;
+    private boolean lastIfResult = true;
 
+    private Consumer<ScriptActionContext> scheduleInnerHandler = null;
     public void forceEndScope(int times) {
         isForcedToEnd += times;
     }
@@ -55,6 +55,15 @@ public class ScriptContext {
         return breakLoop > 0;
     }
 
+    public boolean lastIfResult()
+    {
+        return lastIfResult;
+    }
+
+    public void setLastIfResult(boolean a)
+    {
+        lastIfResult = a;
+    }
     private final HashMap<String,ScriptValue> variables = new HashMap<>();
 
     public ScriptValue getVariable(String name) {
@@ -74,5 +83,15 @@ public class ScriptContext {
 
     public int getVariableCount() {
         return variables.size();
+    }
+
+    public void setScheduleInnerHandler(Consumer<ScriptActionContext> o) {
+        scheduleInnerHandler = o;
+    }
+
+    public void invokeScheduleInnerHandler(ScriptActionContext ctx)
+    {
+        if(scheduleInnerHandler == null) return;
+        scheduleInnerHandler.accept(ctx);
     }
 }
