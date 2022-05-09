@@ -38,10 +38,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
@@ -125,10 +122,6 @@ public enum ScriptActionType {
             }
             for (int i = (int) ctx.value("Times").asNumber(); i > 0; i--) {
                 int current = i+1;
-                /*if(ctx.context().processBreakLoop())
-                {
-                    break;
-                }*/
                 ctx.scheduleInner(() -> {
                     if (ctx.argMap().containsKey("Current")) {
                         ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(current));
@@ -558,20 +551,20 @@ public enum ScriptActionType {
         })),
 
     IF_MATCHES_REGEX(builder -> builder.name("If Matches Regex")
-            .description("Checks if a text matches a regex.")
-            .icon(Items.ANVIL)
-            .category(ScriptActionCategory.TEXTS)
-            .arg("Text", ScriptActionArgumentType.TEXT)
-            .arg("Regex", ScriptActionArgumentType.TEXT)
-            .hasChildren(true)
-            .group(ScriptGroup.CONDITION)
-            .action(ctx -> {
-                String text = ctx.value("Text").asText();
-                String regex = ctx.value("Regex").asText();
-                if (text.matches(regex)) {
-                    ctx.scheduleInner();
-                }
-            })),
+        .description("Checks if a text matches a regex.")
+        .icon(Items.ANVIL)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Regex", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            String regex = ctx.value("Regex").asText();
+            if (text.matches(regex)) {
+                ctx.scheduleInner();
+            }
+        })),
 
     IF_STARTS_WITH(builder -> builder.name("If Starts With")
         .description("Checks if a text starts with an other.")
@@ -637,20 +630,20 @@ public enum ScriptActionType {
         })),
 
     IF_DOESNT_MATCH_REGEX(builder -> builder.name("If Doesnt Match Regex")
-            .description("Checks if a text doesnt match a regex.")
-            .icon(Items.ANVIL)
-            .category(ScriptActionCategory.TEXTS)
-            .arg("Text", ScriptActionArgumentType.TEXT)
-            .arg("Regex", ScriptActionArgumentType.TEXT)
-            .hasChildren(true)
-            .group(ScriptGroup.CONDITION)
-            .action(ctx -> {
-                String text = ctx.value("Text").asText();
-                String regex = ctx.value("Regex").asText();
-                if (!text.matches(regex)) {
-                    ctx.scheduleInner();
-                }
-            })),
+        .description("Checks if a text doesnt match a regex.")
+        .icon(Items.ANVIL)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Regex", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            String regex = ctx.value("Regex").asText();
+            if (!text.matches(regex)) {
+                ctx.scheduleInner();
+            }
+        })),
 
     WAIT(builder -> builder.name("Wait")
         .description("Waits for a given amount of time.")
@@ -748,20 +741,20 @@ public enum ScriptActionType {
         })),
 
     IF_DICT_KEY_DOESNT_EXIST(builder -> builder.name("If Dictionary Key Doesnt Exist")
-            .description("Checks if a key doesnt exist in a dictionary.")
-            .icon(Items.NAME_TAG)
-            .category(ScriptActionCategory.DICTIONARIES)
-            .arg("Dictionary", ScriptActionArgumentType.DICTIONARY)
-            .arg("Key", ScriptActionArgumentType.TEXT)
-            .hasChildren(true)
-            .group(ScriptGroup.CONDITION)
-            .action(ctx -> {
-                HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
-                String key = ctx.value("Key").asText();
-                if (!dict.containsKey(key)) {
-                    ctx.scheduleInner();
-                }
-            })),
+        .description("Checks if a key doesnt exist in a dictionary.")
+        .icon(Items.NAME_TAG)
+        .category(ScriptActionCategory.DICTIONARIES)
+        .arg("Dictionary", ScriptActionArgumentType.DICTIONARY)
+        .arg("Key", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
+        .action(ctx -> {
+            HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
+            String key = ctx.value("Key").asText();
+            if (!dict.containsKey(key)) {
+                ctx.scheduleInner();
+            }
+        })),
 
     REMOVE_DICT_ENTRY(builder -> builder.name("Remove Dictionary Entry")
         .description("Removes a key from a dictionary.")
@@ -792,10 +785,6 @@ public enum ScriptActionType {
             }
             Lists.reverse(list);
             for (ScriptValue item : list) {
-                /*if(ctx.context().processBreakLoop())
-                {
-                    break;
-                }*/
                 ctx.scheduleInner(() -> {
                     ctx.context().setVariable(ctx.variable("Variable").name(), item);
                 });
@@ -814,10 +803,6 @@ public enum ScriptActionType {
         .action(ctx -> {
             HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
             for (Map.Entry<String, ScriptValue> entry : dict.entrySet()) {
-                /*if(ctx.context().processBreakLoop())
-                {
-                    break;
-                }*/
                 ctx.scheduleInner(() -> {
                     ctx.context().setVariable(ctx.variable("Key").name(), new ScriptTextValue(entry.getKey()));
                     ctx.context().setVariable(ctx.variable("Value").name(), entry.getValue());
@@ -948,42 +933,38 @@ public enum ScriptActionType {
         })),
 
     SKIP_ITERATION(builder -> builder.name("Skip Iteration")
-            .description("Skips the current iteration of the latest loop.")
-            .icon(Items.ENDER_PEARL)
-            .category(ScriptActionCategory.MISC)
-            .action(ctx -> {
-                int n = 0;
-                while(!(ctx.task().stack().peek(n) < 0))
-                {
-                    n++;
-                    int pos = ctx.task().stack().peek(n);
-                    ctx.context().forceEndScope();
-                    if(pos < 0 || ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION)
-                    {
-                        break;
-                    }
+        .description("Skips the current iteration of the latest loop.")
+        .icon(Items.ENDER_PEARL)
+        .category(ScriptActionCategory.MISC)
+        .action(ctx -> {
+            int n = 0;
+            while(!(ctx.task().stack().peek(n) < 0)) {
+                n++;
+                int pos = ctx.task().stack().peek(n);
+                ctx.context().forceEndScope();
+                if(pos < 0 || ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION) {
+                    break;
                 }
-            })),
+            }
+        })),
 
     STOP_REPETITION(builder -> builder.name("Stop Repetition")
-            .description("Stops the latest loop.")
-            .icon(Items.PRISMARINE_SHARD)
-            .category(ScriptActionCategory.MISC)
-            .action(ctx -> {
-                ctx.context().breakLoop();
-                int n = 0;
-                while(!(ctx.task().stack().peek(n) < 0))
-                {
-                    n++;
-                    int pos = ctx.task().stack().peek(n);
-                    ctx.context().forceEndScope();
-                    if(pos < 0 || ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION)
-                    {
-                        break;
-                    }
+        .description("Stops the latest loop.")
+        .icon(Items.PRISMARINE_SHARD)
+        .category(ScriptActionCategory.MISC)
+        .action(ctx -> {
+            ctx.context().breakLoop();
+            int n = 0;
+            while(!(ctx.task().stack().peek(n) < 0)) {
+                n++;
+                int pos = ctx.task().stack().peek(n);
+                ctx.context().forceEndScope();
+                if(pos < 0 || ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION) {
+                    break;
                 }
-                ctx.context().forceEndScope(-1);
-            })),
+            }
+            ctx.context().forceEndScope(-1);
+        })),
 
     PLAY_SOUND(builder -> builder.name("Play Sound")
         .description("Plays a sound.")
@@ -1213,23 +1194,23 @@ public enum ScriptActionType {
         })),
 
     IF_FILE_DOESNT_EXIST(builder -> builder.name("If File Doesnt Exist")
-            .description("Executes if the specified file doesnt exist.")
-            .icon(Items.BOOK)
-            .category(ScriptActionCategory.MISC)
-            .arg("Filename", ScriptActionArgumentType.TEXT)
-            .hasChildren(true)
-            .group(ScriptGroup.CONDITION)
-            .action(ctx -> {
-                String filename = ctx.value("Filename").asText();
-                if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
-                    Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
-                    if (!Files.exists(f)) {
-                        ctx.scheduleInner();
-                    }
-                } else {
-                    ChatUtil.error("Illegal filename: " + filename);
+        .description("Executes if the specified file doesnt exist.")
+        .icon(Items.BOOK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Filename", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
+        .action(ctx -> {
+            String filename = ctx.value("Filename").asText();
+            if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
+                Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
+                if (!Files.exists(f)) {
+                    ctx.scheduleInner();
                 }
-            })),
+            } else {
+                ChatUtil.error("Illegal filename: " + filename);
+            }
+        })),
 
     PARSE_NUMBER(builder -> builder.name("Parse Number")
         .description("Parses a number from a text.")
@@ -1516,7 +1497,22 @@ public enum ScriptActionType {
                 ctx.variable("Result").name(),
                 new ScriptNumberValue(result)
             );
-        }));
+        })),
+
+    ELSE(builder -> builder.name("Else")
+        .description(new String[]{"Executes if the last IF condition failed.","The ELSE doesn't have to be placed immediately after the IF condition.","And ELSE also works as a valid IF condition for ELSE."})
+        .icon(Items.END_STONE)
+        .category(ScriptActionCategory.MISC)
+        .group(ScriptGroup.CONDITION)
+        .hasChildren(true)
+        .action(ctx -> {
+            if(ctx.context().lastIfResult()) {
+                ctx.context().setLastIfResult(false);
+            }
+            else {
+                ctx.scheduleInner();
+            }
+    }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
     };
@@ -1524,15 +1520,13 @@ public enum ScriptActionType {
     private String name = "Unnamed Action";
     private boolean hasChildren = false;
     private ScriptActionCategory category = ScriptActionCategory.MISC;
-    private String description = "No description provided.";
-
+    private List<String> description = new ArrayList();
     private ScriptGroup group = ScriptGroup.ACTION;
     private final List<ScriptActionArgument> arguments = new ArrayList<>();
-
     ScriptActionType(Consumer<ScriptActionType> builder) {
+        description.add("No description provided.");
         builder.accept(this);
     }
-
     public ItemStack getIcon() {
         ItemStack item = new ItemStack(icon);
         item.setCustomName(new LiteralText(name)
@@ -1541,10 +1535,12 @@ public enum ScriptActionType {
                 .withItalic(false)));
 
         NbtList lore = new NbtList();
-        lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(description)
-            .fillStyle(Style.EMPTY
-                .withColor(Formatting.GRAY)
-                .withItalic(false)))));
+        for (String descriptionLine: description) {
+            lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(descriptionLine)
+                .fillStyle(Style.EMPTY
+                      .withColor(Formatting.GRAY)
+                      .withItalic(false)))));
+        }
 
         lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(""))));
 
@@ -1557,7 +1553,6 @@ public enum ScriptActionType {
 
         return item;
     }
-
     public String getName() {
         return name;
     }
@@ -1596,18 +1591,26 @@ public enum ScriptActionType {
     }
 
     private ScriptActionType description(String description) {
-        this.description = description;
+        this.description.clear();
+        this.description.add(description);
         return this;
     }
 
-    private ScriptActionType group(ScriptGroup group)
-    {
+    private ScriptActionType description(String[] description) {
+        this.description.clear();
+
+        for (String descriptionLine: description) {
+            this.description.add(descriptionLine);
+        }
+
+        return this;
+    }
+    private ScriptActionType group(ScriptGroup group) {
         this.group = group;
         return this;
     }
 
-    public ScriptGroup getGroup()
-    {
+    public ScriptGroup getGroup() {
         return group;
     }
 

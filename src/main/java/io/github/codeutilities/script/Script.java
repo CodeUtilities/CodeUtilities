@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
@@ -16,7 +15,6 @@ import io.github.codeutilities.script.event.ScriptEvent;
 import io.github.codeutilities.script.execution.ScriptContext;
 import io.github.codeutilities.script.execution.ScriptPosStack;
 import io.github.codeutilities.script.execution.ScriptTask;
-import io.github.codeutilities.util.ComponentUtil;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.File;
@@ -107,6 +105,15 @@ public class Script {
                         }
                     }
                 }
+                if(sa.getGroup() == ScriptGroup.CONDITION) {
+                    if(sa.getType() != ScriptActionType.ELSE) {
+                        context.setLastIfResult(false);
+                    }
+                    context.setScheduleInnerHandler(ctx -> { ctx.context().setLastIfResult(true); });
+                }
+                else {
+                    context.setScheduleInnerHandler(null);
+                }
                 sa.invoke(task.event(), context, inner,task, this);
                 if (!task.isRunning()) {
                     return;
@@ -118,8 +125,7 @@ public class Script {
                         task.stack().pop();
                     }
                 }
-                while(context.isForcedToEndScope())
-                {
+                while(context.isForcedToEndScope()) {
                     context.forceEndScope(-1);
                     if (task.stack().isEmpty()) {
                         return;
@@ -127,17 +133,14 @@ public class Script {
                         task.stack().pop();
                     }
                 }
-                if(context.isLoopBroken())
-                {
+                if(context.isLoopBroken()) {
                     context.breakLoop(-1);
                     int originalPos = task.stack().peekOriginal();
-                    while((task.stack().peekOriginal(1) == originalPos))
-                    {
+                    while((task.stack().peekOriginal(1) == originalPos)) {
                         if(!task.stack().isEmpty())
                             task.stack().pop();
                     }
-                    if(task.stack().isEmpty())
-                    {
+                    if(task.stack().isEmpty()) {
                         return;
                     }
                 }
