@@ -1,5 +1,7 @@
 package io.github.codeutilities.script.action;
 
+import java.net.*;
+import java.io.*;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -290,6 +292,41 @@ public enum ScriptActionType {
                 ctx.variable("Result").name(),
                 new ScriptNumberValue(dividend % divisor)
             );
+        })),
+    
+    SEND_HTTP(builder -> builder.name("Send Web Request")
+        .description("Sends a web request to a website. (not proxied yet)")
+        .icon(Items.IRON_DOOR)
+        .category(ScriptActionCategory.VARIABLES)
+        .arg("URL", ScriptActionArgumentType.TEXT)
+        .arg("Data Received", ScriptActionArgumentType.VARIABLE)
+        .hasChildren(true)
+        .action(ctx -> {
+            StringBuilder data = new StringBuilder();
+            try {
+                URL url = new URL(ctx.value("URL").asText())
+                URLConnection conn = url.openConnection()
+                BufferedReader read = new BufferedReader(new InputStreamReader(
+                    conn.getInputStream()
+                ));
+                String ln;
+                while ((ln = read.readLine()) != null) {
+                    data.append(ln+"\n");
+                }
+                read.close();
+                ctx.context().setVariable(
+                        ctx.variable("Data Received").name(),
+                        new ScriptTextValue(data.toString())
+                );
+            }
+            catch(Exception err)
+            {
+                ctx.context().setVariable(
+                    ctx.variable("Data Received").name,
+                    new ScriptTextValue("Error: "+err)
+                );
+            }
+            ctx.scheduleInner();
         })),
 
     IF_EQUALS(builder -> builder.name("If Equals")
