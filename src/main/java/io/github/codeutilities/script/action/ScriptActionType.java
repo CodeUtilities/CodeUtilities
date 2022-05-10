@@ -1499,8 +1499,17 @@ public enum ScriptActionType {
             );
         })),
 
+    REPEAT_FOREVER(builder -> builder.name("RepeatForever")
+            .description(new String[]{"Repeats for eternity.", "Make sure to have a Stop Repetition, Stop Codeline or Wait somewhere in the code!"})
+            .icon(Items.GOLD_INGOT)
+            .category(ScriptActionCategory.MISC)
+            .hasChildren(true)
+            .group(ScriptGroup.REPETITION)
+            .action(ctx -> {
+                ctx.scheduleInner(null, context -> context.setLastIfResult(true));
+            })),
     ELSE(builder -> builder.name("Else")
-        .description(new String[]{"Executes if the last IF condition failed.","The ELSE doesn't have to be placed immediately after the IF condition.","And ELSE also works as a valid IF condition for ELSE."})
+        .description(new String[]{"Executes if the last IF condition failed.","The ELSE doesn't have to be placed immediately after the IF condition,", " however, don't expect this behaviour to last.","And ELSE also works as a valid IF condition for ELSE."})
         .icon(Items.END_STONE)
         .category(ScriptActionCategory.MISC)
         .group(ScriptGroup.CONDITION)

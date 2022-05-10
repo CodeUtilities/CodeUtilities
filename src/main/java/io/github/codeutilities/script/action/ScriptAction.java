@@ -15,6 +15,7 @@ import io.github.codeutilities.script.execution.ScriptTask;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class ScriptAction implements ScriptPart {
@@ -27,7 +28,7 @@ public class ScriptAction implements ScriptPart {
         this.arguments = arguments;
     }
 
-    public void invoke(Event event, ScriptContext context, Consumer<Runnable> inner, ScriptTask task, Script script) {
+    public void invoke(Event event, ScriptContext context, BiConsumer<Runnable, Consumer<ScriptContext>> inner, ScriptTask task, Script script) {
         type.run(new ScriptActionContext(
             context, arguments, event, inner, task, new HashMap<>(), script
         ));

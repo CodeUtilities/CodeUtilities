@@ -21,6 +21,7 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,86 +69,84 @@ public class Script {
     }
 
     public void execute(ScriptTask task) {
-        if (disabled) {
+        if (disabled) { // don't run the code if it's disabled obviously
             return;
         }
-        while (task.stack().peek() < parts.size()) {
-            ScriptPart part = parts.get(task.stack().peek());
-            if (part instanceof ScriptEvent) {
+        while (task.stack().peek() < parts.size()) { // check if there is still code to be run
+            ScriptPart part = parts.get(task.stack().peek()); // get the script part (action or event who cares)
+            if (part instanceof ScriptEvent) { // well maybe we do care?
                 return;
-            } else if (part instanceof ScriptAction sa) {
-                Consumer<Runnable> inner = null;
+            } else if (part instanceof ScriptAction sa) { // only run ScriptActions (possibly being able to implement comments?)
+                BiConsumer<Runnable, Consumer<ScriptContext>> inner = null;
                 if (sa.getType().hasChildren()) {
-                    int posCopy = task.stack().peek();
-                    inner = (preTask) -> task.schedule(posCopy, preTask);
+                    int posCopy = task.stack().peek(); // get the current position for later
+                    inner = (preTask, condition) -> task.schedule(posCopy, preTask, condition); // schedule the configurable code
                     int depth = 0;
-                    while (task.stack().peek() < parts.size()) {
+                    while (task.stack().peek() < parts.size()) { // loop through all the script parts
                         ScriptPart nextPart = parts.get(task.stack().peek());
-                        if (nextPart instanceof ScriptEvent) {
+                        if (nextPart instanceof ScriptEvent) { // so we can see whether it's an event or an action
                             task.stack().clear();
                             return;
                         } else if (nextPart instanceof ScriptAction sa2) {
-                            if (sa2.getType().hasChildren()) {
+                            if (sa2.getType().hasChildren()) { // we increase the depth if it has children
                                 depth++;
-                            } else if (sa2.getType() == ScriptActionType.CLOSE_BRACKET) {
+                            } else if (sa2.getType() == ScriptActionType.CLOSE_BRACKET) { // or we decrease it if we get to the end of the inner code
                                 depth--;
-                                if (depth == 0) {
+                                if (depth == 0) { // stop when we reach the same depth as the original script action
                                     break;
                                 }
                             }
                         } else {
                             throw new IllegalStateException("Unexpected script part type: " + nextPart.getClass().getName());
                         }
-                        if (!task.stack().isEmpty()) {
+                        if (!task.stack().isEmpty()) { // are we done with code yet?
                             task.stack().increase();
                         } else {
                             return;
                         }
                     }
                 }
-                if(sa.getGroup() == ScriptGroup.CONDITION) {
-                    if(sa.getType() != ScriptActionType.ELSE) {
-                        context.setLastIfResult(false);
+                if(sa.getGroup() == ScriptGroup.CONDITION) { // if it's a condition
+                    if(sa.getType() != ScriptActionType.ELSE) { // and not an else
+                        context.setLastIfResult(false); // set the last result to false
                     }
-                    context.setScheduleInnerHandler(ctx -> { ctx.context().setLastIfResult(true); });
+                    context.setScheduleInnerHandler(ctx -> ctx.context().setLastIfResult(true)); // and if we end up scheduling the inner code, set the last result to true
                 }
                 else {
-                    context.setScheduleInnerHandler(null);
+                    context.setScheduleInnerHandler(null); // otherwise, just remove the handler
                 }
-                sa.invoke(task.event(), context, inner,task, this);
-                if (!task.isRunning()) {
+                sa.invoke(task.event(), context, inner,task, this); // execute the script action
+                if (!task.isRunning()) { // is the script still running?
                     return;
                 }
-                if (sa.getType() == ScriptActionType.CLOSE_BRACKET) {
-                    if (task.stack().isEmpty()) {
+                if (sa.getType() == ScriptActionType.CLOSE_BRACKET) { // is this the end of the scope?
+                    if(endScope(task))
+                    {
                         return;
-                    } else {
-                        task.stack().pop();
                     }
                 }
-                while(context.isForcedToEndScope()) {
+                while(context.isForcedToEndScope()) { // are we forced to end the scope? (aka was skip iteration used?)
                     context.forceEndScope(-1);
-                    if (task.stack().isEmpty()) {
+                    if(endScope(task))
+                    {
                         return;
-                    } else {
-                        task.stack().pop();
                     }
                 }
-                if(context.isLoopBroken()) {
+                if(context.isLoopBroken()) { // are we forced to break the loop? (aka was stop repetition used?)
                     context.breakLoop(-1);
                     int originalPos = task.stack().peekOriginal();
-                    while((task.stack().peekOriginal(1) == originalPos)) {
-                        if(!task.stack().isEmpty())
-                            task.stack().pop();
+                    while(!task.stack().isEmpty() && (task.stack().peekOriginal(1) == originalPos)) { // only stop till all the iterations have been force ended
+                        task.stack().pop();
                     }
-                    if(task.stack().isEmpty()) {
-                        return;
+                    if(task.stack().peekElement().hasCondition())
+                    {
+                        task.stack().pop();
                     }
                 }
             } else {
                 throw new IllegalArgumentException("Invalid script part");
             }
-            if (!task.stack().isEmpty()) {
+            if (!task.stack().isEmpty()) { // did we finish executing the code?
                 task.stack().increase();
             } else {
                 return;
@@ -155,6 +154,22 @@ public class Script {
         }
     }
 
+    private boolean endScope(ScriptTask task)
+    {
+        if(task.stack().peekElement().checkCondition(context))
+        {
+            task.stack().peekElement().setPos(task.stack().peekElement().getOriginalPos());
+            return false;
+        }
+
+        if (task.stack().isEmpty()) {
+            return true;
+        } else {
+            task.stack().pop();
+        }
+
+        return false;
+    }
     public List<ScriptPart> getParts() {
         return parts;
     }

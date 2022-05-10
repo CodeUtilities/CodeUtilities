@@ -7,10 +7,11 @@ import io.github.codeutilities.script.argument.ScriptVariableArgument;
 import io.github.codeutilities.script.values.ScriptValue;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public record ScriptActionContext(ScriptContext context, List<ScriptArgument> arguments, Event event, Consumer<Runnable> inner, ScriptTask task, HashMap<String, List<ScriptArgument>> argMap, Script script) {
+public record ScriptActionContext(ScriptContext context, List<ScriptArgument> arguments, Event event, BiConsumer<Runnable, Consumer<ScriptContext>> inner, ScriptTask task, HashMap<String, List<ScriptArgument>> argMap, Script script) {
 
     public void setArg(String name, List<ScriptArgument> args) {
         argMap.put(name, args);
@@ -38,11 +39,23 @@ public record ScriptActionContext(ScriptContext context, List<ScriptArgument> ar
 
     public void scheduleInner(Runnable runnable) {
         context.invokeScheduleInnerHandler(this);
-        inner.accept(runnable);
+        inner.accept(runnable, null);
     }
 
+    public void scheduleInner(Runnable runnable, Consumer<ScriptContext> condition) {
+        condition.accept(context);
+
+        if(!context.lastIfResult())
+        {
+            return;
+        }
+
+        context.invokeScheduleInnerHandler(this);
+
+        inner.accept(runnable, condition);
+    }
     public void scheduleInner() {
         context.invokeScheduleInnerHandler(this);
-        inner.accept(null);
+        inner.accept(null, null);
     }
 }

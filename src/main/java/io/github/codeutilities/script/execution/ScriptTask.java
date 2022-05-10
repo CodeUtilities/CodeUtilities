@@ -2,9 +2,8 @@ package io.github.codeutilities.script.execution;
 
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.Script;
-import org.jetbrains.annotations.Debug;
 
-import static io.github.codeutilities.CodeUtilities.LOGGER;
+import java.util.function.Consumer;
 
 public class ScriptTask {
 
@@ -41,7 +40,7 @@ public class ScriptTask {
         return running;
     }
 
-    public void schedule(int posCopy, Runnable preTask) {
-        stack.push(posCopy, preTask);
+    public void schedule(int posCopy, Runnable preTask, Consumer<ScriptContext> condition) {
+        stack.push(posCopy, preTask, condition);
     }
 }
