@@ -3,6 +3,7 @@ package io.github.codeutilities.commands.item;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.util.ItemUtil;
 import io.github.codeutilities.util.chat.ChatUtil;
@@ -10,8 +11,6 @@ import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.item.ItemStack;
-
-import static io.github.codeutilities.CodeUtilities.MC;
 
 public class DfGiveCommand implements Command {
 
@@ -39,7 +38,7 @@ public class DfGiveCommand implements Command {
                 ).then(literal("clipboard").executes(ctx -> {
                         String clipboard;
                         try {
-                            clipboard = MC.keyboard.getClipboard();
+                            clipboard = CodeUtilities.MC.keyboard.getClipboard();
                         }
                         catch (Exception e){
                             ChatUtil.error("Unable to get the clipboard.");
@@ -62,7 +61,7 @@ public class DfGiveCommand implements Command {
         if (amount < 1) {
             ChatUtil.error("The minimum amount of items to give is 1");
         }
-        if (!MC.player.isCreative()) {
+        if (!CodeUtilities.MC.player.isCreative()) {
             ChatUtil.error("You must be in creative mode to use this command");
             return;
         }
