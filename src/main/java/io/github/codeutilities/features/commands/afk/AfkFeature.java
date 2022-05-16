@@ -26,6 +26,10 @@ public class AfkFeature implements Loadable {
             if (Config.getBoolean("autoafk")) {
                 afkTick = 0;
 
+                if (CodeUtilities.MC.player == null){
+                    afk = false;
+                }
+
                 if (afk) {
                     CodeUtilities.MC.player.sendChatMessage("/afk");
                 }
@@ -33,11 +37,11 @@ public class AfkFeature implements Loadable {
         }));
 
         EventManager.getInstance().register(TickEvent.class, (event -> {
-            if (Config.getBoolean("autoafk")) {
+            if (Config.getBoolean("autoafk") && CodeUtilities.MC.player != null) {
                 afkTick += 1;
 
                 if (afkTick >= Config.getInteger("autoafk_time")) {
-                    if (!afk) {
+                    if (!afk && CodeUtilities.MC.player != null) {
                         CodeUtilities.MC.player.sendChatMessage("/afk");
                     }
                 }
