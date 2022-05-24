@@ -13,8 +13,6 @@ public class ScriptContext {
 
     private int isForcedToEnd = 0;
     private boolean lastIfResult = true;
-
-    private Consumer<ScriptActionContext> scheduleInnerHandler = null;
     public void forceEndScope(int times) {
         isForcedToEnd += times;
     }
@@ -83,15 +81,5 @@ public class ScriptContext {
 
     public int getVariableCount() {
         return variables.size();
-    }
-
-    public void setScheduleInnerHandler(Consumer<ScriptActionContext> o) {
-        scheduleInnerHandler = o;
-    }
-
-    public void invokeScheduleInnerHandler(ScriptActionContext ctx)
-    {
-        if(scheduleInnerHandler == null) return;
-        scheduleInnerHandler.accept(ctx);
     }
 }

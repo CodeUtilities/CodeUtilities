@@ -110,16 +110,21 @@ public class Script {
                     if(sa.getType() != ScriptActionType.ELSE) { // and not an else
                         context.setLastIfResult(false); // set the last result to false
                     }
-                    context.setScheduleInnerHandler(ctx -> ctx.context().setLastIfResult(true)); // and if we end up scheduling the inner code, set the last result to true
                 }
                 else {
-                    context.setScheduleInnerHandler(null); // otherwise, just remove the handler
+                    context.setLastIfResult(true); //does this detect close brackets or no (no it doesn't, good)
                 }
                 sa.invoke(task.event(), context, inner,task, this); // execute the script action
                 if (!task.isRunning()) { // is the script still running?
                     return;
                 }
+                if(sa.getGroup() == ScriptGroup.CONDITION) { // if it's a condition
+                    if(context.lastIfResult()) { // and it's last if result worked
+                        inner.accept(null, null);
+                    }
+                }
                 if (sa.getType() == ScriptActionType.CLOSE_BRACKET) { // is this the end of the scope?
+
                     if(endScope(task))
                     {
                         return;

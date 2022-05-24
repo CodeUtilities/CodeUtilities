@@ -301,7 +301,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").valueEquals(ctx.value("Other"))) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -315,7 +315,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (!ctx.value("Value").valueEquals(ctx.value("Other"))) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -329,7 +329,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() > ctx.value("Other").asNumber()) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -343,7 +343,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() >= ctx.value("Other").asNumber()) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -357,7 +357,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() < ctx.value("Other").asNumber()) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -371,7 +371,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() <= ctx.value("Other").asNumber()) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -530,7 +530,7 @@ public enum ScriptActionType {
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
             if (list.stream().anyMatch(value -> value.valueEquals(ctx.value("Value")))) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -546,7 +546,7 @@ public enum ScriptActionType {
             String text = ctx.value("Text").asText();
             String subtext = ctx.value("Subtext").asText();
             if (text.contains(subtext)) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -562,7 +562,7 @@ public enum ScriptActionType {
             String text = ctx.value("Text").asText();
             String regex = ctx.value("Regex").asText();
             if (text.matches(regex)) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -578,7 +578,7 @@ public enum ScriptActionType {
             String text = ctx.value("Text").asText();
             String subtext = ctx.value("Subtext").asText();
             if (text.startsWith(subtext)) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -593,7 +593,7 @@ public enum ScriptActionType {
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
             if (list.stream().noneMatch(value -> value.valueEquals(ctx.value("Value")))) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -609,7 +609,7 @@ public enum ScriptActionType {
             String text = ctx.value("Text").asText();
             String subtext = ctx.value("Subtext").asText();
             if (!text.contains(subtext)) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -625,7 +625,7 @@ public enum ScriptActionType {
             String text = ctx.value("Text").asText();
             String subtext = ctx.value("Subtext").asText();
             if (!text.startsWith(subtext)) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -641,7 +641,7 @@ public enum ScriptActionType {
             String text = ctx.value("Text").asText();
             String regex = ctx.value("Regex").asText();
             if (!text.matches(regex)) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -736,7 +736,7 @@ public enum ScriptActionType {
             HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
             String key = ctx.value("Key").asText();
             if (dict.containsKey(key)) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -752,7 +752,7 @@ public enum ScriptActionType {
             HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
             String key = ctx.value("Key").asText();
             if (!dict.containsKey(key)) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -880,7 +880,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (CodeUtilities.MC.currentScreen != null) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -892,7 +892,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (CodeUtilities.MC.currentScreen == null) {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
         })),
 
@@ -1186,7 +1186,7 @@ public enum ScriptActionType {
             if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
                 Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
                 if (Files.exists(f)) {
-                    ctx.scheduleInner();
+                    ctx.context().setLastIfResult(true);
                 }
             } else {
                 ChatUtil.error("Illegal filename: " + filename);
@@ -1205,7 +1205,7 @@ public enum ScriptActionType {
             if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
                 Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
                 if (!Files.exists(f)) {
-                    ctx.scheduleInner();
+                    ctx.context().setLastIfResult(true);
                 }
             } else {
                 ChatUtil.error("Illegal filename: " + filename);
@@ -1509,7 +1509,7 @@ public enum ScriptActionType {
                 ctx.scheduleInner(null, context -> context.setLastIfResult(true));
             })),
     ELSE(builder -> builder.name("Else")
-        .description(new String[]{"Executes if the last IF condition failed.","The ELSE doesn't have to be placed immediately after the IF condition,", " however, don't expect this behaviour to last.","And ELSE also works as a valid IF condition for ELSE."})
+        .description(new String[]{"Executes if the last IF condition failed.","And ELSE also works as a valid IF condition for ELSE."})
         .icon(Items.END_STONE)
         .category(ScriptActionCategory.MISC)
         .group(ScriptGroup.CONDITION)
@@ -1519,7 +1519,7 @@ public enum ScriptActionType {
                 ctx.context().setLastIfResult(false);
             }
             else {
-                ctx.scheduleInner();
+                ctx.context().setLastIfResult(true);
             }
     }));
 
