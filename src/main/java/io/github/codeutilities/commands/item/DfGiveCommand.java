@@ -34,7 +34,22 @@ public class DfGiveCommand implements Command {
                             give(ItemStackArgumentType.getItemStackArgument(ctx, "item"),1);
                             return 1;
                         })
-                )
+
+                ).then(literal("clipboard").executes(ctx -> {
+                        String clipboard;
+                        try {
+                            clipboard = CodeUtilities.MC.keyboard.getClipboard();
+                        }
+                        catch (Exception e){
+                            ChatUtil.error("Unable to get the clipboard.");
+                            return -1;
+                        }
+
+                        clipboard = clipboard.replaceFirst("^/?(df)?give ((\\w{3,16})|(@[aeprs](\\[.]?)?) )?","");
+                        ChatUtil.executeCommand("/dfgive " + clipboard);
+
+                        return 1;
+                    }))
         );
     }
 
