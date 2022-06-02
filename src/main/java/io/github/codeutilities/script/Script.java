@@ -12,9 +12,7 @@ import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
 import io.github.codeutilities.script.event.ScriptEvent;
-import io.github.codeutilities.script.execution.ScriptContext;
-import io.github.codeutilities.script.execution.ScriptPosStack;
-import io.github.codeutilities.script.execution.ScriptTask;
+import io.github.codeutilities.script.execution.*;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.File;
@@ -77,10 +75,10 @@ public class Script {
             if (part instanceof ScriptEvent) { // well maybe we do care?
                 return;
             } else if (part instanceof ScriptAction sa) { // only run ScriptActions (possibly being able to implement comments?)
-                BiConsumer<Runnable, Consumer<ScriptContext>> inner = null;
+                Consumer<ScriptScopeVariables> inner = null;
                 if (sa.getType().hasChildren()) {
                     int posCopy = task.stack().peek(); // get the current position for later
-                    inner = (preTask, condition) -> task.schedule(posCopy, preTask, condition); // schedule the configurable code
+                    inner = (scriptScopeVariables) -> task.schedule(posCopy, scriptScopeVariables); // schedule the configurable code
                     int depth = 0;
                     while (task.stack().peek() < parts.size()) { // loop through all the script parts
                         ScriptPart nextPart = parts.get(task.stack().peek());
@@ -108,19 +106,19 @@ public class Script {
                 }
                 if(sa.getGroup() == ScriptGroup.CONDITION) { // if it's a condition
                     if(sa.getType() != ScriptActionType.ELSE) { // and not an else
-                        context.setLastIfResult(false); // set the last result to false
+                        task.stack().peekElement().setVariable("lastIfResult", false); // set the last result to false
                     }
                 }
                 else {
-                    context.setLastIfResult(true); //does this detect close brackets or no (no it doesn't, good)
+                    task.stack().peekElement().setVariable("lastIfResult", true); //does this detect close brackets or no (no it doesn't, good)
                 }
                 sa.invoke(task.event(), context, inner,task, this); // execute the script action
                 if (!task.isRunning()) { // is the script still running?
                     return;
                 }
                 if(sa.getGroup() == ScriptGroup.CONDITION) { // if it's a condition
-                    if(context.lastIfResult()) { // and it's last if result worked
-                        inner.accept(null, null);
+                    if(task.stack().peekElement().getVariable("lastIfResult").equals(true)) { // and it's last if result worked
+                        inner.accept(null);
                     }
                 }
                 if (sa.getType() == ScriptActionType.CLOSE_BRACKET) { // is this the end of the scope?
@@ -161,7 +159,7 @@ public class Script {
 
     private boolean endScope(ScriptTask task)
     {
-        if(task.stack().peekElement().checkCondition(context))
+        if(task.stack().peekElement().checkCondition())
         {
             task.stack().peekElement().setPos(task.stack().peekElement().getOriginalPos());
             return false;

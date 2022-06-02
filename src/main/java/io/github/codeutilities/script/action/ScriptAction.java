@@ -11,6 +11,7 @@ import io.github.codeutilities.script.ScriptPart;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
 import io.github.codeutilities.script.execution.ScriptContext;
+import io.github.codeutilities.script.execution.ScriptScopeVariables;
 import io.github.codeutilities.script.execution.ScriptTask;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -28,7 +29,7 @@ public class ScriptAction implements ScriptPart {
         this.arguments = arguments;
     }
 
-    public void invoke(Event event, ScriptContext context, BiConsumer<Runnable, Consumer<ScriptContext>> inner, ScriptTask task, Script script) {
+    public void invoke(Event event, ScriptContext context, Consumer<ScriptScopeVariables> inner, ScriptTask task, Script script) {
         type.run(new ScriptActionContext(
             context, arguments, event, inner, task, new HashMap<>(), script
         ));

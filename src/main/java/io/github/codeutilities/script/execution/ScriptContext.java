@@ -53,15 +53,6 @@ public class ScriptContext {
         return breakLoop > 0;
     }
 
-    public boolean lastIfResult()
-    {
-        return lastIfResult;
-    }
-
-    public void setLastIfResult(boolean a)
-    {
-        lastIfResult = a;
-    }
     private final HashMap<String,ScriptValue> variables = new HashMap<>();
 
     public ScriptValue getVariable(String name) {

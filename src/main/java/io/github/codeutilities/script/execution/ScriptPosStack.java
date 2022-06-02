@@ -15,8 +15,12 @@ public class ScriptPosStack {
         data.add(new ScriptPosStackElement(value, preTask));
     }
 
-    public void push(int value, Runnable preTask, Consumer<ScriptContext> condition) {
+    public void push(int value, Runnable preTask, Consumer<ScriptActionContext> condition) {
         data.add(new ScriptPosStackElement(value, preTask, condition));
+    }
+
+    public void push(int value, ScriptScopeVariables variables) {
+        data.add(new ScriptPosStackElement(value, variables));
     }
     public void push(int value) {
         data.add(new ScriptPosStackElement(value));

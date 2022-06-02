@@ -40,7 +40,11 @@ public class ScriptTask {
         return running;
     }
 
-    public void schedule(int posCopy, Runnable preTask, Consumer<ScriptContext> condition) {
+    public void schedule(int posCopy, Runnable preTask, Consumer<ScriptActionContext> condition) {
         stack.push(posCopy, preTask, condition);
+    }
+
+    public void schedule(int posCopy, ScriptScopeVariables scriptScopeVariables) {
+        stack.push(posCopy, scriptScopeVariables);
     }
 }
