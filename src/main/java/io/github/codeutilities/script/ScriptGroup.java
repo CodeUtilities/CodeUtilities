@@ -2,7 +2,7 @@ package io.github.codeutilities.script;
 
 public enum ScriptGroup {
     //This class specifies whether an action type is an action, a condition or a repetition
-    //(important to SKIP_ITERATION and STOP_REPETITION)
+    //(important to SKIP_ITERATION, STOP_REPETITION and ELSE)
     ACTION,
     CONDITION,
     REPETITION,

@@ -6,13 +6,11 @@ import io.github.codeutilities.script.values.ScriptValue;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ScriptContext {
 
     private int isForcedToEnd = 0;
-    private boolean lastIfResult = true;
     public void forceEndScope(int times) {
         isForcedToEnd += times;
     }
@@ -21,13 +19,11 @@ public class ScriptContext {
         isForcedToEnd++;
     }
 
-    public void stopEndScope()
-    {
+    public void stopEndScope() {
         isForcedToEnd = 0;
     }
 
-    public boolean isForcedToEndScope()
-    {
+    public boolean isForcedToEndScope() {
         return isForcedToEnd > 0;
     }
 

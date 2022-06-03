@@ -2,8 +2,6 @@ package io.github.codeutilities.script.execution;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-
 public class ScriptPosStack {
 
     private final List<ScriptPosStackElement> data = new ArrayList<>();

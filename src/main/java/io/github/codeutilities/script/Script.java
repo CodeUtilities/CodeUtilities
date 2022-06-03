@@ -13,13 +13,13 @@ import io.github.codeutilities.script.action.ScriptAction;
 import io.github.codeutilities.script.action.ScriptActionType;
 import io.github.codeutilities.script.event.ScriptEvent;
 import io.github.codeutilities.script.execution.*;
+import io.github.codeutilities.util.ComponentUtil;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -122,7 +122,6 @@ public class Script {
                     }
                 }
                 if (sa.getType() == ScriptActionType.CLOSE_BRACKET) { // is this the end of the scope?
-
                     if(endScope(task))
                     {
                         return;
@@ -137,14 +136,7 @@ public class Script {
                 }
                 if(context.isLoopBroken()) { // are we forced to break the loop? (aka was stop repetition used?)
                     context.breakLoop(-1);
-                    int originalPos = task.stack().peekOriginal();
-                    while(!task.stack().isEmpty() && (task.stack().peekOriginal(1) == originalPos)) { // only stop till all the iterations have been force ended
-                        task.stack().pop();
-                    }
-                    if(task.stack().peekElement().hasCondition())
-                    {
-                        task.stack().pop();
-                    }
+                    task.stack().pop(); // don't use endScope() because of the fact that endScope runs the condition to see if it is false before ending the scope
                 }
             } else {
                 throw new IllegalArgumentException("Invalid script part");
@@ -157,10 +149,22 @@ public class Script {
         }
     }
 
-    private boolean endScope(ScriptTask task)
-    {
-        if(task.stack().peekElement().checkCondition())
-        {
+    private boolean endScope(ScriptTask task) {
+        if(task.stack().peekElement().checkCondition()) {
+            if(!task.stack().peekElement().hasVariable("LagslayerCounter")) {
+                task.stack().peekElement().setVariable("LagslayerCounter", 0);
+            }
+
+            int lagslayerCounter = (Integer)task.stack().peekElement().getVariable("LagslayerCounter")+1;
+
+            task.stack().peekElement().setVariable("LagslayerCounter", lagslayerCounter);
+
+            if(lagslayerCounter >= 100000)
+            {
+                task.stack().peekElement().setVariable("LagslayerCounter", 0);
+                task.stop();//Lagslayer be like:
+            }
+
             task.stack().peekElement().setPos(task.stack().peekElement().getOriginalPos());
             return false;
         }

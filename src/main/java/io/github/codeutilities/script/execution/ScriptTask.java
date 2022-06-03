@@ -3,8 +3,6 @@ package io.github.codeutilities.script.execution;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.Script;
 
-import java.util.function.Consumer;
-
 public class ScriptTask {
 
     private final ScriptPosStack stack;
@@ -42,8 +40,7 @@ public class ScriptTask {
     public void schedule(int posCopy, ScriptScopeVariables scriptScopeVariables) {
         stack.push(posCopy, scriptScopeVariables);
 
-        if(!stack.peekElement().checkCondition())
-        {
+        if(stack.peekElement().hasCondition() && !stack.peekElement().checkCondition()) {
             stack.pop();
             return;
         }

@@ -1,6 +1,5 @@
 package io.github.codeutilities.script.action;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -60,8 +59,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
-import org.apache.logging.log4j.Level;
-
 public enum ScriptActionType {
 
     DISPLAY_CHAT(builder -> builder.name("DisplayChat")
@@ -671,6 +668,18 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.MISC)
         .arg("Ticks", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
+            int n = 0;
+            while(!(ctx.task().stack().peekOriginal(n) < 0)) {
+                int pos = ctx.task().stack().peekOriginal(n);
+                n++;
+                if(pos >= 0 && ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION) {
+                    if(ctx.task().stack().peekElement(n).hasVariable("LagslayerCounter"))
+                    {
+                        ctx.task().stack().peekElement(n).setVariable("LagslayerCounter", 0);
+                    }
+                }
+            }
+
             ctx.task().stop();//Stop the current thread
             ctx.task().stack().increase();//Go to the next action
             Scheduler.schedule((int) ctx.value("Ticks").asNumber(), () -> ctx.task().run());//Resume the task after the given amount of ticks
@@ -997,9 +1006,9 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.MISC)
         .action(ctx -> {
             int n = 0;
-            while(!(ctx.task().stack().peek(n) < 0)) {
+            while(!(ctx.task().stack().peekOriginal(n) < 0)) {
+                int pos = ctx.task().stack().peekOriginal(n);
                 n++;
-                int pos = ctx.task().stack().peek(n);
                 ctx.context().forceEndScope();
                 if(pos < 0 || ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION) {
                     break;
@@ -1014,15 +1023,14 @@ public enum ScriptActionType {
         .action(ctx -> {
             ctx.context().breakLoop();
             int n = 0;
-            while(!(ctx.task().stack().peek(n) < 0)) {
+            while(!(ctx.task().stack().peekOriginal(n) < 0)) {
+                int pos = ctx.task().stack().peekOriginal(n);
                 n++;
-                int pos = ctx.task().stack().peek(n);
                 ctx.context().forceEndScope();
                 if(pos < 0 || ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION) {
                     break;
                 }
             }
-            ctx.context().forceEndScope(-1);
         })),
 
     PLAY_SOUND(builder -> builder.name("Play Sound")
@@ -1570,7 +1578,7 @@ public enum ScriptActionType {
         })),
 
     REPEAT_FOREVER(builder -> builder.name("RepeatForever")
-            .description(new String[]{"Repeats for eternity.", "Make sure to have a Stop Repetition, Stop Codeline or Wait somewhere in the code!"})
+            .description(new String[]{"Repeats for eternity.", "Make sure to have a Stop Repetition, Stop Codeline or Wait somewhere in the code!", "There's a lagslayer for the repetition actions.", "It activates after 100000 iterations with no Wait."})
             .icon(Items.GOLD_INGOT)
             .category(ScriptActionCategory.MISC)
             .hasChildren(true)
@@ -1585,12 +1593,7 @@ public enum ScriptActionType {
         .group(ScriptGroup.CONDITION)
         .hasChildren(true)
         .action(ctx -> {
-            if(ctx.lastIfResult()) {
-                ctx.setLastIfResult(false);
-            }
-            else {
-                ctx.setLastIfResult(true);
-            }
+            ctx.setLastIfResult(!ctx.lastIfResult());
     }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
@@ -1678,9 +1681,7 @@ public enum ScriptActionType {
     private ScriptActionType description(String[] description) {
         this.description.clear();
 
-        for (String descriptionLine: description) {
-            this.description.add(descriptionLine);
-        }
+        this.description.addAll(Arrays.asList(description));
 
         return this;
     }
