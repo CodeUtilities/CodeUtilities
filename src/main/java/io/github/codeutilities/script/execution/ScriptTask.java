@@ -39,12 +39,13 @@ public class ScriptTask {
     public boolean isRunning() {
         return running;
     }
-
-    public void schedule(int posCopy, Runnable preTask, Consumer<ScriptActionContext> condition) {
-        stack.push(posCopy, preTask, condition);
-    }
-
     public void schedule(int posCopy, ScriptScopeVariables scriptScopeVariables) {
         stack.push(posCopy, scriptScopeVariables);
+
+        if(!stack.peekElement().checkCondition())
+        {
+            stack.pop();
+            return;
+        }
     }
 }

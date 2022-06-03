@@ -42,13 +42,6 @@ public record ScriptActionContext(ScriptContext context, List<ScriptArgument> ar
     }
 
     public void scheduleInner(Runnable runnable, Consumer<ScriptActionContext> condition) {
-        condition.accept(this);
-
-        if(!lastIfResult())
-        {
-            return;
-        }
-
         inner.accept(new ScriptScopeVariables(runnable, condition, this));
     }
     public void scheduleInner() {
@@ -68,5 +61,17 @@ public record ScriptActionContext(ScriptContext context, List<ScriptArgument> ar
     }
     public void setLastIfResult(boolean a) {
         setLastIfResult(a, 0);
+    }
+
+    public void setScopeVariable(String name, Object object) {
+        task().stack().peekElement(0).setVariable(name, object);
+    }
+
+    public Object getScopeVariable(String name) {
+        return task().stack().peekElement(0).getVariable(name);
+    }
+
+    public boolean hasScopeVariable(String name) {
+        return task().stack().peekElement(0).hasVariable(name);
     }
 }

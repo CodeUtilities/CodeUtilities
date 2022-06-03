@@ -60,6 +60,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
+import org.apache.logging.log4j.Level;
 
 public enum ScriptActionType {
 
@@ -117,7 +118,26 @@ public enum ScriptActionType {
         .hasChildren(true)
         .group(ScriptGroup.REPETITION)
         .action(ctx -> {
-            if (ctx.argMap().containsKey("Current")) {
+            ctx.scheduleInner(
+                    null,
+                    context -> {
+                        if(!context.hasScopeVariable("Counter")) {
+                            context.setScopeVariable("Counter", 0);
+                        }
+
+                        int counter = (Integer)context.getScopeVariable("Counter")+1;
+
+                        if(counter <= context.value("Times").asNumber()) {
+                            context.setScopeVariable("Counter", counter);
+                            if (context.argMap().containsKey("Current")) {
+                                context.context().setVariable(context.variable("Current").name(), new ScriptNumberValue(counter));
+                            }
+                            context.setLastIfResult(true);
+                        }
+                    }
+            );
+
+            /*if (ctx.argMap().containsKey("Current")) {
                 ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(1));
             }
             for (int i = (int) ctx.value("Times").asNumber(); i > 0; i--) {
@@ -127,7 +147,7 @@ public enum ScriptActionType {
                         ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(current));
                     }
                 });
-            }
+            }*/
         })),
 
     CLOSE_BRACKET(builder -> builder.name("CloseBracket")
@@ -779,7 +799,25 @@ public enum ScriptActionType {
         .hasChildren(true)
         .group(ScriptGroup.REPETITION)
         .action(ctx -> {
-            List<ScriptValue> list = ctx.value("List").asList();
+            ctx.scheduleInner(
+                    null,
+                    context -> {
+                        if(!context.hasScopeVariable("Counter")) {
+                            context.setScopeVariable("Counter", 0);
+                        }
+
+                        int counter = (Integer)context.getScopeVariable("Counter")+1;
+                        List<ScriptValue> list = context.value("List").asList();
+
+                        if(counter <= list.size()) {
+                            context.setScopeVariable("Counter", counter);
+                            context.context().setVariable(context.variable("Variable").name(), list.get(counter-1));
+                            context.setLastIfResult(true);
+                        }
+                    }
+            );
+
+            /*List<ScriptValue> list = ctx.value("List").asList();
             if (!list.isEmpty()) {
                 ctx.context().setVariable(ctx.variable("Variable").name(), list.get(0));
             }
@@ -788,7 +826,7 @@ public enum ScriptActionType {
                 ctx.scheduleInner(() -> {
                     ctx.context().setVariable(ctx.variable("Variable").name(), item);
                 });
-            }
+            }*/
         })),
 
     DICT_FOR_EACH(builder -> builder.name("For Each In Dictionary")
@@ -801,13 +839,34 @@ public enum ScriptActionType {
         .hasChildren(true)
         .group(ScriptGroup.REPETITION)
         .action(ctx -> {
-            HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
+            ctx.scheduleInner(
+                    null,
+                    context -> {
+                        HashMap<String, ScriptValue> dict = context.value("Dictionary").asDictionary();
+
+                        if(!context.hasScopeVariable("Iterator")) {
+                            context.setScopeVariable("Iterator", dict.entrySet().iterator());
+                        }
+
+                        Iterator<Map.Entry<String, ScriptValue>> iterator = (Iterator<Map.Entry<String, ScriptValue>>) context.getScopeVariable("Iterator");
+
+                        if(iterator.hasNext()) {
+                            Map.Entry<String, ScriptValue> entry = iterator.next();
+                            context.setScopeVariable("Iterator", iterator);
+                            context.context().setVariable(context.variable("Key").name(), new ScriptTextValue(entry.getKey()));
+                            context.context().setVariable(context.variable("Value").name(), entry.getValue());
+                            context.setLastIfResult(true);
+                        }
+                    }
+            );
+
+            /*HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
             for (Map.Entry<String, ScriptValue> entry : dict.entrySet()) {
                 ctx.scheduleInner(() -> {
                     ctx.context().setVariable(ctx.variable("Key").name(), new ScriptTextValue(entry.getKey()));
                     ctx.context().setVariable(ctx.variable("Value").name(), entry.getValue());
                 });
-            }
+            }*/
         })),
 
     ROUND_NUM(builder -> builder.name("Round Number")

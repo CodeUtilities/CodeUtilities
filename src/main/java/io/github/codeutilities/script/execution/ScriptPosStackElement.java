@@ -85,4 +85,8 @@ public class ScriptPosStackElement {
     public void setVariable(String name, Object value) {
         scopeVariables.put(name, value);
     }
+
+    public boolean hasVariable(String name) {
+        return scopeVariables.containsKey(name);
+    }
 }
