@@ -157,4 +157,16 @@ public class QueueCommand implements Command {
                         )));
 
     }
+
+    @Override
+    public String getDescription() {
+        return "[blue]/queue[reset]\n"
+                + "\n"
+                + "Checks the Plot Queue of Jeremaster's DiamondFire stream.";
+    }
+
+    @Override
+    public String getName() {
+        return "/queue";
+    }
 }

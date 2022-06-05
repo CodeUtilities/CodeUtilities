@@ -61,5 +61,17 @@ public class PingCommand implements Command {
                 })
         );
     }
+
+    @Override
+    public String getDescription() {
+        return "[blue]/ping[reset]\n"
+                + "\n"
+                + "Gets your ping to both the proxy and server.";
+    }
+
+    @Override
+    public String getName() {
+        return "/ping";
+    }
 }
 

@@ -36,4 +36,16 @@ public class EditNbtCommand implements Command {
                 })
         );
     }
+
+    @Override
+    public String getDescription() {
+        return "[blue]/editnbt[reset]\n"
+                + "\n"
+                + "Opens a menu to edit item data.";
+    }
+
+    @Override
+    public String getName() {
+        return "/edititem";
+    }
 }

@@ -34,4 +34,16 @@ public class NodeCommand implements Command {
 
         cd.register(cmd);
     }
+
+    @Override
+    public String getDescription() {
+        return "[blue]/node <1-7|beta>[reset]\n"
+                + "\n"
+                + "Joins the specified node.";
+    }
+
+    @Override
+    public String getName() {
+        return "/node";
+    }
 }

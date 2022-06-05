@@ -14,17 +14,25 @@ public class CButton implements CWidget {
     private final int y;
     private final int width;
     private final int height;
+    private final float textScale;
     private String text;
     private Runnable onClick;
 
-    public CButton(int x, int y, int width, int height, String text, Runnable onClick) {
+    public CButton(int x, int y, int width, int height, float textScale, String text, Runnable onClick) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.textScale = textScale;
         this.text = text;
         this.onClick = onClick;
     }
+
+    public CButton(int x, int y, int width, int height, String text, Runnable onClick) {
+        this(x, y, width, height, 1f, text, onClick);
+    }
+
+
 
     @Override
     public void render(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
@@ -42,7 +50,7 @@ public class CButton implements CWidget {
         TextRenderer f = CodeUtilities.MC.textRenderer;
 
         stack.translate(rect.width / 2f, rect.height / 2f, 0);
-        stack.scale(0.5f, 0.5f, 0.5f);
+        stack.scale(0.5f * textScale, 0.5f * textScale, 0.5f * textScale);
         stack.translate(-f.getWidth(text) / 2f, -f.fontHeight / 2f, 0);
 
         f.drawWithShadow(stack, text, 0, 0, 0xFFFFFF);

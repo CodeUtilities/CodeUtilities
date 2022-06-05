@@ -22,8 +22,7 @@ public class CopyTextCommand implements Command {
                 )
         );
     }
-    
-    /*
+
     @Override
     public String getDescription() {
         return null;
@@ -33,6 +32,5 @@ public class CopyTextCommand implements Command {
     public String getName() {
         return null;
     }
-    */
 
 }

@@ -6,7 +6,7 @@ import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
-import io.github.codeutilities.util.template.TemplateUtils;
+import io.github.codeutilities.util.template.TemplateUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.ClickEvent;
@@ -26,7 +26,7 @@ public class WebviewCommand implements Command {
                                 JsonObject template;
 
                                 try {
-                                    template = TemplateUtils.fromItemStack(stack);
+                                    template = TemplateUtil.fromItemStack(stack);
                                 } catch (Exception e) {
                                     ChatUtil.sendMessage("Invalid code template!", ChatType.FAIL);
                                     return 1;
@@ -47,4 +47,15 @@ public class WebviewCommand implements Command {
                         })
         );
     }
+
+    @Override
+    public String getDescription() {
+        return "[blue]/webview[reset]\n\nProvides a web version of the template\nthat you're currently holding.";
+    }
+
+    @Override
+    public String getName() {
+        return "/webview";
+    }
+
 }

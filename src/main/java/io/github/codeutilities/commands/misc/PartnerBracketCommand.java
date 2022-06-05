@@ -150,7 +150,7 @@ public class PartnerBracketCommand implements Command {
         });
     }
 
-    /*
+
     @Override
     public String getDescription() {
         return "[blue]/partnerbracket[reset]\n"
@@ -162,5 +162,5 @@ public class PartnerBracketCommand implements Command {
     public String getName() {
         return "/partnerbracket";
     }
-    */
+
 }

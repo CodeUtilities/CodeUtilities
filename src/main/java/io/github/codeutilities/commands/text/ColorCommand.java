@@ -70,8 +70,7 @@ public class ColorCommand implements Command {
                         )));
 
     }
-    
-    /*
+
     @Override
     public String getDescription() {
         return "[blue]/color rgb <r> <g> <b>[reset]\n"
@@ -87,7 +86,6 @@ public class ColorCommand implements Command {
     public String getName() {
         return "/color";
     }
-    */
 
 
     private void copyColor(Color color) {

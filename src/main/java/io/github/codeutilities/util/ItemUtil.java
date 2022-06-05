@@ -4,13 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.codeutilities.CodeUtilities;
+import io.github.codeutilities.features.commands.schem.sk89q.jnbt.CompoundTag;
+import io.github.codeutilities.features.commands.schem.sk89q.jnbt.ListTag;
+import io.github.codeutilities.features.commands.schem.sk89q.jnbt.StringTag;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.registry.Registry;
 
 public class ItemUtil {
 
@@ -45,6 +52,15 @@ public class ItemUtil {
     public static void setHandItem(ItemStack item) {
         MinecraftClient mc = CodeUtilities.MC;
         mc.interactionManager.clickCreativeStack(item, mc.player.getInventory().selectedSlot + 36);
+    }
+
+    public static NbtList toListTag(List<ItemStack> stacks) {
+        NbtList listTag = new NbtList();
+        for (ItemStack stack : stacks) {
+            listTag.add(stack.writeNbt(new NbtCompound()));
+        }
+
+        return listTag;
     }
     
     public static List<ItemStack> fromListTag(NbtList listTag) {
@@ -90,5 +106,48 @@ public class ItemUtil {
         NbtList nbt = container.getOrCreateNbt().getCompound("BlockEntityTag").getList("Items", 10);
         return fromListTag(nbt);
     }
-	
-	}
+
+    public static void setLore(ItemStack itemStack, Text[] lores){
+        NbtList loreTag = new NbtList();
+        for(Text lore : lores) {
+            if(lore == null){
+                itemStack.getSubNbt("display").put("Lore", loreTag);
+                return;
+            }
+            loreTag.add(NbtString.of("{\"extra\":[{\"bold\":" + lore.getStyle().isBold() + ",\"italic\":" + lore.getStyle().isItalic() + ",\"underlined\":" + lore.getStyle().isUnderlined() + ",\"strikethrough\":" + lore.getStyle().isStrikethrough() + ",\"obfuscated\":" + lore.getStyle().isObfuscated() + ",\"color\":\"" + lore.getStyle().getColor() + "\",\"text\":\"" + lore.getString() + "\"}],\"text\":\"\"}"));
+        }
+        itemStack.getSubNbt("display").put("Lore", loreTag);
+    }
+
+    public static ItemStack setLore(ItemStack itemStack, String[] lores){
+        NbtList loreTag = new NbtList();
+        for(String lore : lores) {
+            if(lore == null){
+                itemStack.getSubNbt("display").put("Lore", loreTag);
+                return itemStack;
+            }
+            loreTag.add(NbtString.of(lore));
+        }
+        itemStack.getSubNbt("display").put("Lore", loreTag);
+        return itemStack;
+    }
+
+    public static ItemStack addLore(ItemStack itemStack, String[] lores){
+        NbtList loreTag = new NbtList();
+        if(itemStack.getOrCreateSubNbt("display").contains("Lore")){
+            loreTag = itemStack.getSubNbt("display").getList("Lore", 8);
+        }
+        for(String lore : lores) {
+            if(lore == null){
+                break;
+            }
+            loreTag.add(NbtString.of(lore));
+        }
+        itemStack.getSubNbt("display").put("Lore", loreTag);
+        return itemStack;
+    }
+
+    public static ItemStack fromID(String id) {
+        return new ItemStack(Registry.ITEM.get(new Identifier(id.toLowerCase())));
+    }
+}

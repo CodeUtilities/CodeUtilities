@@ -73,4 +73,17 @@ public class DfGiveCommand implements Command {
             ItemUtil.giveItem(stack);
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "[blue]/dfgive <item|clipboard> [count][reset]\n"
+                + "\n"
+                + "Gives you an item, like in Minecraft /give.\n"
+                + "Use [yellow]/dfgive clipboard[reset] if you have a long /give command copied in your clipboard.";
+    }
+
+    @Override
+    public String getName() {
+        return "/dfgive";
+    }
 }

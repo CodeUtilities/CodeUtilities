@@ -35,7 +35,10 @@ public class CText implements CWidget {
         stack.push();
         stack.translate(x, y, 0);
 
-        stack.scale(0.5f, 0.5f, 0.5f);
+        //stack.scale(0.5f, 0.5f, 0.5f);
+
+        // maintain backwards compat with the old 0.5f
+        stack.scale(0.5f * scale, 0.5f * scale, 0.5f * scale);
 
         TextRenderer f = CodeUtilities.MC.textRenderer;
 

@@ -176,5 +176,12 @@
   "config.codeutilities.option.dfNodeButtons.tooltip": "Adds node specific buttons in the title screen to join DiamondFire.",
 
   "config.codeutilities.option.clickToReply": "Click to reply",
-  "config.codeutilities.option.clickToReply.tooltip": "Makes /messages clickable so you can reply easily to players!"
+  "config.codeutilities.option.clickToReply.tooltip": "Makes /messages clickable so you can reply easily to players!",
+
+  "command.codeutilities.require_creative_mode": "You must be in creative mode to use this command!",
+  "command.codeutilities.require_dev_mode": "You must be in dev mode to use this command!",
+
+  "command.codeutilities.search.cleared": "Search Cleared!",
+  "command.codeutilities.search.invalid": "Invalid Action '%s'.",
+  "command.codeutilities.search.begin_search": "Results of '%s'"
 }

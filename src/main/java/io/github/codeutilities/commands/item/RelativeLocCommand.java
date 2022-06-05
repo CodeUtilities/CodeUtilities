@@ -56,7 +56,6 @@ public class RelativeLocCommand implements Command {
         );
     }
 
-    /*
     @Override
     public String getDescription() {
         return "[blue]/relativeloc <target> <forwards> <upwards> <right> <rot_down> <rot_right>[reset]\n"
@@ -69,8 +68,6 @@ public class RelativeLocCommand implements Command {
     public String getName() {
         return "/relativeloc";
     }
-    
-    */
 
     private int run(String target, float forwards, float upwards, float right, float rot_down, float rot_right) {
         String[] targetNames = {"Selected Object", "Default", "Damager", "Killer", "Victim", "Shooter", "Projectile"};

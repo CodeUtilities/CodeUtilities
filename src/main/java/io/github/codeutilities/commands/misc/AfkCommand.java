@@ -57,5 +57,17 @@ public class AfkCommand implements Command {
                 })
         );
     }
+
+    @Override
+    public String getDescription() {
+        return "[blue]/afk[reset]\n\n"
+                + "Marks you as AFK. When you leave AFK, any\n"
+                + "messages you received will be shown.\n";
+    }
+
+    @Override
+    public String getName() {
+        return "/afk";
+    }
 }
 

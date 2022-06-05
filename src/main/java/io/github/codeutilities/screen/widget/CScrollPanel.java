@@ -111,6 +111,8 @@ public class CScrollPanel implements CWidget {
         children.add(child);
     }
 
+    public void clear() { children.clear(); }
+
     @Override
     public void renderOverlay(MatrixStack stack, int mouseX, int mouseY, float tickDelta) {
         mouseY -= scroll;

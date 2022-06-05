@@ -82,4 +82,16 @@ public class ScriptsCommand implements Command {
         }
         ChatUtil.error("Unknown script!");
     }
+
+    @Override
+    public String getDescription() {
+        return "[blue]/scripts[reset]\n" +
+                "\n" +
+                "Opens a GUI to edit custom CodeUtilities scripts.\n";
+    }
+
+    @Override
+    public String getName() {
+        return "/scripts";
+    }
 }

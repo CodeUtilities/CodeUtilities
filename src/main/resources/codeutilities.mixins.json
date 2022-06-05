@@ -13,6 +13,7 @@
     "render.MInGameHUD",
     "render.MOptionsScreen",
     "render.MPlayerListHUD",
+    "render.MSignRenderer",
     "render.MTitleScreen"
   ],
   "client": [

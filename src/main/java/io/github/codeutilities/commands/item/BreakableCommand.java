@@ -37,8 +37,6 @@ public class BreakableCommand implements Command {
         );
     }
 
-    /*
-
     @Override
     public String getDescription() {
         return "[blue]/breakable[reset]\n"
@@ -50,6 +48,6 @@ public class BreakableCommand implements Command {
     public String getName() {
         return "/breakable";
     }
-    */
+
 }
 

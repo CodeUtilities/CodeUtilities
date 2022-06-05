@@ -19,7 +19,6 @@ public class TitleCommand implements Command {
         reg("titlepreview",mc,cd);
     }
 
-    /*
     @Override
     public String getDescription() {
         return "[blue]/previewtitle [text][reset]\n"
@@ -32,7 +31,6 @@ public class TitleCommand implements Command {
     public String getName() {
         return "/previewtitle";
     }
-    */
 
     public void reg(String name, MinecraftClient mc, CommandDispatcher<FabricClientCommandSource> cd) {
         cd.register(literal(name)
