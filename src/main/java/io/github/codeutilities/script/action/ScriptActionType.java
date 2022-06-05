@@ -654,6 +654,21 @@ public enum ScriptActionType {
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptDictionaryValue(dict));
         })),
 
+    PARSE_JSON(builder -> builder.name("Parse from JSON")
+        .description("Creates a dict from JSON data.")
+        .icon(Items.ANVIL)
+        .category(ScriptActionCategory.DICTIONARIES)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("JSON", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            ScriptValue dict;
+
+
+            dict = ScriptValueJson.fromJson(JsonParser.parseString(ctx.value("JSON").toString()));
+
+            ctx.context().setVariable(ctx.variable("Result").name(), dict);
+        })),
+
     GET_DICT_VALUE(builder -> builder.name("Get Dictionary Value")
         .description("Gets a value from a dictionary.")
         .icon(Items.BOOK)
