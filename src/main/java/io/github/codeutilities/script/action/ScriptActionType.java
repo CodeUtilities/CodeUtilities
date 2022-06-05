@@ -2,7 +2,9 @@ package io.github.codeutilities.script.action;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -660,8 +662,11 @@ public enum ScriptActionType {
         .action(ctx -> {
             ScriptValue dict;
 
+            try{
+                dict = ScriptValueJson.fromJson(JsonParser.parseString(ctx.value("JSON").toString()));
+            }
+            catch (JsonParseException e) {dict = new ScriptUnknownValue();}
 
-            dict = ScriptValueJson.fromJson(JsonParser.parseString(ctx.value("JSON").toString()));
 
             ctx.context().setVariable(ctx.variable("Result").name(), dict);
         })),
