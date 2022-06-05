@@ -37,10 +37,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
@@ -710,6 +707,18 @@ public enum ScriptActionType {
             HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(dict.size()));
         })),
+
+    GET_DICT_KEYS(builder -> builder.name("Get Dictionary Keys")
+        .description("Gets a list of the keys in a dictionary.")
+        .icon(Items.FURNACE_MINECART)
+        .category(ScriptActionCategory.DICTIONARIES)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Dictionary", ScriptActionArgumentType.DICTIONARY)
+        .action(ctx -> {
+            HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptListValue(dict.keySet().stream().map(x -> (ScriptValue) new ScriptTextValue(x)).toList()));
+        })
+    ),
 
     IF_DICT_KEY_EXISTS(builder -> builder.name("If Dictionary Key Exists")
         .description("Checks if a key exists in a dictionary.")
