@@ -1,7 +1,9 @@
 package io.github.codeutilities.script.action;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -711,6 +713,24 @@ public enum ScriptActionType {
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptDictionaryValue(dict));
         })),
 
+    PARSE_JSON(builder -> builder.name("Parse from JSON")
+        .description("Creates a dict from JSON data.")
+        .icon(Items.ANVIL)
+        .category(ScriptActionCategory.DICTIONARIES)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("JSON", ScriptActionArgumentType.TEXT)
+        .action(ctx -> {
+            ScriptValue dict;
+
+            try{
+                dict = ScriptValueJson.fromJson(JsonParser.parseString(ctx.value("JSON").toString()));
+            }
+            catch (JsonParseException e) {dict = new ScriptUnknownValue();}
+
+
+            ctx.context().setVariable(ctx.variable("Result").name(), dict);
+        })),
+
     GET_DICT_VALUE(builder -> builder.name("Get Dictionary Value")
         .description("Gets a value from a dictionary.")
         .icon(Items.BOOK)
@@ -752,6 +772,18 @@ public enum ScriptActionType {
             HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptNumberValue(dict.size()));
         })),
+
+    GET_DICT_KEYS(builder -> builder.name("Get Dictionary Keys")
+        .description("Gets a list of the keys in a dictionary.")
+        .icon(Items.FURNACE_MINECART)
+        .category(ScriptActionCategory.DICTIONARIES)
+        .arg("Result", ScriptActionArgumentType.VARIABLE)
+        .arg("Dictionary", ScriptActionArgumentType.DICTIONARY)
+        .action(ctx -> {
+            HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
+            ctx.context().setVariable(ctx.variable("Result").name(), new ScriptListValue(dict.keySet().stream().map(x -> (ScriptValue) new ScriptTextValue(x)).toList()));
+        })
+    ),
 
     IF_DICT_KEY_EXISTS(builder -> builder.name("If Dictionary Key Exists")
         .description("Checks if a key exists in a dictionary.")

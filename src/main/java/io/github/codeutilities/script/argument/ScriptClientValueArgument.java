@@ -68,6 +68,8 @@ public enum ScriptClientValueArgument implements ScriptArgument {
 
     TIMESTAMP("Timestamp","The current timestamp in milliseconds.", Items.CLOCK, ScriptActionArgumentType.NUMBER, (event,context) -> new ScriptNumberValue(System.currentTimeMillis())),
 
+    CLIPBOARD("Clipboard", "The current text on the clipboard", Items.PAPER, ScriptActionArgumentType.TEXT, (event,context) -> new ScriptTextValue(CodeUtilities.MC.keyboard.getClipboard())),
+
     MAIN_HAND_ITEM("MainHandItem","The item in the players main hand.", Items.STONE_BUTTON, ScriptActionArgumentType.DICTIONARY,
         (event,context) -> ScriptValueItem.valueFromItem(CodeUtilities.MC.player.getMainHandStack())
     ),
