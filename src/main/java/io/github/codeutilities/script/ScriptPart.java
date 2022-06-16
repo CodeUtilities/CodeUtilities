@@ -18,6 +18,8 @@ import java.util.List;
 
 public interface ScriptPart {
 
+    ScriptGroup getGroup();
+
     class Serializer implements JsonDeserializer<ScriptPart> {
 
         @Override

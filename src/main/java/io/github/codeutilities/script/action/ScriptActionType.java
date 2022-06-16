@@ -1,6 +1,5 @@
 package io.github.codeutilities.script.action;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -10,6 +9,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.event.HudRenderEvent;
 import io.github.codeutilities.event.system.CancellableEvent;
+import io.github.codeutilities.script.ScriptGroup;
 import io.github.codeutilities.script.action.ScriptActionArgument.ScriptActionArgumentType;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
@@ -37,10 +37,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
@@ -62,7 +59,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
-
 public enum ScriptActionType {
 
     DISPLAY_CHAT(builder -> builder.name("DisplayChat")
@@ -117,8 +113,28 @@ public enum ScriptActionType {
         .arg("Times", ScriptActionArgumentType.NUMBER)
         .arg("Current", ScriptActionArgumentType.VARIABLE, b -> b.optional(true))
         .hasChildren(true)
+        .group(ScriptGroup.REPETITION)
         .action(ctx -> {
-            if (ctx.argMap().containsKey("Current")) {
+            ctx.scheduleInner(
+                    null,
+                    context -> {
+                        if(!context.hasScopeVariable("Counter")) {
+                            context.setScopeVariable("Counter", 0);
+                        }
+
+                        int counter = (Integer)context.getScopeVariable("Counter")+1;
+
+                        if(counter <= context.value("Times").asNumber()) {
+                            context.setScopeVariable("Counter", counter);
+                            if (context.argMap().containsKey("Current")) {
+                                context.context().setVariable(context.variable("Current").name(), new ScriptNumberValue(counter));
+                            }
+                            context.setLastIfResult(true);
+                        }
+                    }
+            );
+
+            /*if (ctx.argMap().containsKey("Current")) {
                 ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(1));
             }
             for (int i = (int) ctx.value("Times").asNumber(); i > 0; i--) {
@@ -128,7 +144,7 @@ public enum ScriptActionType {
                         ctx.context().setVariable(ctx.variable("Current").name(), new ScriptNumberValue(current));
                     }
                 });
-            }
+            }*/
         })),
 
     CLOSE_BRACKET(builder -> builder.name("CloseBracket")
@@ -299,9 +315,10 @@ public enum ScriptActionType {
         .arg("Value", ScriptActionArgumentType.ANY)
         .arg("Other", ScriptActionArgumentType.ANY)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").valueEquals(ctx.value("Other"))) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -312,9 +329,10 @@ public enum ScriptActionType {
         .arg("Value", ScriptActionArgumentType.ANY)
         .arg("Other", ScriptActionArgumentType.ANY)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (!ctx.value("Value").valueEquals(ctx.value("Other"))) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -325,9 +343,10 @@ public enum ScriptActionType {
         .arg("Value", ScriptActionArgumentType.NUMBER)
         .arg("Other", ScriptActionArgumentType.NUMBER)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() > ctx.value("Other").asNumber()) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -338,9 +357,10 @@ public enum ScriptActionType {
         .arg("Value", ScriptActionArgumentType.NUMBER)
         .arg("Other", ScriptActionArgumentType.NUMBER)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() >= ctx.value("Other").asNumber()) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -351,9 +371,10 @@ public enum ScriptActionType {
         .arg("Value", ScriptActionArgumentType.NUMBER)
         .arg("Other", ScriptActionArgumentType.NUMBER)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() < ctx.value("Other").asNumber()) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -364,9 +385,10 @@ public enum ScriptActionType {
         .arg("Value", ScriptActionArgumentType.NUMBER)
         .arg("Other", ScriptActionArgumentType.NUMBER)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (ctx.value("Value").asNumber() <= ctx.value("Other").asNumber()) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -521,10 +543,11 @@ public enum ScriptActionType {
         .arg("List", ScriptActionArgumentType.LIST)
         .arg("Value", ScriptActionArgumentType.ANY)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
             if (list.stream().anyMatch(value -> value.valueEquals(ctx.value("Value")))) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -535,28 +558,30 @@ public enum ScriptActionType {
         .arg("Text", ScriptActionArgumentType.TEXT)
         .arg("Subtext", ScriptActionArgumentType.TEXT)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             String text = ctx.value("Text").asText();
             String subtext = ctx.value("Subtext").asText();
             if (text.contains(subtext)) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
     IF_MATCHES_REGEX(builder -> builder.name("If Matches Regex")
-            .description("Checks if a text matches a regex.")
-            .icon(Items.ANVIL)
-            .category(ScriptActionCategory.TEXTS)
-            .arg("Text", ScriptActionArgumentType.TEXT)
-            .arg("Regex", ScriptActionArgumentType.TEXT)
-            .hasChildren(true)
-            .action(ctx -> {
-                String text = ctx.value("Text").asText();
-                String regex = ctx.value("Regex").asText();
-                if (text.matches(regex)) {
-                    ctx.scheduleInner();
-                }
-            })),
+        .description("Checks if a text matches a regex.")
+        .icon(Items.ANVIL)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Regex", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            String regex = ctx.value("Regex").asText();
+            if (text.matches(regex)) {
+                ctx.setLastIfResult(true);
+            }
+        })),
 
     IF_STARTS_WITH(builder -> builder.name("If Starts With")
         .description("Checks if a text starts with an other.")
@@ -565,25 +590,27 @@ public enum ScriptActionType {
         .arg("Text", ScriptActionArgumentType.TEXT)
         .arg("Subtext", ScriptActionArgumentType.TEXT)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             String text = ctx.value("Text").asText();
             String subtext = ctx.value("Subtext").asText();
             if (text.startsWith(subtext)) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
     IF_LIST_DOESNT_CONTAIN(builder -> builder.name("If List Doesnt Contain")
-        .description("Checks if a list contains a value.")
+        .description("Checks if a list doesnt contain a value.")
         .icon(Items.BOOKSHELF)
         .category(ScriptActionCategory.LISTS)
         .arg("List", ScriptActionArgumentType.LIST)
         .arg("Value", ScriptActionArgumentType.ANY)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             List<ScriptValue> list = ctx.value("List").asList();
             if (list.stream().noneMatch(value -> value.valueEquals(ctx.value("Value")))) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -594,11 +621,12 @@ public enum ScriptActionType {
         .arg("Text", ScriptActionArgumentType.TEXT)
         .arg("Subtext", ScriptActionArgumentType.TEXT)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             String text = ctx.value("Text").asText();
             String subtext = ctx.value("Subtext").asText();
             if (!text.contains(subtext)) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -609,11 +637,28 @@ public enum ScriptActionType {
         .arg("Text", ScriptActionArgumentType.TEXT)
         .arg("Subtext", ScriptActionArgumentType.TEXT)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             String text = ctx.value("Text").asText();
             String subtext = ctx.value("Subtext").asText();
             if (!text.startsWith(subtext)) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
+            }
+        })),
+
+    IF_DOESNT_MATCH_REGEX(builder -> builder.name("If Doesnt Match Regex")
+        .description("Checks if a text doesnt match a regex.")
+        .icon(Items.ANVIL)
+        .category(ScriptActionCategory.TEXTS)
+        .arg("Text", ScriptActionArgumentType.TEXT)
+        .arg("Regex", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
+        .action(ctx -> {
+            String text = ctx.value("Text").asText();
+            String regex = ctx.value("Regex").asText();
+            if (!text.matches(regex)) {
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -623,6 +668,18 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.MISC)
         .arg("Ticks", ScriptActionArgumentType.NUMBER)
         .action(ctx -> {
+            int n = 0;
+            while(!(ctx.task().stack().peekOriginal(n) < 0)) {
+                int pos = ctx.task().stack().peekOriginal(n);
+                n++;
+                if(pos >= 0 && ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION) {
+                    if(ctx.task().stack().peekElement(n).hasVariable("LagslayerCounter"))
+                    {
+                        ctx.task().stack().peekElement(n).setVariable("LagslayerCounter", 0);
+                    }
+                }
+            }
+
             ctx.task().stop();//Stop the current thread
             ctx.task().stack().increase();//Go to the next action
             Scheduler.schedule((int) ctx.value("Ticks").asNumber(), () -> ctx.task().run());//Resume the task after the given amount of ticks
@@ -703,11 +760,28 @@ public enum ScriptActionType {
         .arg("Dictionary", ScriptActionArgumentType.DICTIONARY)
         .arg("Key", ScriptActionArgumentType.TEXT)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
             String key = ctx.value("Key").asText();
             if (dict.containsKey(key)) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
+            }
+        })),
+
+    IF_DICT_KEY_DOESNT_EXIST(builder -> builder.name("If Dictionary Key Doesnt Exist")
+        .description("Checks if a key doesnt exist in a dictionary.")
+        .icon(Items.NAME_TAG)
+        .category(ScriptActionCategory.DICTIONARIES)
+        .arg("Dictionary", ScriptActionArgumentType.DICTIONARY)
+        .arg("Key", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
+        .action(ctx -> {
+            HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
+            String key = ctx.value("Key").asText();
+            if (!dict.containsKey(key)) {
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -732,8 +806,27 @@ public enum ScriptActionType {
         .arg("Variable", ScriptActionArgumentType.VARIABLE)
         .arg("List", ScriptActionArgumentType.LIST)
         .hasChildren(true)
+        .group(ScriptGroup.REPETITION)
         .action(ctx -> {
-            List<ScriptValue> list = ctx.value("List").asList();
+            ctx.scheduleInner(
+                    null,
+                    context -> {
+                        if(!context.hasScopeVariable("Counter")) {
+                            context.setScopeVariable("Counter", 0);
+                        }
+
+                        int counter = (Integer)context.getScopeVariable("Counter")+1;
+                        List<ScriptValue> list = context.value("List").asList();
+
+                        if(counter <= list.size()) {
+                            context.setScopeVariable("Counter", counter);
+                            context.context().setVariable(context.variable("Variable").name(), list.get(counter-1));
+                            context.setLastIfResult(true);
+                        }
+                    }
+            );
+
+            /*List<ScriptValue> list = ctx.value("List").asList();
             if (!list.isEmpty()) {
                 ctx.context().setVariable(ctx.variable("Variable").name(), list.get(0));
             }
@@ -742,7 +835,7 @@ public enum ScriptActionType {
                 ctx.scheduleInner(() -> {
                     ctx.context().setVariable(ctx.variable("Variable").name(), item);
                 });
-            }
+            }*/
         })),
 
     DICT_FOR_EACH(builder -> builder.name("For Each In Dictionary")
@@ -753,14 +846,36 @@ public enum ScriptActionType {
         .arg("Value", ScriptActionArgumentType.VARIABLE)
         .arg("Dictionary", ScriptActionArgumentType.DICTIONARY)
         .hasChildren(true)
+        .group(ScriptGroup.REPETITION)
         .action(ctx -> {
-            HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
+            ctx.scheduleInner(
+                    null,
+                    context -> {
+                        HashMap<String, ScriptValue> dict = context.value("Dictionary").asDictionary();
+
+                        if(!context.hasScopeVariable("Iterator")) {
+                            context.setScopeVariable("Iterator", dict.entrySet().iterator());
+                        }
+
+                        Iterator<Map.Entry<String, ScriptValue>> iterator = (Iterator<Map.Entry<String, ScriptValue>>) context.getScopeVariable("Iterator");
+
+                        if(iterator.hasNext()) {
+                            Map.Entry<String, ScriptValue> entry = iterator.next();
+                            context.setScopeVariable("Iterator", iterator);
+                            context.context().setVariable(context.variable("Key").name(), new ScriptTextValue(entry.getKey()));
+                            context.context().setVariable(context.variable("Value").name(), entry.getValue());
+                            context.setLastIfResult(true);
+                        }
+                    }
+            );
+
+            /*HashMap<String, ScriptValue> dict = ctx.value("Dictionary").asDictionary();
             for (Map.Entry<String, ScriptValue> entry : dict.entrySet()) {
                 ctx.scheduleInner(() -> {
                     ctx.context().setVariable(ctx.variable("Key").name(), new ScriptTextValue(entry.getKey()));
                     ctx.context().setVariable(ctx.variable("Value").name(), entry.getValue());
                 });
-            }
+            }*/
         })),
 
     ROUND_NUM(builder -> builder.name("Round Number")
@@ -830,9 +945,10 @@ public enum ScriptActionType {
         .icon(Items.BOOK)
         .hasChildren(true)
         .category(ScriptActionCategory.MISC)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (CodeUtilities.MC.currentScreen != null) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -841,9 +957,10 @@ public enum ScriptActionType {
         .icon(Items.BOOK)
         .hasChildren(true)
         .category(ScriptActionCategory.MISC)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             if (CodeUtilities.MC.currentScreen == null) {
-                ctx.scheduleInner();
+                ctx.setLastIfResult(true);
             }
         })),
 
@@ -875,12 +992,45 @@ public enum ScriptActionType {
             ctx.context().setVariable(ctx.variable("Result").name(), new ScriptListValue(split));
         })),
 
-    STOP(builder -> builder.name("Stop")
+    STOP(builder -> builder.name("Stop Codeline")
         .description("Stops the current codeline.")
         .icon(Items.BARRIER)
         .category(ScriptActionCategory.MISC)
         .action(ctx -> {
             ctx.task().stop();
+        })),
+
+    SKIP_ITERATION(builder -> builder.name("Skip Iteration")
+        .description("Skips the current iteration of the latest loop.")
+        .icon(Items.ENDER_PEARL)
+        .category(ScriptActionCategory.MISC)
+        .action(ctx -> {
+            int n = 0;
+            while(!(ctx.task().stack().peekOriginal(n) < 0)) {
+                int pos = ctx.task().stack().peekOriginal(n);
+                n++;
+                ctx.context().forceEndScope();
+                if(pos < 0 || ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION) {
+                    break;
+                }
+            }
+        })),
+
+    STOP_REPETITION(builder -> builder.name("Stop Repetition")
+        .description("Stops the latest loop.")
+        .icon(Items.PRISMARINE_SHARD)
+        .category(ScriptActionCategory.MISC)
+        .action(ctx -> {
+            ctx.context().breakLoop();
+            int n = 0;
+            while(!(ctx.task().stack().peekOriginal(n) < 0)) {
+                int pos = ctx.task().stack().peekOriginal(n);
+                n++;
+                ctx.context().forceEndScope();
+                if(pos < 0 || ctx.script().getParts().get(pos).getGroup() == ScriptGroup.REPETITION) {
+                    break;
+                }
+            }
         })),
 
     PLAY_SOUND(builder -> builder.name("Play Sound")
@@ -1108,12 +1258,32 @@ public enum ScriptActionType {
         .category(ScriptActionCategory.MISC)
         .arg("Filename", ScriptActionArgumentType.TEXT)
         .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
         .action(ctx -> {
             String filename = ctx.value("Filename").asText();
             if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
                 Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
                 if (Files.exists(f)) {
-                    ctx.scheduleInner();
+                    ctx.setLastIfResult(true);
+                }
+            } else {
+                ChatUtil.error("Illegal filename: " + filename);
+            }
+        })),
+
+    IF_FILE_DOESNT_EXIST(builder -> builder.name("If File Doesnt Exist")
+        .description("Executes if the specified file doesnt exist.")
+        .icon(Items.BOOK)
+        .category(ScriptActionCategory.MISC)
+        .arg("Filename", ScriptActionArgumentType.TEXT)
+        .hasChildren(true)
+        .group(ScriptGroup.CONDITION)
+        .action(ctx -> {
+            String filename = ctx.value("Filename").asText();
+            if (filename.matches("^[a-zA-Z\\d_\\-\\. ]+$")) {
+                Path f = FileUtil.cuFolder("Scripts").resolve(ctx.script().getFile().getName()+"-files").resolve(filename);
+                if (!Files.exists(f)) {
+                    ctx.setLastIfResult(true);
                 }
             } else {
                 ChatUtil.error("Illegal filename: " + filename);
@@ -1405,7 +1575,26 @@ public enum ScriptActionType {
                 ctx.variable("Result").name(),
                 new ScriptNumberValue(result)
             );
-        }));
+        })),
+
+    REPEAT_FOREVER(builder -> builder.name("RepeatForever")
+            .description(new String[]{"Repeats for eternity.", "Make sure to have a Stop Repetition, Stop Codeline or Wait somewhere in the code!", "There's a lagslayer for the repetition actions.", "It activates after 100000 iterations with no Wait."})
+            .icon(Items.GOLD_INGOT)
+            .category(ScriptActionCategory.MISC)
+            .hasChildren(true)
+            .group(ScriptGroup.REPETITION)
+            .action(ctx -> {
+                ctx.scheduleInner(null, context -> context.setLastIfResult(true));
+            })),
+    ELSE(builder -> builder.name("Else")
+        .description(new String[]{"Executes if the last IF condition failed.","And ELSE also works as a valid IF condition for ELSE."})
+        .icon(Items.END_STONE)
+        .category(ScriptActionCategory.MISC)
+        .group(ScriptGroup.CONDITION)
+        .hasChildren(true)
+        .action(ctx -> {
+            ctx.setLastIfResult(!ctx.lastIfResult());
+    }));
 
     private Consumer<ScriptActionContext> action = (ctx) -> {
     };
@@ -1413,13 +1602,13 @@ public enum ScriptActionType {
     private String name = "Unnamed Action";
     private boolean hasChildren = false;
     private ScriptActionCategory category = ScriptActionCategory.MISC;
-    private String description = "No description provided.";
+    private List<String> description = new ArrayList();
+    private ScriptGroup group = ScriptGroup.ACTION;
     private final List<ScriptActionArgument> arguments = new ArrayList<>();
-
     ScriptActionType(Consumer<ScriptActionType> builder) {
+        description.add("No description provided.");
         builder.accept(this);
     }
-
     public ItemStack getIcon() {
         ItemStack item = new ItemStack(icon);
         item.setCustomName(new LiteralText(name)
@@ -1428,10 +1617,12 @@ public enum ScriptActionType {
                 .withItalic(false)));
 
         NbtList lore = new NbtList();
-        lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(description)
-            .fillStyle(Style.EMPTY
-                .withColor(Formatting.GRAY)
-                .withItalic(false)))));
+        for (String descriptionLine: description) {
+            lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(descriptionLine)
+                .fillStyle(Style.EMPTY
+                      .withColor(Formatting.GRAY)
+                      .withItalic(false)))));
+        }
 
         lore.add(NbtString.of(Text.Serializer.toJson(new LiteralText(""))));
 
@@ -1444,7 +1635,6 @@ public enum ScriptActionType {
 
         return item;
     }
-
     public String getName() {
         return name;
     }
@@ -1483,8 +1673,25 @@ public enum ScriptActionType {
     }
 
     private ScriptActionType description(String description) {
-        this.description = description;
+        this.description.clear();
+        this.description.add(description);
         return this;
+    }
+
+    private ScriptActionType description(String[] description) {
+        this.description.clear();
+
+        this.description.addAll(Arrays.asList(description));
+
+        return this;
+    }
+    private ScriptActionType group(ScriptGroup group) {
+        this.group = group;
+        return this;
+    }
+
+    public ScriptGroup getGroup() {
+        return group;
     }
 
     public ScriptActionType arg(String name, ScriptActionArgumentType type, Consumer<ScriptActionArgument> builder) {

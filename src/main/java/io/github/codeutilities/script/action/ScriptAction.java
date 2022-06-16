@@ -6,14 +6,17 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.github.codeutilities.event.system.Event;
 import io.github.codeutilities.script.Script;
+import io.github.codeutilities.script.ScriptGroup;
 import io.github.codeutilities.script.ScriptPart;
 import io.github.codeutilities.script.argument.ScriptArgument;
 import io.github.codeutilities.script.execution.ScriptActionContext;
 import io.github.codeutilities.script.execution.ScriptContext;
+import io.github.codeutilities.script.execution.ScriptScopeVariables;
 import io.github.codeutilities.script.execution.ScriptTask;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class ScriptAction implements ScriptPart {
@@ -26,7 +29,7 @@ public class ScriptAction implements ScriptPart {
         this.arguments = arguments;
     }
 
-    public void invoke(Event event, ScriptContext context, Consumer<Runnable> inner, ScriptTask task, Script script) {
+    public void invoke(Event event, ScriptContext context, Consumer<ScriptScopeVariables> inner, ScriptTask task, Script script) {
         type.run(new ScriptActionContext(
             context, arguments, event, inner, task, new HashMap<>(), script
         ));
@@ -38,6 +41,11 @@ public class ScriptAction implements ScriptPart {
 
     public List<ScriptArgument> getArguments() {
         return arguments;
+    }
+
+    @Override
+    public ScriptGroup getGroup() {
+        return getType().getGroup();
     }
 
     public static class Serializer implements JsonSerializer<ScriptAction> {

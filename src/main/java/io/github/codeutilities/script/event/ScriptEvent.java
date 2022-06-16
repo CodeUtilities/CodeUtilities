@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import io.github.codeutilities.script.ScriptGroup;
 import io.github.codeutilities.script.ScriptPart;
 import java.lang.reflect.Type;
 
@@ -17,6 +18,11 @@ public class ScriptEvent implements ScriptPart {
 
     public ScriptEventType getType() {
         return type;
+    }
+
+    @Override
+    public ScriptGroup getGroup() {
+        return ScriptGroup.EVENT;
     }
 
     public static class Serializer implements JsonSerializer<ScriptEvent> {

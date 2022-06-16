@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public record ScriptActionContext(ScriptContext context, List<ScriptArgument> arguments, Event event, Consumer<Runnable> inner, ScriptTask task, HashMap<String, List<ScriptArgument>> argMap, Script script) {
+public record ScriptActionContext(ScriptContext context, List<ScriptArgument> arguments, Event event, Consumer<ScriptScopeVariables> inner, ScriptTask task, HashMap<String, List<ScriptArgument>> argMap, Script script) {
 
     public void setArg(String name, List<ScriptArgument> args) {
         argMap.put(name, args);
@@ -37,10 +37,40 @@ public record ScriptActionContext(ScriptContext context, List<ScriptArgument> ar
     }
 
     public void scheduleInner(Runnable runnable) {
-        inner.accept(runnable);
+        inner.accept(new ScriptScopeVariables(runnable, null, this));
     }
 
+    public void scheduleInner(Runnable runnable, Consumer<ScriptActionContext> condition) {
+        inner.accept(new ScriptScopeVariables(runnable, condition, this));
+    }
     public void scheduleInner() {
-        inner.accept(null);
+        inner.accept(new ScriptScopeVariables(null, null, this));
+    }
+
+    public boolean lastIfResult(int n) {
+        return task().stack().peekElement(n).getVariable("lastIfResult").equals(true);
+    }
+
+    public boolean lastIfResult() {
+        return lastIfResult(0);
+    }
+
+    public void setLastIfResult(boolean a, int n) {
+        task().stack().peekElement(n).setVariable("lastIfResult", a);
+    }
+    public void setLastIfResult(boolean a) {
+        setLastIfResult(a, 0);
+    }
+
+    public void setScopeVariable(String name, Object object) {
+        task().stack().peekElement(0).setVariable(name, object);
+    }
+
+    public Object getScopeVariable(String name) {
+        return task().stack().peekElement(0).getVariable(name);
+    }
+
+    public boolean hasScopeVariable(String name) {
+        return task().stack().peekElement(0).hasVariable(name);
     }
 }

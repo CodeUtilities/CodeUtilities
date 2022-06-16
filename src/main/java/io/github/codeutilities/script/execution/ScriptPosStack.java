@@ -2,39 +2,65 @@ package io.github.codeutilities.script.execution;
 
 import java.util.ArrayList;
 import java.util.List;
-
 public class ScriptPosStack {
 
-    private final List<Integer> data = new ArrayList<>();
-    private final List<Runnable> preTasks = new ArrayList<>();
-
+    private final List<ScriptPosStackElement> data = new ArrayList<>();
     public ScriptPosStack(int initial) {
-        data.add(initial);
-        preTasks.add(null);
+        push(initial);
     }
-
-    public void push(int value, Runnable preTask) {
-        data.add(value);
-        preTasks.add(preTask);
+    public void push(int value, ScriptScopeVariables variables) {
+        data.add(new ScriptPosStackElement(value, variables));
     }
-
     public void push(int value) {
-        data.add(value);
-        preTasks.add(null);
+        data.add(new ScriptPosStackElement(value));
     }
 
     public void pop() {
-        Runnable preTask = preTasks.remove(preTasks.size() - 1);
-        if (preTask != null) {
-            preTask.run();
+        if(isEmpty())
+        {
+            return;
         }
-        data.remove(data.size() - 1);
+        ScriptPosStackElement element = data.remove(data.size() - 1);
+        element.runPreTask();
     }
 
     public int peek() {
-        return data.get(data.size() - 1);
+        return peek(0);
     }
 
+    public int peekOriginal() {
+        return peekOriginal(0);
+    }
+
+    public ScriptPosStackElement peekElement() { return peekElement(0); }
+
+    public int peek(int n)
+    {
+        ScriptPosStackElement element = peekElement(n);
+        if(element == null)
+        {
+            return -1;
+        }
+        return element.getPos();
+    }
+
+    public int peekOriginal(int n)
+    {
+        ScriptPosStackElement element = peekElement(n);
+        if(element == null)
+        {
+            return -1;
+        }
+        return element.getOriginalPos();
+    }
+
+    public ScriptPosStackElement peekElement(int n) {
+        if(!(data.size() - 1 - n >= 0))
+        {
+            return null;
+        }
+        return data.get(data.size() - 1 - n);
+    }
     public int size() {
         return data.size();
     }
@@ -48,6 +74,7 @@ public class ScriptPosStack {
     }
 
     public void increase() {
-        data.set(data.size() - 1, data.get(data.size() - 1) + 1);
+        ScriptPosStackElement element = peekElement();
+        data.set(data.size() - 1, element.setPos(element.getPos()+1));
     }
 }

@@ -37,8 +37,12 @@ public class ScriptTask {
     public boolean isRunning() {
         return running;
     }
+    public void schedule(int posCopy, ScriptScopeVariables scriptScopeVariables) {
+        stack.push(posCopy, scriptScopeVariables);
 
-    public void schedule(int posCopy, Runnable preTask) {
-        stack.push(posCopy, preTask);
+        if(stack.peekElement().hasCondition() && !stack.peekElement().checkCondition()) {
+            stack.pop();
+            return;
+        }
     }
 }

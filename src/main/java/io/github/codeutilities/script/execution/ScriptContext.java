@@ -2,12 +2,52 @@ package io.github.codeutilities.script.execution;
 
 import io.github.codeutilities.script.values.ScriptUnknownValue;
 import io.github.codeutilities.script.values.ScriptValue;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class ScriptContext {
+
+    private int isForcedToEnd = 0;
+    public void forceEndScope(int times) {
+        isForcedToEnd += times;
+    }
+
+    public void forceEndScope() {
+        isForcedToEnd++;
+    }
+
+    public void stopEndScope() {
+        isForcedToEnd = 0;
+    }
+
+    public boolean isForcedToEndScope() {
+        return isForcedToEnd > 0;
+    }
+
+    private int breakLoop = 0;
+
+    public void breakLoop(int n)
+    {
+        breakLoop += n;
+    }
+
+    public void breakLoop()
+    {
+        breakLoop(1);
+    }
+
+    public void stopBreakLoop()
+    {
+        breakLoop = 0;
+    }
+
+    public boolean isLoopBroken()
+    {
+        return breakLoop > 0;
+    }
 
     private final HashMap<String,ScriptValue> variables = new HashMap<>();
 
