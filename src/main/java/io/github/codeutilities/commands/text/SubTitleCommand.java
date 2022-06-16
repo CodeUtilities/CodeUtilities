@@ -17,8 +17,6 @@ public class SubTitleCommand implements Command {
         reg("previewsubtitle",mc,cd);
         reg("subtitlepreview",mc,cd);
     }
-    
-    /*
 
     @Override
     public String getDescription() {
@@ -32,8 +30,6 @@ public class SubTitleCommand implements Command {
     public String getName() {
         return "/previewsubtitle";
     }
-    
-    */
 
     public void reg(String name, MinecraftClient mc, CommandDispatcher<FabricClientCommandSource> cd) {
         cd.register(literal(name)

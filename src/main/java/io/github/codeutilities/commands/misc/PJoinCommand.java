@@ -78,7 +78,7 @@ public class PJoinCommand implements Command {
         );
     }
 
-    /*
+
     @Override
     public String getDescription() {
         return "[blue]/pjoin <player>[reset]\n"
@@ -90,7 +90,7 @@ public class PJoinCommand implements Command {
     public String getName() {
         return "/pjoin";
     }
-    */
+
 
     private int run(MinecraftClient mc, String player) {
 

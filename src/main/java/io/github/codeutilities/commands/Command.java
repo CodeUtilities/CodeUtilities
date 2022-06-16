@@ -10,6 +10,9 @@ public interface Command {
 
     void register(CommandDispatcher<FabricClientCommandSource> cd);
 
+    String getName();
+    String getDescription();
+
     default LiteralArgumentBuilder<FabricClientCommandSource> literal(String name) {
         return LiteralArgumentBuilder.literal(name);
     }

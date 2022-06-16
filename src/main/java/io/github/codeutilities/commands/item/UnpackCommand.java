@@ -49,7 +49,6 @@ public class UnpackCommand implements Command {
         );
     }
 
-    /*
     @Override
     public String getDescription() {
         return "[blue]/unpack[reset]\n\nExtracts the items in a container you are holding.";
@@ -59,5 +58,5 @@ public class UnpackCommand implements Command {
     public String getName() {
         return "/unpack";
     }
-    */
+
 }

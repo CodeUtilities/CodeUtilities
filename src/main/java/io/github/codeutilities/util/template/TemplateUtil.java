@@ -11,7 +11,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class TemplateUtils {
+public class TemplateUtil {
 
     public static final int VERSION = 1;
 

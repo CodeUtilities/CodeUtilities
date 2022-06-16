@@ -120,7 +120,6 @@ public class CalcCommand implements Command {
         );
     }
 
-    /*
     @Override
     public String getDescription() {
         return "[blue]/calc <expression>[reset]\n\nCalculates simple math expressions.";
@@ -130,5 +129,5 @@ public class CalcCommand implements Command {
     public String getName() {
         return "/calc";
     }
-    */
+
 }

@@ -14,6 +14,8 @@ import io.github.codeutilities.config.types.*;
 import io.github.codeutilities.config.types.list.*;
 import io.github.codeutilities.features.*;
 import io.github.codeutilities.features.commands.afk.AfkFeature;
+import io.github.codeutilities.features.commands.search.codeaction.ActionDump;
+import io.github.codeutilities.features.commands.templates.TemplateStorageHandler;
 import io.github.codeutilities.features.streamermode.StreamerModeListeners;
 import io.github.codeutilities.features.tab.Client;
 import io.github.codeutilities.loader.Loader;
@@ -21,15 +23,20 @@ import io.github.codeutilities.loader.v2.CodeInitializer;
 import io.github.codeutilities.script.ScriptManager;
 import io.github.codeutilities.util.Scheduler;
 import io.github.codeutilities.websocket.SocketHandler;
+import io.github.codeutilities.features.PlayerState;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class CodeUtilities implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger();
+    public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
 
     public static final String MOD_NAME = "CodeUtilities";
@@ -60,6 +67,9 @@ public class CodeUtilities implements ModInitializer {
         LOGGER.info("Initializing");
         Runtime.getRuntime().addShutdownHook(new Thread(this::onClose));
 
+        // allows FileDialog class to open without a HeadlessException
+        System.setProperty("java.awt.headless", "false");
+
         PLAYER_UUID = MC.getSession().getUuid();
         PLAYER_NAME = MC.getSession().getUsername();
 
@@ -78,10 +88,13 @@ public class CodeUtilities implements ModInitializer {
         loader.load(new Client());
         loader.load(new StreamerModeListeners());
         loader.load(new SocketHandler());
+        loader.load(new ActionDump());
+        loader.load(new PlayerState());
 
         CodeInitializer initializer = new CodeInitializer();
         initializer.add(new ConfigFile());
         initializer.add(new ConfigManager());
+        initializer.add(new TemplateStorageHandler());
 
         LOGGER.info("Initialized");
     }
@@ -90,6 +103,7 @@ public class CodeUtilities implements ModInitializer {
         LOGGER.info("Closing...");
         try {
             ConfigFile.getInstance().save();
+            TemplateStorageHandler.getInstance().save();
         } catch (Exception err) {
             LOGGER.error("Error");
             err.printStackTrace();

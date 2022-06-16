@@ -18,7 +18,6 @@ public class ActionbarCommand implements Command {
         reg("actionbarpreview",mc,cd);
     }
 
-    /*    
     @Override
     public String getDescription() {
         return "[blue]/previewactionbar [text][reset]\n"
@@ -31,7 +30,6 @@ public class ActionbarCommand implements Command {
     public String getName() {
         return "/previewactionbar";
     }
-     */
 
 
     public void reg(String name, MinecraftClient mc, CommandDispatcher<FabricClientCommandSource> cd) {

@@ -2,7 +2,7 @@ package io.github.codeutilities.websocket.client.type;
 
 import com.google.gson.JsonObject;
 import io.github.codeutilities.CodeUtilities;
-import io.github.codeutilities.util.template.TemplateUtils;
+import io.github.codeutilities.util.template.TemplateUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -37,11 +37,11 @@ public abstract class AbstractTemplateItem extends SocketItem {
         if (templateObject.has("version")) {
             version = templateObject.get("version").getAsInt();
         } else {
-            version = TemplateUtils.VERSION;
+            version = TemplateUtil.VERSION;
         }
 
         stack.setCustomName(name);
-        TemplateUtils.applyRawTemplateNBT(stack, (LiteralText) name, author, templateData, version);
+        TemplateUtil.applyRawTemplateNBT(stack, (LiteralText) name, author, templateData, version);
         return stack;
     }
 

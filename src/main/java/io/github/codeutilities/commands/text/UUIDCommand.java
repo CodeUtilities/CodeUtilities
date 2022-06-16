@@ -44,8 +44,6 @@ public class UUIDCommand implements Command {
         );
     }
     
-    /*
-    
     @Override
     public String getDescription() {
         return "[blue]/uuid <username>[reset]\n"
@@ -57,7 +55,6 @@ public class UUIDCommand implements Command {
     public String getName() {
         return "/uuid";
     }
-    */
 
     private void showUUID(String uuid) {
         if (uuid == null) {
