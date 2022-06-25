@@ -1,25 +1,17 @@
 package io.github.codeutilities.commands.text;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.github.codeutilities.CodeUtilities;
 import io.github.codeutilities.commands.Command;
 import io.github.codeutilities.commands.arguments.FreeStringArgumentType;
 import io.github.codeutilities.features.PlayerState;
 import io.github.codeutilities.features.commands.gradient.HSLColor;
-import io.github.codeutilities.util.ItemUtil;
 import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import io.github.codeutilities.util.chat.text.MinecraftColors;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.block.Material;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.argument.ColorArgumentType;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.*;
 
 import java.awt.*;
