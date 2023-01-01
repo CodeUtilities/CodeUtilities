@@ -8,6 +8,7 @@ import io.github.codeutilities.util.chat.ChatType;
 import io.github.codeutilities.util.chat.ChatUtil;
 import io.github.codeutilities.util.template.TemplateUtil;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
@@ -18,11 +19,12 @@ public class WebviewCommand implements Command {
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
+        MinecraftClient mc = CodeUtilities.MC;
         cd.register(
                 literal("webview")
                         .executes(ctx -> {
                             if (CodeUtilities.MC.player != null) {
-                                ItemStack stack = CodeUtilities.MC.player.getActiveItem();
+                                ItemStack stack = mc.player.getMainHandStack();
                                 JsonObject template;
 
                                 try {
