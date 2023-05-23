@@ -15,12 +15,8 @@ public class CodeUtilitiesCommand implements Command {
     public void register(CommandDispatcher<FabricClientCommandSource> cd) {
         cd.register(literal("codeutilities")
                 .executes(ctx -> {
-                    if (CodeUtilities.MC.player.isCreative()) {
-                        CodeUtilitiesScreen gui = new CodeUtilitiesScreen();
-                        CodeUtilities.MC.send(() -> CodeUtilities.MC.setScreen(gui));
-                    } else {
-                        ChatUtil.sendMessage(new TranslatableText("command.codeutilities.require_dev_mode", ChatType.FAIL));
-                    }
+                    CodeUtilitiesScreen gui = new CodeUtilitiesScreen();
+                    CodeUtilities.MC.send(() -> CodeUtilities.MC.setScreen(gui));
                     return 1;
                 })
         );
