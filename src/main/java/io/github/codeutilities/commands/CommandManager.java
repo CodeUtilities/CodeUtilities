@@ -60,6 +60,7 @@ public class CommandManager implements Loadable {
         commands.add(new ActionbarCommand());
         commands.add(new ColorCommand());
         commands.add(new CopyTextCommand());
+        commands.add(new GradientCommand());
         commands.add(new SubTitleCommand());
         commands.add(new TitleCommand());
         commands.add(new UUIDCommand());
